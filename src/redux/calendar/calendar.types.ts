@@ -1,74 +1,62 @@
+
 export interface GoogleCalendarEvent {
-  kind: string;
-  etag: string;
   id: string;
-  status: string;
-  htmlLink: string;
-  created: string;
-  updated: string;
+  google_event_id: string;
+  title: string;
+  notes_encrypted: string;
+  deadline: string; // ISO string
+  estimated_start_date: string; // ISO string
+  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'On Hold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
+  priority_level: number;
+  subtasks: any[];
+  tags: any[];
+  links: { title: string; url: string }[];
+  estimate_timer?: number;
+  participants?: { email: string; responseStatus?: string; avatar?: string }[];
+  organizer_email?: string;
+  location?: string;
+  is_all_day: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Interface that matches the RAW Google Calendar API response.
+ * Used for direct operations with the Google API (create/update).
+ */
+export interface RawGoogleEvent {
+  id?: string;
   summary?: string;
   description?: string;
-  creator: {
-    email: string;
-    self: boolean;
-  };
-  organizer: {
-    email: string;
-    self: boolean;
-  };
-  start: {
+  start?: {
     dateTime?: string;
-    timeZone?: string;
     date?: string;
   };
-  end: {
+  end?: {
     dateTime?: string;
-    timeZone?: string;
     date?: string;
-  };
-  recurringEventId?: string;
-  originalStartTime?: {
-    dateTime: string;
-    timeZone: string;
-  };
-  iCalUID: string;
-  sequence: number;
-  reminders: {
-    useDefault: boolean;
-  };
-  eventType: string;
-  colorId?: string;
-  attendees?: {
-    email: string;
-    organizer?: boolean;
-    self?: boolean;
-    responseStatus: string;
-  }[];
-  extendedProperties?: {
-    private: {
-      [key: string]: string;
-    };
-  };
-  source?: {
-    url: string;
-    title: string;
   };
   hangoutLink?: string;
   conferenceData?: {
+    createRequest?: {
+      requestId?: string;
+      conferenceSolutionKey?: { type: string };
+    };
     entryPoints?: {
-      entryPointType: string;
-      uri: string;
+      entryPointType?: string;
+      uri?: string;
       label?: string;
     }[];
-    conferenceId?: string;
-    conferenceSolution?: {
-      key: {
-        type: string;
-      };
-      name: string;
-      iconUri: string;
-    };
   };
+  attendees?: {
+    email?: string;
+    responseStatus?: string;
+  }[];
+  organizer?: {
+    email?: string;
+    self?: boolean;
+  };
+  location?: string;
+  created?: string;
+  updated?: string;
 }
-
-// Outlook calendar types removed along with Outlook integration

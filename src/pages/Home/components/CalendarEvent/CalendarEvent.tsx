@@ -98,9 +98,8 @@ export const CalendarEvent = (props: EventProps<ICalendarEvent>) => {
   const isMeeting =
     (event.type === 'event' &&
       !!(
-        (event.resource as GoogleCalendarEvent)?.hangoutLink ||
-        (event.resource as GoogleCalendarEvent)?.conferenceData ||
-        ((event.resource as GoogleCalendarEvent)?.attendees?.length ?? 0) > 1
+        (event.resource as GoogleCalendarEvent)?.links?.some((link) => VIDEO_CALL_DOMAINS.test(link.url)) ||
+        ((event.resource as GoogleCalendarEvent)?.participants?.length ?? 0) > 1
       )) ||
     hasVideoLinkInTask;
 

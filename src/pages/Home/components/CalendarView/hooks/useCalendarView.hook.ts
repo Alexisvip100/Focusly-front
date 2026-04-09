@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
@@ -11,7 +11,7 @@ import { setEvents } from '@/redux/calendar/calendar.slice';
 import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
 import type { TaskData } from '../../CreateTaskModal';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import { GET_TASKS, DELETE_TASK, GET_WORKSPACES, CREATE_TASK } from '@/api/graphql';
+import { GET_TASKS, DELETE_TASK, GET_WORKSPACES } from '@/api/graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
@@ -59,66 +59,6 @@ export const useCalendarView = () => {
         });
     }
   }, [reduxEvents.length, dispatch, user?.authProvider]);
-  const [createTaskMutation] = useMutation(CREATE_TASK);
-  const importedIds = useRef(new Set<string>());
-
-  useEffect(() => {
-    if (reduxEvents.length > 0 && user?.id) {
-      const newEvents = reduxEvents.filter((e) => {
-        const normGoogleId = e.id.replace(/^_+/, '').split('_')[0];
-        const isAlreadyProcessed = importedIds.current.has(normGoogleId);
-        const existsInDB = tasks.some(t => {
-          const tGoogleId = t.google_event_id?.replace(/^_+/, '').split('_')[0];
-          return tGoogleId === normGoogleId;
-        });
-        return !isAlreadyProcessed && !existsInDB;
-      });
-
-      if (newEvents.length > 0) {
-        newEvents.forEach(async (ge) => {
-          const normId = ge.id.replace(/^_+/, '').split('_')[0];
-          importedIds.current.add(normId);
-
-          try {
-            const startStr = ge.start.dateTime || ge.start.date || '';
-            const endStr = ge.end.dateTime || ge.end.date || '';
-            const start = new Date(startStr);
-            const end = endStr ? new Date(endStr) : new Date(start.getTime() + 30 * 60000);
-            const durationMinutes = Math.floor((end.getTime() - start.getTime()) / 60000);
-
-            const links: { title: string; url: string }[] = [];
-            if (ge.hangoutLink) links.push({ title: 'Google Meet', url: ge.hangoutLink });
-            if (ge.conferenceData?.entryPoints) {
-              ge.conferenceData.entryPoints.forEach(ep => {
-                if (ep.uri) links.push({ title: ep.label || ep.entryPointType || 'Joining Info', url: ep.uri });
-              });
-            }
-
-            await createTaskMutation({
-              variables: {
-                createTaskInput: {
-                  user_id: user.id || '',
-                  title: ge.summary || 'Untitled Import',
-                  notes_encrypted: ge.description || '',
-                  estimate_timer: durationMinutes > 0 ? durationMinutes : 30,
-                  deadline: start.toISOString(),
-                  priority_level: 2,
-                  status: 'Pending',
-                  category: 'Meeting',
-                  google_event_id: ge.id,
-                  links: links.map(l => ({ title: l.title, url: l.url })),
-                },
-              },
-              refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
-            });
-          } catch (err) {
-            console.error('Failed to auto-import event:', ge.id, err);
-          }
-        });
-      }
-    }
-  }, [reduxEvents, tasks, user?.id, createTaskMutation]);
-
   const events = useMemo(() => {
     // 1. Map Google Calendar Events (Virtual)
     const calendarEvents = reduxEvents
@@ -131,16 +71,12 @@ export const useCalendarView = () => {
       })
       .map((ge) => {
         try {
-          const startStr = ge.start.dateTime || ge.start.date || '';
-          const endStr = ge.end.dateTime || ge.end.date || '';
-          if (!startStr) return null;
-
           return {
             id: ge.id,
-            title: ge.summary || 'Untitled',
-            start: new Date(startStr),
-            end: endStr ? new Date(endStr) : new Date(startStr),
-            allDay: !ge.start.dateTime && !!ge.start.date,
+            title: ge.title,
+            start: new Date(ge.estimated_start_date),
+            end: new Date(ge.deadline),
+            allDay: ge.is_all_day,
             resource: ge,
             type: 'event' as const,
             provider: 'google',

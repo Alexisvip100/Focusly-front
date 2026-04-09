@@ -48,18 +48,20 @@ export const useTaskMutations = ({
               requestId: `focusly-${Date.now()}`,
               conferenceSolutionKey: { type: 'hangoutsMeet' },
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any,
+          },
         });
         return updated.hangoutLink;
       } else {
         const tempEvent = await createGoogleEvent({
           summary: state?.title || 'Focusly Meeting',
           description: state?.description || '',
-          start: { dateTime: state?.deadline?.toISOString() || new Date().toISOString() },
+          start: { 
+            dateTime: state?.deadline?.toISOString() || new Date().toISOString() 
+          },
           end: {
             dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) + (parseDuration(state?.duration || '30m') || 30) * 60000
+              (state?.deadline?.getTime() || Date.now()) + 
+              (parseDuration(state?.duration || '30m') || 30) * 60000
             ).toISOString(),
           },
           conferenceData: {
@@ -67,8 +69,7 @@ export const useTaskMutations = ({
               requestId: `focusly-${Date.now()}`,
               conferenceSolutionKey: { type: 'hangoutsMeet' },
             },
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          } as any,
+          },
         });
         
         const meetLink = tempEvent.hangoutLink || null;
