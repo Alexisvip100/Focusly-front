@@ -1,0 +1,82 @@
+:root {
+  font-family: Outfit, Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark light; /* Prefer dark */
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #1b1b1d;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+}
+
+/* --- Native View Transition API (for modern browsers) --- */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    view-transition-name: root;
+  }
+
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-old(root) {
+    filter: brightness(1);
+    opacity: 1;
+    transition: opacity 0.4s ease-in-out;
+  }
+
+  ::view-transition-new(root) {
+    opacity: 0;
+    transition: opacity 0.4s ease-in-out;
+  }
+}
+
+/* --- Refined CSS Fallback (for non-supporting browsers) ---
+   We avoid the global "*" selector to eliminate "tirones" (stutters) 
+   during the React re-render of complex components! */
+.theme-transitioning,
+.theme-transitioning .MuiPaper-root,
+.theme-transitioning .MuiBox-root,
+.theme-transitioning .MuiTypography-root {
+  transition: background-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+[data-sileo-viewport] {
+  z-index: 9999 !important;
+  padding-top: 80px !important;
+}
+
+[data-sileo-title] {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  text-align: center !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+[data-sileo-description] {
+  color: #e1e1e1 !important; /* Muted Dark Gray */
+  text-align: center !important;
+  width: 100% !important;
+  display: block !important;
+}
+
+[data-sileo-button] {
+  color: #ffffff !important;
+  font-weight: 700 !important;
+}
