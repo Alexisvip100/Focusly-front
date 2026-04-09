@@ -8,79 +8,23 @@ import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
  * a Google event from the calendar views.
  */
 export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
-  try {
-    const startStr = event.start.dateTime || event.start.date || '';
-    const endStr = event.end.dateTime || event.end.date || '';
-    
-    if (!startStr) {
-      throw new Error('Google event has no start time/date');
-    }
-
-    const start = new Date(startStr);
-    const end = endStr ? new Date(endStr) : new Date(start.getTime() + 30 * 60000);
-    const durationMinutes = Math.floor((end.getTime() - start.getTime()) / 60000);
-
-    const links: { title: string; url: string }[] = [];
-    const seenUrls = new Set<string>();
-
-    const addLink = (title: string, url: string) => {
-      const norm = url.replace(/^https?:\/\//, '').replace(/\/$/, '');
-      if (!seenUrls.has(norm)) {
-        links.push({ title, url });
-        seenUrls.add(norm);
-      }
-    };
-
-    if (event.hangoutLink) {
-      addLink('Google Meet', event.hangoutLink);
-    }
-    
-    if (event.conferenceData?.entryPoints) {
-      event.conferenceData.entryPoints.forEach((ep) => {
-        if (ep.uri) {
-          addLink(ep.label || ep.entryPointType || 'Joining Info', ep.uri);
-        }
-      });
-    }
-
-    return {
-      id: event.id,
-      user_id: 'google-user', // Marker for virtual/transient tasks from Google
-      title: event.summary || 'Untitled',
-      notes_encrypted: event.description || '',
-      estimate_timer: durationMinutes > 0 ? durationMinutes : 30,
-      priority_level: 2,
-      deadline: start.toISOString(),
-      status: 'Pending' as TaskStatus,
-      category: 'Meeting',
-      created_at: event.created || new Date().toISOString(),
-      updated_at: event.updated || new Date().toISOString(),
-      links,
-      google_event_id: event.id,
-      subtasks: [],
-      tags: [],
-    };
-  } catch (err) {
-    console.error('Failed to map Google Event to Task:', err);
-    // Return a minimal fallback if mapping fails
-    return {
-      id: event.id,
-      user_id: 'google-user',
-      title: event.summary || 'Untitled',
-      notes_encrypted: event.description || '',
-      estimate_timer: 30,
-      priority_level: 2,
-      deadline: new Date().toISOString(),
-      status: 'Pending' as TaskStatus,
-      category: 'Meeting',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-      links: [],
-      google_event_id: event.id,
-      subtasks: [],
-      tags: [],
-    };
-  }
+  return {
+    id: event.id,
+    user_id: 'google-user', // Marker for virtual/transient tasks from Google
+    title: event.title || 'Untitled',
+    notes_encrypted: event.notes_encrypted || '',
+    estimate_timer: event.estimate_timer || 30,
+    priority_level: event.priority_level || 3,
+    deadline: event.deadline,
+    status: (event.status as TaskStatus) || 'Pending',
+    category: 'Meeting',
+    created_at: event.created_at || new Date().toISOString(),
+    updated_at: event.updated_at || new Date().toISOString(),
+    links: event.links || [],
+    google_event_id: event.id,
+    subtasks: event.subtasks || [],
+    tags: event.tags || [],
+  };
 };
 
 /**
