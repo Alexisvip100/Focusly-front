@@ -22,7 +22,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     updated_at: event.updated_at || new Date().toISOString(),
     links: event.links || [],
     google_event_id: event.id,
-    subtasks: event.subtasks || [],
+    subtasks: (event.subtasks || []) as any,
     tags: event.tags || [],
   };
 };

@@ -1,5 +1,3 @@
-import type { Task } from "../tasks/task.types";
-
 
 export interface GoogleCalendarEvent {
   id: string;
@@ -8,9 +6,9 @@ export interface GoogleCalendarEvent {
   notes_encrypted: string;
   deadline: string; // ISO string
   estimated_start_date: string; // ISO string
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled';
+  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'On Hold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
   priority_level: number;
-  subtasks: Task[];
+  subtasks: any[];
   tags: any[];
   links: { title: string; url: string }[];
   estimate_timer?: number;
@@ -22,3 +20,43 @@ export interface GoogleCalendarEvent {
   updated_at: string;
 }
 
+/**
+ * Interface that matches the RAW Google Calendar API response.
+ * Used for direct operations with the Google API (create/update).
+ */
+export interface RawGoogleEvent {
+  id?: string;
+  summary?: string;
+  description?: string;
+  start?: {
+    dateTime?: string;
+    date?: string;
+  };
+  end?: {
+    dateTime?: string;
+    date?: string;
+  };
+  hangoutLink?: string;
+  conferenceData?: {
+    createRequest?: {
+      requestId?: string;
+      conferenceSolutionKey?: { type: string };
+    };
+    entryPoints?: {
+      entryPointType?: string;
+      uri?: string;
+      label?: string;
+    }[];
+  };
+  attendees?: {
+    email?: string;
+    responseStatus?: string;
+  }[];
+  organizer?: {
+    email?: string;
+    self?: boolean;
+  };
+  location?: string;
+  created?: string;
+  updated?: string;
+}
