@@ -166,6 +166,24 @@ export const CalendarContainer = styled(Box, {
     overflow: 'hidden',
   },
 
+  '& .rbc-month-view .rbc-date-cell.rbc-now': {
+    '& button': {
+      backgroundColor: theme.palette.primary.main,
+      color: '#ffffff !important',
+      width: '24px',
+      height: '24px',
+      borderRadius: '50%',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: '6px 8px 0 auto',
+      padding: '0',
+      minWidth: '24px',
+      fontWeight: 600,
+      fontSize: '12px',
+    }
+  },
+
   '& .rbc-month-view .rbc-event': {
     maxHeight: '20px !important',
     margin: '3px 0',
