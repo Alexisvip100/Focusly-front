@@ -6,16 +6,24 @@ export const CalendarContainer = styled(Box, {
   backgroundColor: theme.palette.background.paper,
   height: '100%',
   flex: 1,
+  boxSizing: 'border-box',
   // Override React Big Calendar styles for Dark Mode
   '& .rbc-calendar': {
     fontFamily: theme.typography.fontFamily,
     color: theme.palette.text.primary,
+    '& *, & *:before, & *:after': {
+      boxSizing: 'inherit',
+    },
   },
   
-  // Force all react-big-calendar borders to use theme divider
-  '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view, & .rbc-month-row, & .rbc-day-bg, & .rbc-time-content, & .rbc-timeslot-group, & .rbc-time-slot, & .rbc-header, & .rbc-time-header-content, & .rbc-time-header, & .rbc-time-gutter': {
-    borderColor: `${theme.palette.divider} !important`,
+
+  '& .rbc-row-bg': {
+    display: 'flex',
+    flexDirection: 'row',
+    flex: '1 0 0',
+    overflow: 'hidden',
   },
+  
 
   '& .rbc-event-label': {
     display: 'none',
@@ -34,12 +42,6 @@ export const CalendarContainer = styled(Box, {
 
   '& .rbc-time-view .rbc-allday-cell': {
     display: 'none',
-  },
-  '& .rbc-day-bg + .rbc-day-bg': {
-    borderLeft: `1px solid ${theme.palette.divider}`,
-  },
-  '& .rbc-day-bg': {
-    borderLeft: `1px solid ${theme.palette.divider}`,
   },
   '& .rbc-time-content': {
     borderTop: `1px solid ${theme.palette.divider}`,
@@ -92,12 +94,6 @@ export const CalendarContainer = styled(Box, {
     border: 'none',
     '&:focus': { outline: 'none' },
   },
-  '& .rbc-header + .rbc-header': {
-    borderLeft: `1px solid ${theme.palette.divider}`,
-  },
-  '& .rbc-header.rbc-today': {
-    borderBottom: `2px solid ${theme.palette.primary.main}`,
-  },
   '& .rbc-header': {
     backgroundColor: theme.palette.background.paper,
     borderBottom: `1px solid ${theme.palette.divider}`, // Restore horizontal line under headers
@@ -107,7 +103,19 @@ export const CalendarContainer = styled(Box, {
     display: 'flex', 
     alignItems: 'center',
     justifyContent: 'center',
-    borderTop: `1px solid ${theme.palette.divider}`, // Ensure top border for consistency
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    '&:first-of-type': {
+      borderLeft: 'none',
+    }
+  },
+  '& .rbc-row-bg > div': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+    '&:last-child': {
+      borderRight: `1px solid ${theme.palette.divider}`,
+    }
+  },
+  '& .rbc-month-row': {
+    borderBottom: `1px solid ${theme.palette.divider}`,
   },
   '& .rbc-time-header-content': {
     borderLeft: `1px solid ${theme.palette.divider}`,
