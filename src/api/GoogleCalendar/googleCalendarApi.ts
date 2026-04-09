@@ -5,7 +5,7 @@ import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 // el backend lo hace automáticamente usando la sesión del usuario.
 export const fetchGoogleEvents = async (): Promise<GoogleCalendarEvent[]> => {
   const response = await axios.get('/google-calendar/events');
-  return (response.data.items || []) as GoogleCalendarEvent[];
+  return (response.data || []) as GoogleCalendarEvent[];
 };
 
 export const createGoogleEvent = async (

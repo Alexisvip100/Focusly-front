@@ -16,9 +16,6 @@ export const calendarSlice = createSlice({
   initialState,
   reducers: {
     setEvents: (state, action: PayloadAction<CalendarEvent[]>) => {
-      // Logic to append or replace? Existing code replaces.
-      // But we might want to merge if we fetch from multiple providers?
-      // For now, let's just allow the union type.
       state.reduxEvents = action.payload;
     },
     addEvent: (state, action: PayloadAction<CalendarEvent>) => {
