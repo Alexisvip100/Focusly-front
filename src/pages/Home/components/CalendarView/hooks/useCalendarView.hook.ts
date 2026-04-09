@@ -1,7 +1,8 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
+import moment from 'moment';
 import { sileo } from 'sileo';
 // Types
 import type { RootState } from '@/redux/store';
@@ -25,6 +26,7 @@ export const useCalendarView = () => {
 
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState(new Date());
+  
   const [slotContextMenu, setSlotContextMenu] = useState<{ mouseX: number; mouseY: number; date: Date } | null>(null);
 
   // New Task Modal State moved to URL parameters
@@ -45,20 +47,41 @@ export const useCalendarView = () => {
     }
   }, [tasksData, dispatch]);
 
-  // Fetch Google Calendar Events on Mount if not present but user is from Google
-  useEffect(() => {
-    if (reduxEvents.length === 0 && user?.authProvider === 'google') {
-      fetchGoogleEvents()
-        .then((events) => {
-          if (events) {
-            dispatch(setEvents(events));
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to restore Google Calendar events', err);
-        });
+  const refreshCalendarEvents = useCallback(async () => {
+    if (user?.authProvider !== 'google') return;
+
+    let timeMin: string;
+    let timeMax: string;
+
+    const mDate = moment(currentDate);
+
+    if (currentView === Views.MONTH) {
+      // Fetch current month with 1 week buffer on each side
+      timeMin = mDate.clone().startOf('month').subtract(7, 'days').toISOString();
+      timeMax = mDate.clone().endOf('month').add(7, 'days').toISOString();
+    } else if (currentView === Views.WEEK) {
+      // Fetch current week
+      timeMin = mDate.clone().startOf('week').toISOString();
+      timeMax = mDate.clone().endOf('week').toISOString();
+    } else {
+      // Day view or other: fetch day with 1 day buffer
+      timeMin = mDate.clone().startOf('day').subtract(1, 'day').toISOString();
+      timeMax = mDate.clone().endOf('day').add(1, 'day').toISOString();
     }
-  }, [reduxEvents.length, dispatch, user?.authProvider]);
+
+    try {
+      const events = await fetchGoogleEvents(timeMin, timeMax);
+      if (events) {
+        dispatch(setEvents(events));
+      }
+    } catch (err) {
+      console.error('Failed to refresh Google Calendar events', err);
+    }
+  }, [currentDate, currentView, user?.authProvider, dispatch]);
+
+  useEffect(() => {
+    refreshCalendarEvents();
+  }, [refreshCalendarEvents]);
   const events = useMemo(() => {
     // 1. Map Google Calendar Events (Virtual)
     const calendarEvents = reduxEvents
