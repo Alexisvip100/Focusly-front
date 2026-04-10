@@ -1,261 +1,202 @@
 import { Box, styled, alpha } from '@mui/material';
-import type { CalendarDesignMode } from './calendarView.types';
 
 export const CalendarContainer = styled(Box, {
-  shouldForwardProp: (prop) => prop !== 'isDayView' && prop !== 'design',
-})<{ isDayView?: boolean; design?: CalendarDesignMode }>(
-  ({ theme, isDayView, design = 'current' }) => {
-    const isDark = theme.palette.mode === 'dark';
-    const isModern = design === 'modern';
+  shouldForwardProp: (prop) => prop !== 'isDayView',
+})<{ isDayView?: boolean }>(({ theme, isDayView }) => ({
+  backgroundColor: theme.palette.background.paper,
+  height: '100%',
+  flex: 1,
+  // Override React Big Calendar styles for Dark Mode
+  '& .rbc-calendar': {
+    fontFamily: theme.typography.fontFamily,
+    color: theme.palette.text.primary,
+  },
+  
+  '& .rbc-month-row .rbc-row-bg > div': {
+    borderLeft: `1px solid ${theme.palette.divider} !important`,
+    borderRight: `1px solid ${theme.palette.divider} !important`,
+  },
+  // Force all react-big-calendar borders to use theme divider
+  '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view, & .rbc-month-row, & .rbc-day-bg, & .rbc-time-content, & .rbc-timeslot-group, & .rbc-time-slot, & .rbc-header, & .rbc-time-header-content, & .rbc-time-header, & .rbc-time-gutter': {
+    borderColor: `${theme.palette.divider} !important`,
+  },
 
-    // Modern Design Tokens
-    const modernSurface = alpha(theme.palette.background.paper, isDark ? 0.86 : 0.94);
-    const modernBorder = alpha(theme.palette.divider, 0.9);
-    const modernRadius = '20px';
+  '& .rbc-event-label': {
+    display: 'none',
+  },
+  '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view': {
+    border: `1px solid ${theme.palette.divider}`,
+    backgroundColor: theme.palette.background.default,
+  },
+  '& .rbc-off-range-bg': {
+    backgroundColor: theme.palette.mode === 'dark' ? alpha(theme.palette.background.default, 0.5) : theme.palette.grey[100],
+  },
 
-    return {
-      backgroundColor: theme.palette.background.paper,
-      height: '100%',
-      flex: 1,
-      boxSizing: 'border-box',
-      
-      '& .rbc-calendar': {
-        fontFamily: theme.typography.fontFamily,
-        color: theme.palette.text.primary,
-        backgroundColor: isModern ? 'transparent' : 'inherit',
-        '& *, & *:before, & *:after': {
-          boxSizing: 'inherit',
-        },
-      },
+  '& .rbc-month-row + .rbc-month-row': {
+    borderTop: `1px solid ${theme.palette.divider}`,
+  },
 
-      '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view': {
-        border: isModern ? 'none' : `1px solid ${theme.palette.divider}`,
-        backgroundColor: isModern ? 'transparent' : theme.palette.background.default,
-      },
+  '& .rbc-time-view .rbc-allday-cell': {
+    display: 'none',
+  },
+  '& .rbc-day-bg + .rbc-day-bg': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
+  '& .rbc-day-bg': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
+  '& .rbc-time-content': {
+    borderTop: `1px solid ${theme.palette.divider}`,
+    scrollbarWidth: 'none',
+    msOverflowStyle: 'none',
+    backgroundColor: theme.palette.background.default,
+    '&::-webkit-scrollbar': {
+      display: 'none',
+    },
+  },
+  '& .rbc-time-content > * + * > *': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
+  // Perfect Scrollbar Customizations
+  '& .ps__rail-y': {
+    zIndex: 10,
+    backgroundColor: 'transparent !important',
+    width: '8px !important',
+  },
+  '& .ps__thumb-y': {
+    backgroundColor: `${theme.palette.divider} !important`,
+    width: '4px !important',
+    borderRadius: '4px !important',
+  },
+  '& .ps__rail-y:hover .ps__thumb-y, & .ps__rail-y.ps--clicking .ps__thumb-y': {
+    backgroundColor: `${theme.palette.text.secondary} !important`,
+  },
+  '& .rbc-timeslot-group': {
+    borderBottom: `1px solid ${theme.palette.divider}`,
+    minHeight: '65px', // Consistent hour height
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  '& .rbc-time-header': {
+    display: isDayView ? 'none' : 'flex',
+  },
+  '& .rbc-time-slot': {
+    flex: 1,
+    '&:not(:last-child)': {
+      borderBottom: `1px solid ${theme.palette.divider}`, // Restore solid 1px line
+    },
+  },
+  '& .rbc-today': {
+    backgroundColor: 'transparent !important',
+  },
+  '& .rbc-event': {
+    backgroundColor: 'transparent', // Custom component handles bg
+    padding: 0,
+    outline: 'none',
+    border: 'none',
+    '&:focus': { outline: 'none' },
+  },
+  '& .rbc-header + .rbc-header': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
+  '& .rbc-header.rbc-today': {
+    borderBottom: `2px solid ${theme.palette.primary.main}`,
+  },
+  '& .rbc-header': {
+    backgroundColor: theme.palette.background.paper,
+    borderBottom: `1px solid ${theme.palette.divider}`, // Restore horizontal line under headers
+    fontWeight: 600,
+    padding: '8px 0',
+    height: 'auto',
+    display: 'flex', 
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderTop: `1px solid ${theme.palette.divider}`, // Ensure top border for consistency
+  },
+  '& .rbc-time-header-content': {
+    borderLeft: `1px solid ${theme.palette.divider}`,
+  },
+  '& .rbc-time-header.rbc-overflowing': {
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
+  // Fix for Week view header height
+  '& .rbc-time-header-cell': {
+    minHeight: '60px', // Force enough height for stacked header
+  },
+  '& .rbc-toolbar button': {
+    color: theme.palette.text.primary,
+    borderColor: theme.palette.divider,
+    '&:hover': {
+      backgroundColor: theme.palette.action.hover,
+    },
+    '&.rbc-active': {
+      backgroundColor: `${theme.palette.primary.main} !important`,
+      color: '#ffffff',
+      boxShadow: 'none',
+    },
+  },
+  '& .rbc-time-gutter': {
+    backgroundColor: theme.palette.background.paper, // Match container bg
+    borderRight: `1px solid ${theme.palette.divider}`,
+  },
 
-      '& .rbc-off-range-bg': {
-        backgroundColor: isDark ? alpha(theme.palette.background.default, 0.45) : theme.palette.grey[100],
-      },
+  '& .rbc-label': {
+    color: theme.palette.text.secondary,
+    fontSize: '11px',
+    fontWeight: 500,
+  },
+  '& .rbc-current-time-indicator': {
+    backgroundColor: '#ef4444', // Red line
+    height: '1px',
+  },
+  '& .rbc-show-more': {
+    color: theme.palette.primary.main,
+    fontWeight: 600,
+    fontSize: '11px',
+    padding: '2px 4px',
+    cursor: 'pointer',
+    background: 'none',
+    '&:hover': {
+      textDecoration: 'underline',
+    },
+  },
 
-      // Global removals for Modern Mode
-      ...(isModern && {
-        '& .rbc-month-view, & .rbc-time-view, & .rbc-header, & .rbc-day-bg, & .rbc-month-row, & .rbc-time-content, & .rbc-time-header-content, & .rbc-timeslot-group': {
-          border: 'none !important',
-        },
-      }),
+  '& .rbc-month-view .rbc-month-row': {
+    maxHeight: '135px',
+    minHeight: '135px',
+    overflow: 'hidden',
+  },
+  '& .rbc-month-view .rbc-row-content': {
+    overflow: 'hidden',
+  },
 
-      // Month View Specific (Cards)
-      '& .rbc-month-view': {
-        ...(isModern && {
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '12px',
-          padding: '8px',
-          '& .rbc-month-row': {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(7, 1fr)',
-            gap: '12px',
-            border: 'none',
-            overflow: 'visible',
-            maxHeight: 'none !important',
-            minHeight: '135px',
-          },
-          '& .rbc-row-bg': {
-            display: 'grid',
-            gridTemplateColumns: 'repeat(7, 1fr)',
-            gap: '12px',
-            position: 'absolute',
-            inset: 0,
-            overflow: 'visible',
-          },
-          '& .rbc-day-bg': {
-            backgroundColor: modernSurface,
-            border: `1px solid ${modernBorder} !important`,
-            borderRadius: modernRadius,
-            boxShadow: isDark ? '0 4px 12px rgba(0,0,0,0.3)' : '0 4px 12px rgba(0,0,0,0.05)',
-            transition: 'all 0.2s ease',
-            '&:hover': {
-              transform: 'scale(1.01) translateY(-2px)',
-              borderColor: alpha(theme.palette.primary.main, 0.45) + ' !important',
-              boxShadow: isDark ? '0 8px 24px rgba(0,0,0,0.5)' : '0 8px 24px rgba(0,0,0,0.1)',
-            },
-          },
-          '& .rbc-date-cell': {
-            padding: '12px 14px',
-            fontWeight: 800,
-            fontSize: '15px',
-            color: theme.palette.text.primary,
-          },
-        }),
-      },
+  '& .rbc-month-view .rbc-date-cell.rbc-now': {
+    '& button': {
+      backgroundColor: theme.palette.primary.main,
+      color: '#ffffff !important',
+      width: '24px',
+      height: '24px',
+      borderRadius: '50%',
+      display: 'inline-flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: '6px 8px 0 auto',
+      padding: '0',
+      minWidth: '24px',
+      fontWeight: 600,
+      fontSize: '12px',
+    }
+  },
 
-      // Standard Grid styling for Current Mode
-      ...(!isModern && {
-        '& .rbc-month-row + .rbc-month-row': {
-          borderTop: `1px solid ${theme.palette.divider}`,
-        },
-        '& .rbc-day-bg + .rbc-day-bg': {
-          borderLeft: `1px solid ${theme.palette.divider}`,
-        },
-      }),
-
-      // Time View (Week/Day) Specific
-      '& .rbc-time-view': {
-        ...(isModern && {
-          '& .rbc-time-header': {
-            display: isDayView ? 'none' : 'flex',
-            gap: '12px',
-            padding: '0 12px',
-            marginBottom: '12px',
-          },
-          '& .rbc-time-header-cell': {
-            backgroundColor: modernSurface,
-            border: `1px solid ${modernBorder} !important`,
-            borderRadius: '18px',
-            padding: '10px',
-            minHeight: '65px',
-          },
-          '& .rbc-time-content': {
-            display: 'flex',
-            gap: '12px',
-            padding: '0 12px',
-            backgroundColor: 'transparent',
-            borderTop: 'none',
-          },
-          '& .rbc-day-slot': {
-            backgroundColor: modernSurface,
-            border: `1px solid ${modernBorder} !important`,
-            borderRadius: modernRadius,
-          },
-          '& .rbc-time-gutter': {
-            backgroundColor: 'transparent',
-            border: 'none',
-          },
-        }),
-      },
-
-      ...(!isModern && {
-        '& .rbc-time-content': {
-          borderTop: `1px solid ${theme.palette.divider}`,
-          backgroundColor: theme.palette.background.default,
-        },
-        '& .rbc-time-content > * + * > *': {
-          borderLeft: `1px solid ${theme.palette.divider}`,
-        },
-        '& .rbc-timeslot-group': {
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          minHeight: '65px',
-        },
-        '& .rbc-time-gutter': {
-          backgroundColor: theme.palette.background.paper,
-          borderRight: `1px solid ${theme.palette.divider}`,
-        },
-      }),
-
-      '& .rbc-timeslot-group': {
-        display: 'flex',
-        flexDirection: 'column',
-        minHeight: '65px',
-        ...(isModern && { border: 'none !important' }),
-      },
-
-      '& .rbc-time-slot': {
-        flex: 1,
-        ...(!isModern && {
-          '&:not(:last-child)': {
-            borderBottom: `1px solid ${theme.palette.divider}`,
-          },
-        }),
-      },
-
-      '& .rbc-today': {
-        backgroundColor: 'transparent !important',
-        ...(isModern && {
-          '&.rbc-day-bg': {
-            borderColor: theme.palette.primary.main + ' !important',
-            boxShadow: `0 0 0 2px ${alpha(theme.palette.primary.main, 0.25)}`,
-          },
-        }),
-      },
-
-      '& .rbc-event': {
-        backgroundColor: 'transparent',
-        padding: 0,
-        outline: 'none',
-        border: 'none',
-        '&:focus': { outline: 'none' },
-      },
-
-      '& .rbc-header': {
-        backgroundColor: isModern ? 'transparent' : theme.palette.background.paper,
-        borderBottom: isModern ? 'none' : `1px solid ${theme.palette.divider}`,
-        fontWeight: 700,
-        padding: '10px 0',
-        height: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        ...(!isModern && {
-          borderLeft: `1px solid ${theme.palette.divider}`,
-          '&:first-of-type': {
-            borderLeft: 'none',
-          },
-        }),
-      },
-
-      '& .rbc-show-more': {
-        color: theme.palette.primary.main,
-        fontWeight: 700,
-        fontSize: '12px',
-        padding: '4px 8px',
-        cursor: 'pointer',
-        background: 'none',
-        '&:hover': {
-          textDecoration: 'underline',
-        },
-      },
-
-      '& .rbc-month-view .rbc-date-cell.rbc-now': {
-        '& button': {
-          backgroundColor: theme.palette.primary.main,
-          color: '#ffffff !important',
-          width: '28px',
-          height: '28px',
-          borderRadius: '50%',
-          display: 'inline-flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          margin: '6px 8px 0 auto',
-          padding: '0',
-          minWidth: '28px',
-          fontWeight: 800,
-          fontSize: '13px',
-        },
-      },
-
-      '& .rbc-month-view .rbc-event': {
-        margin: isModern ? '4px 10px' : '2px 0',
-        padding: '0 !important',
-        backgroundColor: 'transparent !important',
-        '& .event-icon-container': { display: isModern ? 'none' : 'flex' },
-        '& .event-info': { 
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          gap: '6px',
-          '& span:last-child': { display: 'none' } 
-        },
-      },
-      
-      '& .rbc-label': {
-        color: theme.palette.text.secondary,
-        fontSize: '12px',
-        fontWeight: 600,
-      },
-
-      '& .rbc-current-time-indicator': {
-        backgroundColor: '#ef4444',
-        height: '1px',
-      },
-    };
-  }
-);
+  '& .rbc-month-view .rbc-event': {
+    maxHeight: '20px !important',
+    margin: '3px 0',
+    padding: '0 !important',
+    backgroundColor: 'transparent !important',
+    '& .event-icon-container': { display: 'none' },
+    '& .event-card-inner': { padding: '2px 6px !important', gap: '0 !important' },
+    '& .event-info': { flexDirection: 'row', alignItems: 'center', gap: '4px' },
+    // Hide time in month view to save even more space
+    '& .event-info span:last-child': { display: 'none' },
+  },
+}));
