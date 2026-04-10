@@ -9,7 +9,7 @@ const pulse = keyframes`
 export const ModernEventContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'isMeeting' && prop !== 'overlapIndex',
 })<{ variant: { main: string }; isMeeting?: boolean; overlapIndex?: number }>(
-  ({ theme, variant, isMeeting, overlapIndex = 0 }) => {
+  ({ theme, variant, isMeeting, overlapIndex: _overlapIndex = 0 }) => {
     const isDark = theme.palette.mode === 'dark';
     
     // Glassmorphism constants

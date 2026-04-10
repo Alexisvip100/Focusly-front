@@ -23,17 +23,15 @@ import { contextMenuSx, priorityCircleSx, PRIORITY_COLORS } from '../CalendarEve
 import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
 import type { ToolbarProps } from 'react-big-calendar';
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface CalendarViewProps {
   onStartFocus?: () => void;
 }
 
-export const CalendarView: React.FC = () => {
+export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus: _onStartFocus }) => {
   const {
     events,
     currentView,
     currentDate,
-    isCalendarLoading,
     handleOnChangeView,
     handleOnNavigate,
     handleSelectSlot,

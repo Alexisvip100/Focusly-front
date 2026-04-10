@@ -6,8 +6,7 @@ import {
   Typography, 
   Divider, 
   Stack, 
-  alpha,
-  useTheme
+  alpha
 } from '@mui/material';
 import { 
   CalendarToday as CalendarTodayIcon, 
@@ -42,11 +41,16 @@ interface CalendarEventProps {
   event: ICalendarEvent;
   title: string;
   design?: CalendarDesignMode;
+  continuesPrior?: boolean;
+  continuesAfter?: boolean;
+  localizer?: any;
+  slotStart?: Date;
+  slotEnd?: Date;
+  onStartFocus?: any;
 }
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, title, design = 'current' } = props;
-  const theme = useTheme();
+  const { event, title, design = 'current', onStartFocus: _onStartFocus } = props;
   const variant = getEventColor(event as { id?: string });
   const timeRange = `${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}`;
 
