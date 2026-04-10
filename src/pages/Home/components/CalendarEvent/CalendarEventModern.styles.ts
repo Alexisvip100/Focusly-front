@@ -9,6 +9,7 @@ const pulse = keyframes`
 export const ModernEventContainer = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'variant' && prop !== 'isMeeting' && prop !== 'overlapIndex',
 })<{ variant: { main: string }; isMeeting?: boolean; overlapIndex?: number }>(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ({ theme, variant, isMeeting, overlapIndex: _overlapIndex = 0 }) => {
     const isDark = theme.palette.mode === 'dark';
     

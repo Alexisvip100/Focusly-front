@@ -27,7 +27,7 @@ interface CalendarViewProps {
   onStartFocus?: () => void;
 }
 
-export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus: _onStartFocus }) => {
+export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
   const {
     events,
     currentView,
@@ -62,7 +62,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus: _onSta
       }
       
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      handleSelectSlot(params as any); // Cast as any here since handleSelectSlot expects a specific RBC event which we've extended
+      handleSelectSlot(params as any);
       closeSlotContextMenu();
     }
   };
@@ -97,7 +97,13 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus: _onSta
               />
             ),
             header: CalendarHeader,
-            event: (props: any) => <CalendarEvent {...props} design={calendarDesign} />,
+            event: (props: any) => (
+              <CalendarEvent 
+                {...props} 
+                design={calendarDesign} 
+                onStartFocus={onStartFocus}
+              />
+            ),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             timeSlotWrapper: (props: any) => (
               <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
@@ -115,9 +121,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus: _onSta
             showMore: (count: number) => `+${count} más`,
           }}
         />
-
-
-        
       </Box>
 
       {/* Slot Context Menu */}

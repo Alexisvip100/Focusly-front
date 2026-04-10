@@ -6,7 +6,7 @@ import {
   Typography, 
   Divider, 
   Stack, 
-  alpha
+  alpha 
 } from '@mui/material';
 import { 
   CalendarToday as CalendarTodayIcon, 
@@ -43,14 +43,14 @@ interface CalendarEventProps {
   design?: CalendarDesignMode;
   continuesPrior?: boolean;
   continuesAfter?: boolean;
-  localizer?: any;
+  localizer?: unknown;
   slotStart?: Date;
   slotEnd?: Date;
-  onStartFocus?: any;
+  onStartFocus?: () => void;
 }
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, title, design = 'current', onStartFocus: _onStartFocus } = props;
+  const { event, title, design = 'current', onStartFocus } = props;
   const variant = getEventColor(event as { id?: string });
   const timeRange = `${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}`;
 
@@ -94,6 +94,14 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     e.stopPropagation();
     if (event.id) {
       handleChangePriority(event.id, level);
+    }
+    handleClose();
+  };
+
+  const handleOnStartFocus = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onStartFocus) {
+      onStartFocus();
     }
     handleClose();
   };
@@ -226,6 +234,13 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           </Typography>
         </Box>
         
+        {onStartFocus && (
+          <MenuItem onClick={handleOnStartFocus}>
+            <ScheduleIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+            Start Focus
+          </MenuItem>
+        )}
+
         {event.type === 'task' && (
           <MenuItem onClick={onDuplicate}>
             <DuplicateIcon sx={{ mr: 1.5, color: 'primary.main' }} />
