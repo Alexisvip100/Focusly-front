@@ -23,15 +23,17 @@ import { contextMenuSx, priorityCircleSx, PRIORITY_COLORS } from '../CalendarEve
 import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
 import type { ToolbarProps } from 'react-big-calendar';
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 interface CalendarViewProps {
   onStartFocus?: () => void;
 }
 
-export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
+export const CalendarView: React.FC = () => {
   const {
     events,
     currentView,
     currentDate,
+    isCalendarLoading,
     handleOnChangeView,
     handleOnNavigate,
     handleSelectSlot,
@@ -41,6 +43,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,
+    calendarDesign,
+    handleNavigateAction,
+    handleCalendarDesignChange,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -66,7 +71,10 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
 
   return (
-    <CalendarContainer isDayView={currentView === Views.DAY}>
+    <CalendarContainer 
+      isDayView={currentView === Views.DAY} 
+      design={calendarDesign}
+    >
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}>
         <Calendar
           localizer={localizer}
@@ -84,12 +92,14 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
               <CalendarToolbar
                 {...props}
-                onStartFocus={onStartFocus}
                 isSessionActive={isFocusSessionActive}
+                calendarDesign={calendarDesign}
+                setCalendarDesign={handleCalendarDesignChange}
+                onNavigateAction={handleNavigateAction}
               />
             ),
             header: CalendarHeader,
-            event: CalendarEvent,
+            event: (props: any) => <CalendarEvent {...props} design={calendarDesign} />,
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             timeSlotWrapper: (props: any) => (
               <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
@@ -107,6 +117,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             showMore: (count: number) => `+${count} más`,
           }}
         />
+
+
+        
       </Box>
 
       {/* Slot Context Menu */}

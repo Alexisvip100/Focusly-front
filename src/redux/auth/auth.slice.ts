@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk, type PayloadAction } from '@reduxjs/toolkit';
 import { auth } from '@/context/firebase';
+import { API_BASE_URL } from '@/config/env.config';
 import { AuthProviders } from '@/pages/Login/types/Login.types';
 
 interface User {
@@ -15,13 +16,15 @@ interface AuthState {
   user: User | null;
   authProvider: AuthProviders | null;
   onboardingCompleted: boolean;
+  sessionExpiredNotice: boolean;
 }
+
+type LogoutReason = 'manual' | 'expired';
 
 const getInitialState = (): AuthState => {
   const user = localStorage.getItem('user');
   const authProvider = localStorage.getItem('authProvider');
   const onboardingCompleted = localStorage.getItem('onboardingCompleted') === 'true';
-
 
   if (user) {
     try {
@@ -31,6 +34,7 @@ const getInitialState = (): AuthState => {
         user: parsedUser,
         authProvider: authProvider as AuthProviders,
         onboardingCompleted,
+        sessionExpiredNotice: false,
       };
     } catch (e) {
       console.error('[DEBUG] authSlice: Error parsing user from localStorage', e);
@@ -42,21 +46,24 @@ const getInitialState = (): AuthState => {
     user: null,
     authProvider: null,
     onboardingCompleted,
+    sessionExpiredNotice: false,
   };
 };
 
-import { API_BASE_URL } from '@/config/env.config';
-
-export const logout = createAsyncThunk('auth/logout', async (_, { dispatch }) => {
-  try {
-    await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
-    await auth.signOut();
-  } catch (error) {
-    console.error('Logout error:', error);
-  } finally {
-    dispatch(clearAuth());
+export const logout = createAsyncThunk<void, LogoutReason | undefined>(
+  'auth/logout',
+  async (reason = 'manual', { dispatch }) => {
+    try {
+      await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+      await auth.signOut();
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      dispatch(setSessionExpiredNotice(reason === 'expired'));
+      dispatch(clearAuth());
+    }
   }
-});
+);
 
 const initialState: AuthState = getInitialState();
 
@@ -75,6 +82,7 @@ export const authSlice = createSlice({
       state.isLogged = action.payload.isLogged;
       state.user = action.payload.user;
       state.authProvider = action.payload.provider;
+      state.sessionExpiredNotice = false;
 
       localStorage.setItem('authProvider', action.payload.provider);
       localStorage.setItem('user', JSON.stringify(action.payload.user));
@@ -86,6 +94,12 @@ export const authSlice = createSlice({
 
       localStorage.removeItem('user');
       localStorage.removeItem('authProvider');
+    },
+    setSessionExpiredNotice: (state, action: PayloadAction<boolean>) => {
+      state.sessionExpiredNotice = action.payload;
+    },
+    dismissSessionExpiredNotice: (state) => {
+      state.sessionExpiredNotice = false;
     },
     completeOnboarding: (state) => {
       state.onboardingCompleted = true;
@@ -100,6 +114,13 @@ export const authSlice = createSlice({
   },
 });
 
-export const { login, clearAuth, completeOnboarding, updateUser } = authSlice.actions;
+export const {
+  login,
+  clearAuth,
+  setSessionExpiredNotice,
+  dismissSessionExpiredNotice,
+  completeOnboarding,
+  updateUser,
+} = authSlice.actions;
 
 export default authSlice.reducer;

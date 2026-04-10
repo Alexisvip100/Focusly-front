@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
+import { addDays, addMonths, addWeeks, subDays, subMonths, subWeeks } from 'date-fns';
 import { sileo } from 'sileo';
 // Types
 import type { RootState } from '@/redux/store';
@@ -14,6 +15,7 @@ import type { ICalendarEvent } from '../../CalendarEvent';
 import { GET_TASKS, DELETE_TASK, GET_WORKSPACES } from '@/api/graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import type { CalendarDesignMode, CalendarNavigateAction } from '../calendarView.types';
 
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
@@ -26,13 +28,24 @@ export const useCalendarView = () => {
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [slotContextMenu, setSlotContextMenu] = useState<{ mouseX: number; mouseY: number; date: Date } | null>(null);
+  const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] = useState<string | null>(null);
+  
+  const [calendarDesign, setCalendarDesign] = useState<CalendarDesignMode>(() => {
+    const savedMode = window.localStorage.getItem('calendarDesignMode');
+    return savedMode === 'modern' ? 'modern' : 'current';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('calendarDesignMode', calendarDesign);
+  }, [calendarDesign]);
+
 
   // New Task Modal State moved to URL parameters
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
 
   const user = useSelector((state: RootState) => state.auth.user);
 
-  const { data: tasksData } = useQuery(GET_TASKS, {
+  const { data: tasksData, loading: isTasksQueryLoading } = useQuery(GET_TASKS, {
     skip: !user?.id,
     variables: { userId: user?.id },
     fetchPolicy: 'cache-and-network',
@@ -45,20 +58,50 @@ export const useCalendarView = () => {
     }
   }, [tasksData, dispatch]);
 
+  const shouldRestoreGoogleCalendar =
+    user?.authProvider === 'google' &&
+    Boolean(user?.id) &&
+    reduxEvents.length === 0 &&
+    resolvedGoogleCalendarUserId !== user.id;
+
+  const isGoogleEventsLoading = shouldRestoreGoogleCalendar;
+
   // Fetch Google Calendar Events on Mount if not present but user is from Google
   useEffect(() => {
-    if (reduxEvents.length === 0 && user?.authProvider === 'google') {
-      fetchGoogleEvents()
-        .then((events) => {
-          if (events) {
-            dispatch(setEvents(events));
-          }
-        })
-        .catch((err) => {
-          console.error('Failed to restore Google Calendar events', err);
-        });
+    if (!shouldRestoreGoogleCalendar || !user?.id) {
+      return;
     }
-  }, [reduxEvents.length, dispatch, user?.authProvider]);
+
+    let isMounted = true;
+
+    fetchGoogleEvents()
+      .then((events) => {
+        if (isMounted && events) {
+          dispatch(setEvents(events));
+        }
+      })
+      .catch((err) => {
+        console.error('Failed to restore Google Calendar events', err);
+      })
+      .finally(() => {
+        if (isMounted) {
+          setResolvedGoogleCalendarUserId(user.id);
+        }
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [dispatch, shouldRestoreGoogleCalendar, user?.id]);
+
+  const hasRenderableCalendarData =
+    reduxEvents.length > 0 ||
+    tasks.length > 0 ||
+    (tasksData?.tasks?.length ?? 0) > 0;
+
+  const isCalendarLoading =
+    !hasRenderableCalendarData && (isTasksQueryLoading || isGoogleEventsLoading);
+
   const events = useMemo(() => {
     // 1. Map Google Calendar Events (Virtual)
     const calendarEvents = reduxEvents
@@ -150,6 +193,29 @@ export const useCalendarView = () => {
 
   const handleOnNavigate = (newDate: Date) => {
     setCurrentDate(newDate);
+  };
+
+  const handleNavigateAction = (action: CalendarNavigateAction) => {
+    if (action === 'TODAY') {
+      setCurrentDate(new Date());
+      return;
+    }
+
+    if (currentView === Views.MONTH) {
+      setCurrentDate((prev) => (action === 'NEXT' ? addMonths(prev, 1) : subMonths(prev, 1)));
+      return;
+    }
+
+    if (currentView === Views.WEEK) {
+      setCurrentDate((prev) => (action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1)));
+      return;
+    }
+
+    setCurrentDate((prev) => (action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1)));
+  };
+
+  const handleCalendarDesignChange = (selectedDesign: CalendarDesignMode) => {
+    setCalendarDesign(selectedDesign);
   };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
@@ -255,8 +321,12 @@ export const useCalendarView = () => {
     events,
     currentView,
     currentDate,
+    isCalendarLoading,
+    calendarDesign,
     handleOnChangeView,
     handleOnNavigate,
+    handleNavigateAction,
+    handleCalendarDesignChange,
     handleSelectSlot,
     handleSelectEvent,
     handleSaveTask,

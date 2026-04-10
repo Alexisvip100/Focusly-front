@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { ToolbarProps, View } from 'react-big-calendar';
 import type { ICalendarEvent } from '../CalendarEvent';
 import { Navigate } from 'react-big-calendar';
+import type { CalendarDesignMode, CalendarNavigateAction } from '../CalendarView/calendarView.types';
 import {
   Box,
   Button,
@@ -41,12 +42,14 @@ interface Notification {
 const initialNotifications: Notification[] = [];
 
 interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
-  onStartFocus?: () => void;
   isSessionActive?: boolean;
+  calendarDesign?: CalendarDesignMode;
+  setCalendarDesign?: (design: CalendarDesignMode) => void;
+  onNavigateAction?: (action: CalendarNavigateAction) => void;
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
-  const { date, view, onView, onNavigate, label } = props;
+  const { date, view, onView, onNavigate, label, calendarDesign, setCalendarDesign, onNavigateAction } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -72,9 +75,9 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
   };
 
-  const goToBack = () => onNavigate(Navigate.PREVIOUS);
-  const goToNext = () => onNavigate(Navigate.NEXT);
-  const goToToday = () => onNavigate(Navigate.TODAY);
+  const goToBack = () => onNavigateAction ? onNavigateAction('PREV') : onNavigate(Navigate.PREVIOUS);
+  const goToNext = () => onNavigateAction ? onNavigateAction('NEXT') : onNavigate(Navigate.NEXT);
+  const goToToday = () => onNavigateAction ? onNavigateAction('TODAY') : onNavigate(Navigate.TODAY);
   const handleViewChange = (newView: View) => onView(newView);
 
   const getFormattedDate = () => {
@@ -136,6 +139,37 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           }}
         >
           Month
+        </Button>
+      </ViewToggle>
+
+      <Box sx={{ flexGrow: 1 }} />
+
+      <ViewToggle variant="contained" aria-label="design mode button group" sx={{ mr: 2 }}>
+        <Button
+          onClick={() => setCalendarDesign?.('current')}
+          className={calendarDesign === 'current' ? 'active' : ''}
+          sx={{
+            borderRadius: '6px', textTransform: 'none', fontSize: '12px', fontWeight: 600,
+            px: 1.5,
+            color: '#94a3b8',
+            '&.active': { color: '#ffffff', bgcolor: '#334155' },
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+          }}
+        >
+          Current
+        </Button>
+        <Button
+          onClick={() => setCalendarDesign?.('modern')}
+          className={calendarDesign === 'modern' ? 'active' : ''}
+          sx={{
+            borderRadius: '6px', textTransform: 'none', fontSize: '12px', fontWeight: 600,
+            px: 1.5,
+            color: '#94a3b8',
+            '&.active': { color: '#ffffff', bgcolor: '#334155' },
+            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
+          }}
+        >
+          Modern
         </Button>
       </ViewToggle>
       <Box>

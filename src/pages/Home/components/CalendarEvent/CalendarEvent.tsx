@@ -1,15 +1,11 @@
-import React, { useState } from 'react';
-import moment from 'moment';
-import type { EventProps } from 'react-big-calendar';
+import { useState } from 'react';
 import { 
-  Typography, 
+  Box, 
   Menu, 
   MenuItem, 
+  Typography, 
   Divider, 
-  Box, 
   Stack, 
-  ListItemIcon, 
-  ListItemText,
   alpha,
   useTheme
 } from '@mui/material';
@@ -17,13 +13,17 @@ import {
   CalendarToday as CalendarTodayIcon, 
   Videocam as VideocamIcon,
   ContentCopy as DuplicateIcon,
-  DeleteOutline as DeleteIcon
+  DeleteOutline as DeleteIcon,
+  Schedule as ScheduleIcon
 } from '@mui/icons-material';
 
 import { getEventColor, EventContainer, priorityCircleSx, contextMenuSx, PRIORITY_COLORS } from './CalendarEvent.styles';
+import { ModernEventContainer, ModernPriorityDot } from './CalendarEventModern.styles';
+import type { CalendarDesignMode } from '../CalendarView/calendarView.types';
 
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import type { Task } from '@/redux/tasks/task.types';
+import moment from 'moment';
 import { useCalendarContextMenu } from './hooks/useCalendarContextMenu';
 
 export interface ICalendarEvent {
@@ -32,14 +32,20 @@ export interface ICalendarEvent {
   start: Date;
   end: Date;
   allDay?: boolean;
-  resource?: GoogleCalendarEvent | Task;
-  type?: 'task' | 'event';
-  provider?: string;
+  resource?: Task | GoogleCalendarEvent;
+  type: 'task' | 'event';
   overlapIndex?: number;
+  provider?: string;
 }
 
-export const CalendarEvent = (props: EventProps<ICalendarEvent>) => {
-  const { event, title } = props;
+interface CalendarEventProps {
+  event: ICalendarEvent;
+  title: string;
+  design?: CalendarDesignMode;
+}
+
+export const CalendarEvent = (props: CalendarEventProps) => {
+  const { event, title, design = 'current' } = props;
   const theme = useTheme();
   const variant = getEventColor(event as { id?: string });
   const timeRange = `${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}`;
@@ -105,38 +111,99 @@ export const CalendarEvent = (props: EventProps<ICalendarEvent>) => {
 
   const currentPriority = event.type === 'task' ? (event.resource as Task)?.priority_level : undefined;
 
+  const renderClassic = () => (
+    <EventContainer 
+      variant={variant} 
+      isMeeting={isMeeting} 
+      overlapIndex={event.overlapIndex}
+      onContextMenu={handleContextMenu}
+    >
+      <div className="event-card-inner">
+        <div className="event-icon-container">
+          {isMeeting ? (
+            <VideocamIcon sx={{ fontSize: '18px', color: '#3B82F6' }} />
+          ) : (
+            <CalendarTodayIcon sx={{ fontSize: '16px', color: '#ffffff' }} />
+          )}
+        </div>
+        <div className="event-info">
+          <Typography
+            variant="caption"
+            sx={{ fontWeight: 700, fontSize: '13px', lineHeight: 1.2, display: 'block', color: 'inherit' }}
+          >
+            {title}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '11px', fontWeight: 500, display: 'block', opacity: 0.8, color: 'inherit' }}
+          >
+            {timeRange}
+          </Typography>
+        </div>
+      </div>
+    </EventContainer>
+  );
+
+  const renderModern = () => (
+    <ModernEventContainer 
+      variant={variant} 
+      isMeeting={isMeeting} 
+      overlapIndex={event.overlapIndex}
+      onContextMenu={handleContextMenu}
+    >
+      <Stack spacing={0.5} sx={{ height: '100%', justifyContent: 'center' }}>
+        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
+          {isMeeting && <Box className="meeting-indicator" />}
+          {!isMeeting && event.type === 'task' && currentPriority && (
+            <ModernPriorityDot color={PRIORITY_COLORS[currentPriority].main} />
+          )}
+          <Typography
+            variant="caption"
+            noWrap
+            sx={{ 
+              fontWeight: 700, 
+              fontSize: '12.5px', 
+              lineHeight: 1.2, 
+              color: 'text.primary',
+              opacity: 0.95
+            }}
+          >
+            {title}
+          </Typography>
+        </Stack>
+
+        <Stack direction="row" alignItems="center" spacing={0.6} sx={{ opacity: 0.6 }}>
+          <ScheduleIcon sx={{ fontSize: '11px' }} />
+          <Typography
+            variant="caption"
+            sx={{ 
+              fontSize: '10.5px', 
+              fontWeight: 600,
+              letterSpacing: '0.01em'
+            }}
+          >
+            {timeRange}
+          </Typography>
+        </Stack>
+      </Stack>
+      
+      {isMeeting && (
+        <VideocamIcon 
+          sx={{ 
+            position: 'absolute', 
+            top: '8px', 
+            right: '8px', 
+            fontSize: '16px', 
+            color: alpha('#3B82F6', 0.6) 
+          }} 
+        />
+      )}
+    </ModernEventContainer>
+  );
+
   return (
     <>
-      <EventContainer 
-        variant={variant} 
-        isMeeting={isMeeting} 
-        overlapIndex={event.overlapIndex}
-        onContextMenu={handleContextMenu}
-      >
-        <div className="event-card-inner">
-          <div className="event-icon-container">
-            {isMeeting ? (
-              <VideocamIcon sx={{ fontSize: '18px', color: '#3B82F6' }} />
-            ) : (
-              <CalendarTodayIcon sx={{ fontSize: '16px', color: '#ffffff' }} />
-            )}
-          </div>
-          <div className="event-info">
-            <Typography
-              variant="caption"
-              sx={{ fontWeight: 700, fontSize: '13px', lineHeight: 1.2, display: 'block', color: 'inherit' }}
-            >
-              {title}
-            </Typography>
-            <Typography
-              variant="caption"
-              sx={{ fontSize: '11px', fontWeight: 500, display: 'block', opacity: 0.8, color: 'inherit' }}
-            >
-              {timeRange}
-            </Typography>
-          </div>
-        </div>
-      </EventContainer>
+      {design === 'modern' ? renderModern() : renderClassic()}
 
       <Menu
         open={contextMenu !== null}
@@ -149,48 +216,44 @@ export const CalendarEvent = (props: EventProps<ICalendarEvent>) => {
         }
         sx={contextMenuSx}
       >
+        <Box sx={{ px: 2, py: 1.5 }}>
+          <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+            Actions
+          </Typography>
+        </Box>
+        
+        {event.type === 'task' && (
+          <MenuItem onClick={onDuplicate}>
+            <DuplicateIcon sx={{ mr: 1.5, color: 'primary.main' }} />
+            Duplicate Task
+          </MenuItem>
+        )}
+
         {event.type === 'task' && (
           <>
-            <Box sx={{ px: 2, py: 1.5 }}>
-              <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1, lineHeight: 1 }}>
-                Priority & Color
+            <Divider />
+            <Box sx={{ px: 2, py: 1 }}>
+              <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                Priority
               </Typography>
-              <Stack direction="row" spacing={1.5} justifyContent="center" sx={{ mt: 1 }}>
+              <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, mb: 0.5 }}>
                 {[1, 2, 3, 4].map((level) => (
                   <Box
                     key={level}
-                    onClick={(e: React.MouseEvent) => onPriorityChange(e, level)}
+                    onClick={(e) => onPriorityChange(e, level)}
                     sx={priorityCircleSx(PRIORITY_COLORS[level].main, currentPriority === level)}
                   />
                 ))}
               </Stack>
             </Box>
-            
-            <Divider />
-            
-            <MenuItem onClick={onDuplicate}>
-              <ListItemIcon>
-                <DuplicateIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Duplicate Task</ListItemText>
-            </MenuItem>
           </>
         )}
+
+        <Divider />
         
-        <MenuItem 
-          onClick={onDelete} 
-          sx={{ 
-            color: 'error.main', 
-            '&:hover': { 
-              backgroundColor: alpha(theme.palette.error.main, 0.08) + ' !important',
-              color: 'error.dark'
-            } 
-          }}
-        >
-          <ListItemIcon>
-            <DeleteIcon fontSize="small" color="error" />
-          </ListItemIcon>
-          <ListItemText>{event.type === 'task' ? 'Delete Task' : 'Delete External Event'}</ListItemText>
+        <MenuItem onClick={onDelete} sx={{ color: '#ef4444', '&:hover': { bgcolor: alpha('#ef4444', 0.08) } }}>
+          <DeleteIcon sx={{ mr: 1.5, color: '#ef4444' }} />
+          Delete {event.type === 'task' ? 'Task' : 'Event'}
         </MenuItem>
       </Menu>
     </>

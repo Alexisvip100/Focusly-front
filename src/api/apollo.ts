@@ -17,13 +17,13 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
         extensions?.code === 'UNAUTHENTICATED' ||
         (extensions?.response as { statusCode?: number } | undefined)?.statusCode === 401
       ) {
-        store.dispatch(logout());
+        store.dispatch(logout('expired'));
       }
     });
   }
 
   if (networkError && 'statusCode' in networkError && networkError.statusCode === 401) {
-    store.dispatch(logout());
+    store.dispatch(logout('expired'));
   }
 });
 
