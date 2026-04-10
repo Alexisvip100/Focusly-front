@@ -1,6 +1,7 @@
+#!/bin/sh
+. "$(dirname "$0")/_/husky.sh"
 
-
-echo "Running type check..."
+echo "Checking types..."
 yarn tsc --noEmit
 
 echo "Running lint-staged..."
