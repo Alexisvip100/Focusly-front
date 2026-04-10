@@ -49,7 +49,7 @@ interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
 }
 
 export const CalendarToolbar = (props: CustomToolbarProps) => {
-  const { date, view, onView, onNavigate, label, calendarDesign, setCalendarDesign, onNavigateAction } = props;
+  const { date, view, onView, onNavigate, label, onNavigateAction } = props;
   const theme = useTheme();
 
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -141,38 +141,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
           Month
         </Button>
       </ViewToggle>
-
-      <Box sx={{ flexGrow: 1 }} />
-
-      <ViewToggle variant="contained" aria-label="design mode button group" sx={{ mr: 2 }}>
-        <Button
-          onClick={() => setCalendarDesign?.('current')}
-          className={calendarDesign === 'current' ? 'active' : ''}
-          sx={{
-            borderRadius: '6px', textTransform: 'none', fontSize: '12px', fontWeight: 600,
-            px: 1.5,
-            color: '#94a3b8',
-            '&.active': { color: '#ffffff', bgcolor: '#334155' },
-            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
-          }}
-        >
-          Current
-        </Button>
-        <Button
-          onClick={() => setCalendarDesign?.('modern')}
-          className={calendarDesign === 'modern' ? 'active' : ''}
-          sx={{
-            borderRadius: '6px', textTransform: 'none', fontSize: '12px', fontWeight: 600,
-            px: 1.5,
-            color: '#94a3b8',
-            '&.active': { color: '#ffffff', bgcolor: '#334155' },
-            '&:hover': { bgcolor: 'rgba(255,255,255,0.05)' },
-          }}
-        >
-          Modern
-        </Button>
-      </ViewToggle>
-      <Box>
 
         <Popover
           open={open}
@@ -289,7 +257,6 @@ export const CalendarToolbar = (props: CustomToolbarProps) => {
             </>
           )}
         </Popover>
-      </Box>
     </ToolbarContainer>
   );
 };
