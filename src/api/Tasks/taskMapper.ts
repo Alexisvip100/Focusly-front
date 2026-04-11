@@ -24,6 +24,8 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     google_event_id: event.id,
     subtasks: (event.subtasks || []) as any,
     tags: event.tags || [],
+    estimated_start_date: event.estimated_start_date,
+    estimated_end_date: event.deadline,
   };
 };
 
@@ -78,5 +80,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     links: t.links || [],
     google_event_id: t.google_event_id,
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
+    estimated_start_date: safeISO(t.estimated_start_date),
+    estimated_end_date: safeISO(t.estimated_end_date),
   };
 };

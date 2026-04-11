@@ -129,8 +129,10 @@ export const useCalendarView = () => {
       const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
       const deadlineDate = task.deadline ? new Date(task.deadline) : new Date();
-      let start = isNaN(deadlineDate.getTime()) ? new Date() : deadlineDate;
-      let end = new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
+      const hasEstimatedStart = task.estimated_start_date && !isNaN(new Date(task.estimated_start_date).getTime());
+      
+      let start = hasEstimatedStart ? new Date(task.estimated_start_date!) : (isNaN(deadlineDate.getTime()) ? new Date() : deadlineDate);
+      let end = hasEstimatedStart && task.estimated_end_date ? new Date(task.estimated_end_date) : new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
 
       if (startDateMatch && startDateMatch[1]) {
         const parsedStart = new Date(startDateMatch[1]);

@@ -70,6 +70,8 @@ export interface TaskResponse {
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
   google_event_id?: string;
+  estimated_start_date?: string;
+  estimated_end_date?: string;
 }
 
 export interface updateTask {
@@ -90,6 +92,8 @@ export interface updateTask {
     | 'Scheduled'
     | 'Archived';
   subtasks?: string[];
+  estimated_start_date?: string;
+  estimated_end_date?: string;
 }
 
 export interface CreateTaskRequest {
@@ -111,4 +115,6 @@ export interface CreateTaskRequest {
     | 'Archived';
   tags: string[];
   subtasks: string[];
+  estimated_start_date?: string;
+  estimated_end_date?: string;
 }
