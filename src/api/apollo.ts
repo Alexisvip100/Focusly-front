@@ -42,7 +42,7 @@ const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) 
           isRefreshing = false;
           resolvePendingRequests();
         })
-        .catch((error) => {
+        .catch((_error) => {
           isRefreshing = false;
           pendingRequests = [];
           store.dispatch(logout('expired'));
