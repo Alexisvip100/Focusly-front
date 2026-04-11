@@ -162,12 +162,35 @@ export const CalendarContainer = styled(Box, {
   },
 
   '& .rbc-month-view .rbc-month-row': {
-    maxHeight: '135px',
-    minHeight: '135px',
+    height: '104px',
+    minHeight: '104px',
+    maxHeight: '104px',
     overflow: 'hidden',
   },
+
   '& .rbc-month-view .rbc-row-content': {
+    height: '104px',
+    minHeight: '104px',
+    maxHeight: '104px',
     overflow: 'hidden',
+  },
+
+  '& .rbc-month-view .rbc-row-content .rbc-row': {
+    minHeight: '22px',
+  },
+
+  '& .rbc-month-view .rbc-row-segment': {
+    padding: '0 2px 1px 2px',
+  },
+
+  '& .rbc-month-view .rbc-show-more': {
+    color: theme.palette.primary.main,
+    fontWeight: 600,
+    fontSize: '11px',
+    lineHeight: 1.1,
+    padding: '0 4px',
+    marginTop: '1px',
+    background: 'none',
   },
 
   '& .rbc-month-view .rbc-date-cell.rbc-now': {
@@ -189,14 +212,15 @@ export const CalendarContainer = styled(Box, {
   },
 
   '& .rbc-month-view .rbc-event': {
+    height: '20px !important',
+    minHeight: '20px !important',
     maxHeight: '20px !important',
-    margin: '3px 0',
+    margin: '1px 0 !important',
     padding: '0 !important',
     backgroundColor: 'transparent !important',
     '& .event-icon-container': { display: 'none' },
     '& .event-card-inner': { padding: '2px 6px !important', gap: '0 !important' },
     '& .event-info': { flexDirection: 'row', alignItems: 'center', gap: '4px' },
-    // Hide time in month view to save even more space
     '& .event-info span:last-child': { display: 'none' },
   },
 }));

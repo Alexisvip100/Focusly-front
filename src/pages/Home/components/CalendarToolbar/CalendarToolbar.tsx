@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { ToolbarProps, View } from 'react-big-calendar';
 import type { ICalendarEvent } from '../CalendarEvent';
 import { Navigate } from 'react-big-calendar';
-import type { CalendarDesignMode, CalendarNavigateAction } from '../CalendarView/calendarView.types';
+import type { CalendarNavigateAction } from '../CalendarView/calendarView.types';
 import {
   Box,
   Button,
@@ -43,8 +43,6 @@ const initialNotifications: Notification[] = [];
 
 interface CustomToolbarProps extends ToolbarProps<ICalendarEvent, object> {
   isSessionActive?: boolean;
-  calendarDesign?: CalendarDesignMode;
-  setCalendarDesign?: (design: CalendarDesignMode) => void;
   onNavigateAction?: (action: CalendarNavigateAction) => void;
 }
 

@@ -17,8 +17,7 @@ import {
 } from '@mui/icons-material';
 
 import { getEventColor, EventContainer, priorityCircleSx, contextMenuSx, PRIORITY_COLORS } from './CalendarEvent.styles';
-import { ModernEventContainer, ModernPriorityDot } from './CalendarEventModern.styles';
-import type { CalendarDesignMode } from '../CalendarView/calendarView.types';
+
 
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 import type { Task } from '@/redux/tasks/task.types';
@@ -40,7 +39,7 @@ export interface ICalendarEvent {
 interface CalendarEventProps {
   event: ICalendarEvent;
   title: string;
-  design?: CalendarDesignMode;
+
   continuesPrior?: boolean;
   continuesAfter?: boolean;
   localizer?: unknown;
@@ -50,7 +49,7 @@ interface CalendarEventProps {
 }
 
 export const CalendarEvent = (props: CalendarEventProps) => {
-  const { event, title, design = 'current', onStartFocus } = props;
+  const { event, title, onStartFocus } = props;
   const variant = getEventColor(event as { id?: string });
   const timeRange = `${moment(event.start).format('HH:mm')} - ${moment(event.end).format('HH:mm')}`;
 
@@ -156,66 +155,10 @@ export const CalendarEvent = (props: CalendarEventProps) => {
     </EventContainer>
   );
 
-  const renderModern = () => (
-    <ModernEventContainer 
-      variant={variant} 
-      isMeeting={isMeeting} 
-      overlapIndex={event.overlapIndex}
-      onContextMenu={handleContextMenu}
-    >
-      <Stack spacing={0.5} sx={{ height: '100%', justifyContent: 'center' }}>
-        <Stack direction="row" alignItems="center" spacing={1} sx={{ minWidth: 0 }}>
-          {isMeeting && <Box className="meeting-indicator" />}
-          {!isMeeting && event.type === 'task' && currentPriority && (
-            <ModernPriorityDot color={PRIORITY_COLORS[currentPriority].main} />
-          )}
-          <Typography
-            variant="caption"
-            noWrap
-            sx={{ 
-              fontWeight: 700, 
-              fontSize: '12.5px', 
-              lineHeight: 1.2, 
-              color: 'text.primary',
-              opacity: 0.95
-            }}
-          >
-            {title}
-          </Typography>
-        </Stack>
-
-        <Stack direction="row" alignItems="center" spacing={0.6} sx={{ opacity: 0.6 }}>
-          <ScheduleIcon sx={{ fontSize: '11px' }} />
-          <Typography
-            variant="caption"
-            sx={{ 
-              fontSize: '10.5px', 
-              fontWeight: 600,
-              letterSpacing: '0.01em'
-            }}
-          >
-            {timeRange}
-          </Typography>
-        </Stack>
-      </Stack>
-      
-      {isMeeting && (
-        <VideocamIcon 
-          sx={{ 
-            position: 'absolute', 
-            top: '8px', 
-            right: '8px', 
-            fontSize: '16px', 
-            color: alpha('#3B82F6', 0.6) 
-          }} 
-        />
-      )}
-    </ModernEventContainer>
-  );
 
   return (
     <>
-      {design === 'modern' ? renderModern() : renderClassic()}
+      {renderClassic()}
 
       <Menu
         open={contextMenu !== null}

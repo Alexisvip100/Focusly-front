@@ -4,7 +4,6 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
 import { addDays, addMonths, addWeeks, subDays, subMonths, subWeeks } from 'date-fns';
 import { sileo } from 'sileo';
-// Types
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
@@ -15,8 +14,7 @@ import type { ICalendarEvent } from '../../CalendarEvent';
 import { GET_TASKS, DELETE_TASK, GET_WORKSPACES } from '@/api/graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import type { CalendarDesignMode, CalendarNavigateAction } from '../calendarView.types';
-
+import type { CalendarNavigateAction } from '../calendarView.types';
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
@@ -30,14 +28,6 @@ export const useCalendarView = () => {
   const [slotContextMenu, setSlotContextMenu] = useState<{ mouseX: number; mouseY: number; date: Date } | null>(null);
   const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] = useState<string | null>(null);
   
-  const [calendarDesign, setCalendarDesign] = useState<CalendarDesignMode>(() => {
-    const savedMode = window.localStorage.getItem('calendarDesignMode');
-    return savedMode === 'modern' ? 'modern' : 'current';
-  });
-
-  useEffect(() => {
-    localStorage.setItem('calendarDesignMode', calendarDesign);
-  }, [calendarDesign]);
 
 
   // New Task Modal State moved to URL parameters
@@ -187,6 +177,7 @@ export const useCalendarView = () => {
     return result;
   }, [reduxEvents, tasks]);
 
+
   const handleOnChangeView = (selectedView: View) => {
     setCurrentView(selectedView);
   };
@@ -214,9 +205,6 @@ export const useCalendarView = () => {
     setCurrentDate((prev) => (action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1)));
   };
 
-  const handleCalendarDesignChange = (selectedDesign: CalendarDesignMode) => {
-    setCalendarDesign(selectedDesign);
-  };
 
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
     setSearchParams({ action: 'create', start: start.toISOString(), end: end.toISOString() });
@@ -322,11 +310,9 @@ export const useCalendarView = () => {
     currentView,
     currentDate,
     isCalendarLoading,
-    calendarDesign,
     handleOnChangeView,
     handleOnNavigate,
     handleNavigateAction,
-    handleCalendarDesignChange,
     handleSelectSlot,
     handleSelectEvent,
     handleSaveTask,

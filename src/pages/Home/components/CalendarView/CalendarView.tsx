@@ -41,9 +41,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     slotContextMenu,
     handleSlotContextMenu,
     closeSlotContextMenu,
-    calendarDesign,
     handleNavigateAction,
-    handleCalendarDesignChange,
   } = useCalendarView();
 
   const handleCreateTaskAtSlot = (priority?: number) => {
@@ -70,8 +68,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
 
   return (
     <CalendarContainer 
-      isDayView={currentView === Views.DAY} 
-      design={calendarDesign}
+      isDayView={currentView === Views.DAY}
     >
       <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}>
         <Calendar
@@ -86,29 +83,26 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
           selectable
+          showAllEvents={false}
+          doShowMoreDrillDown={false}
           components={{
             toolbar: (props: ToolbarProps<ICalendarEvent>) => (
               <CalendarToolbar
                 {...props}
                 isSessionActive={isFocusSessionActive}
-                calendarDesign={calendarDesign}
-                setCalendarDesign={handleCalendarDesignChange}
                 onNavigateAction={handleNavigateAction}
               />
             ),
             header: CalendarHeader,
             event: (props: any) => (
-              <CalendarEvent 
-                {...props} 
-                design={calendarDesign} 
+              <CalendarEvent
+                {...props}
                 onStartFocus={onStartFocus}
               />
             ),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             timeSlotWrapper: (props: any) => (
               <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
             ),
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             dateCellWrapper: (props: any) => (
               <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
             ),
