@@ -19,8 +19,10 @@ import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
-  const reduxEvents = useSelector((state: RootState) => state.calendar.reduxEvents);
-  const tasks = useSelector((state: RootState) => state.task.tasks);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const reduxEvents = useSelector((state: RootState) => state.calendar?.reduxEvents) || [];
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
 
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
@@ -97,7 +99,7 @@ export const useCalendarView = () => {
     const calendarEvents = reduxEvents
       .filter((e) => {
         const normGoogleId = e.id.replace(/^_+/, '').split('_')[0];
-        return !tasks.some(t => {
+        return !(tasks || []).some(t => {
           const tGoogleId = t.google_event_id?.replace(/^_+/, '').split('_')[0];
           return tGoogleId === normGoogleId;
         });
@@ -126,7 +128,8 @@ export const useCalendarView = () => {
       const desc = task.notes_encrypted || '';
       const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
-      let start = new Date(task.deadline || new Date());
+      const deadlineDate = task.deadline ? new Date(task.deadline) : new Date();
+      let start = isNaN(deadlineDate.getTime()) ? new Date() : deadlineDate;
       let end = new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
 
       if (startDateMatch && startDateMatch[1]) {
@@ -150,13 +153,17 @@ export const useCalendarView = () => {
     });
 
     const allEvents = [...calendarEvents, ...taskEvents] as ICalendarEvent[];
-    const sortedEvents = allEvents.sort((a, b) => a.start.getTime() - b.start.getTime());
+    const sortedEvents = allEvents.sort((a, b) => {
+      const aStart = a.start?.getTime() || 0;
+      const bStart = b.start?.getTime() || 0;
+      return aStart - bStart;
+    });
 
     const result: ICalendarEvent[] = [];
     const activeWindows: { end: number; index: number }[] = [];
 
     sortedEvents.forEach((event) => {
-      const start = event.start.getTime();
+      const start = event.start?.getTime() || 0;
       
       for (let i = activeWindows.length - 1; i >= 0; i--) {
         if (activeWindows[i].end <= start) {

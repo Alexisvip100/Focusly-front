@@ -388,14 +388,14 @@ export const CreateTaskModal = ({
                       {status === 'Todo' && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
                       {status === 'Planning' && <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />}
                       {status === 'Pending' && <AccessTimeIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
-                      {status === 'On Hold' && <OnHoldIcon sx={{ fontSize: 16, color: 'error.main' }} />}
+                      {status === 'OnHold' && <OnHoldIcon sx={{ fontSize: 16, color: 'error.main' }} />}
                       {status === 'Review' && <VisibilityIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
                       {status === 'Done' && <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'success.main' }} />}
                       {status === 'Backlog' && <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
                       {!status && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
                     </>
                   }
-                  label={status || 'Todo'}
+                  label={status === 'OnHold' ? 'On Hold' : status || 'Todo'}
                   onClick={(e) => setStatusAnchor(e.currentTarget)}
                   sx={{
                     bgcolor: (theme) =>
@@ -406,7 +406,7 @@ export const CreateTaskModal = ({
                       status === 'Todo' ? 'text.secondary' :
                       status === 'Planning' ? 'info.main' :
                       status === 'Pending' ? 'warning.main' :
-                      status === 'On Hold' ? 'error.main' :
+                      status === 'OnHold' ? 'error.main' :
                       status === 'Review' ? 'secondary.main' :
                       status === 'Done' ? 'success.main' :
                       status === 'Backlog' ? 'text.secondary' :
@@ -1135,7 +1135,7 @@ export const CreateTaskModal = ({
           }}
         >
           <Stack sx={{ p: 1, minWidth: '180px' }}>
-            {['Todo', 'Planning', 'Pending', 'On Hold', 'Review', 'Done', 'Backlog'].map((s) => (
+            {['Todo', 'Planning', 'Pending', 'OnHold', 'Review', 'Done', 'Backlog'].map((s) => (
               <MenuItem
                 key={s}
                 onClick={() => {
@@ -1150,7 +1150,7 @@ export const CreateTaskModal = ({
                   {s === 'Pending' && (
                     <AccessTimeIcon sx={{ fontSize: 18, color: 'warning.main' }} />
                   )}
-                  {s === 'On Hold' && <OnHoldIcon sx={{ fontSize: 18, color: 'error.main' }} />}
+                  {s === 'OnHold' && <OnHoldIcon sx={{ fontSize: 18, color: 'error.main' }} />}
                   {s === 'Review' && <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />}
                   {s === 'Done' && (
                     <CheckCircleOutlineIcon sx={{ fontSize: 18, color: 'success.main' }} />
@@ -1159,7 +1159,7 @@ export const CreateTaskModal = ({
                     <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
                   )}
                   <Typography variant="body2" fontWeight={500}>
-                    {s}
+                    {s === 'OnHold' ? 'On Hold' : s}
                   </Typography>
                 </Box>
               </MenuItem>

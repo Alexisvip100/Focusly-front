@@ -6,7 +6,7 @@ export interface GoogleCalendarEvent {
   notes_encrypted: string;
   deadline: string; // ISO string
   estimated_start_date: string; // ISO string
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'On Hold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
+  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'OnHold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
   priority_level: number;
   subtasks: any[];
   tags: any[];

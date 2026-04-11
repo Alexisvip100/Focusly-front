@@ -113,7 +113,7 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
   const handleApplyFilters = (filters: FilterState) => {
     const statusMap: Record<string, string> = {
       ToDo: 'Todo',
-      OnHold: 'On Hold',
+      OnHold: 'OnHold',
       Completed: 'Done',
     };
 

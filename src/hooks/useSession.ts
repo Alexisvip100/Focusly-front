@@ -17,12 +17,11 @@ export const useSession = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const auth = useAppSelector((state) => state.auth);
-  const wasLoggedIn = useRef(auth.isLogged);
+  const wasLoggedIn = useRef(false);
 
   const logout = useCallback(async (isExternal = false) => {
     try {
       if (isExternal) {
-        // Just clear local state if logout happened elsewhere
         dispatch(clearAuth());
         sileo.info({
           title: 'Sesión Finalizada',

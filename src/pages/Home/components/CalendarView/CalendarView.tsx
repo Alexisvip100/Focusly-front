@@ -7,21 +7,33 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { CalendarToolbar } from '../CalendarToolbar';
 import { CalendarHeader } from '../CalendarHeader';
 import { CalendarEvent } from '../CalendarEvent';
-// Styles & Hook
-import { CalendarContainer } from './CalendarView.styles';
-import { Box } from '@mui/material';
 import { CalendarSidePanel } from './components/CalendarSidePanel/CalendarSidePanel';
+import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
+
+// Material UI
+import {
+  Box,
+  Menu,
+  MenuItem,
+  ListItemIcon,
+  ListItemText,
+  Divider,
+  Stack,
+  Typography
+} from '@mui/material';
+import { Add as AddIcon } from '@mui/icons-material';
+
+// Styles & Hooks
+import { CalendarContainer } from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
+import { contextMenuSx, priorityCircleSx, PRIORITY_COLORS } from '../CalendarEvent/CalendarEvent.styles';
+
+// Types
+import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
+import type { ToolbarProps } from 'react-big-calendar';
 
 // Setup the localizer
 const localizer = momentLocalizer(moment);
-
-import { CalendarSlotWrapper } from './components/CalendarSlotWrapper/CalendarSlotWrapper';
-import { Menu, MenuItem, ListItemIcon, ListItemText, Divider, Stack, Typography } from '@mui/material';
-import { Add as AddIcon } from '@mui/icons-material';
-import { contextMenuSx, priorityCircleSx, PRIORITY_COLORS } from '../CalendarEvent/CalendarEvent.styles';
-import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
-import type { ToolbarProps } from 'react-big-calendar';
 
 interface CalendarViewProps {
   onStartFocus?: () => void;

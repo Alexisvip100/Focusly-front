@@ -1,29 +1,59 @@
-import { ApolloClient, InMemoryCache, createHttpLink, from } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink, from, Observable } from '@apollo/client';
 import { onError } from '@apollo/client/link/error';
 import { store } from '@/redux/store';
 import { logout } from '@/redux/auth/auth.slice';
 import { API_BASE_URL } from '@/config/env.config';
+import axios from 'axios';
 
 const httpLink = createHttpLink({
   uri: `${API_BASE_URL}/graphql`,
   credentials: 'include',
 });
 
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors) {
-    graphQLErrors.forEach(({ message, extensions }) => {
-      if (
-        message === 'Unauthorized' ||
-        extensions?.code === 'UNAUTHENTICATED' ||
-        (extensions?.response as { statusCode?: number } | undefined)?.statusCode === 401
-      ) {
-        store.dispatch(logout('expired'));
-      }
-    });
-  }
+let isRefreshing = false;
+let pendingRequests: any[] = [];
 
-  if (networkError && 'statusCode' in networkError && networkError.statusCode === 401) {
-    store.dispatch(logout('expired'));
+const resolvePendingRequests = () => {
+  pendingRequests.map(callback => callback());
+  pendingRequests = [];
+};
+
+const errorLink = onError(({ graphQLErrors, networkError, operation, forward }) => {
+  const isUnauthorized = 
+    (graphQLErrors && graphQLErrors.some(({ message, extensions }) => 
+      message === 'Unauthorized' || 
+      extensions?.code === 'UNAUTHENTICATED' ||
+      (extensions?.response as { statusCode?: number } | undefined)?.statusCode === 401
+    )) ||
+    (networkError && 'statusCode' in networkError && networkError.statusCode === 401);
+
+  if (isUnauthorized) {
+    const user = store.getState().auth.user;
+
+    if (!user) {
+      store.dispatch(logout('expired'));
+      return;
+    }
+
+    if (!isRefreshing) {
+      isRefreshing = true;
+      axios.post(`${API_BASE_URL}/auth/refresh`, { userId: user.id }, { withCredentials: true })
+        .then(() => {
+          isRefreshing = false;
+          resolvePendingRequests();
+        })
+        .catch((error) => {
+          isRefreshing = false;
+          pendingRequests = [];
+          store.dispatch(logout('expired'));
+        });
+    }
+
+    return new Observable((observer) => {
+      pendingRequests.push(() => {
+        forward(operation).subscribe(observer);
+      });
+    });
   }
 });
 
