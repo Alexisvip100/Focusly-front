@@ -134,7 +134,7 @@ export const Tasks = () => {
     setSearchParams({ tab: 'Tasks', taskId: task.id });
   };
 
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'workload'>('workload');
+  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'workload'>('list');
   const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(null);
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
   const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(null);
