@@ -124,6 +124,9 @@ export const useHome = () => {
               deadline: s.deadline,
               category: s.category,
             })),
+            google_event_id: (taskDetailsTask as Task).google_event_id,
+            estimated_start_date: (taskDetailsTask as Task).estimated_start_date,
+            estimated_end_date: (taskDetailsTask as Task).estimated_end_date,
           },
         },
         refetchQueries: [
@@ -139,6 +142,8 @@ export const useHome = () => {
           user_id: data.updateTask.user_id || (taskDetailsTask as Task).user_id,
           notes_encrypted: data.updateTask.notes_encrypted || '',
           deadline: data.updateTask.deadline || new Date().toISOString(),
+          estimated_start_date: data.updateTask.estimated_start_date,
+          estimated_end_date: data.updateTask.estimated_end_date,
           tags: data.updateTask.tags?.map((t: { name: string } | string) => (typeof t === 'string' ? t : t.name)) || [],
         };
         dispatch(upsertTaskRedux(mappedTask));

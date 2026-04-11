@@ -44,6 +44,8 @@ export const GET_TASKS = gql`
         url
       }
       google_event_id
+      estimated_start_date
+      estimated_end_date
       workspace {
         id
         title
@@ -70,6 +72,8 @@ export const GET_TASKS_TITLES = gql`
         url
       }
       google_event_id
+      estimated_start_date
+      estimated_end_date
       workspace {
         id
         title
@@ -134,6 +138,8 @@ export const UPDATE_TASK = gql`
         url
       }
       google_event_id
+      estimated_start_date
+      estimated_end_date
       priority_level
     }
 }
@@ -175,6 +181,8 @@ export const CREATE_TASK = gql`
         url
       }
       google_event_id
+      estimated_start_date
+      estimated_end_date
       priority_level
     }
 }

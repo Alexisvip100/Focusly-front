@@ -49,6 +49,9 @@ export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormState
       .replace(/https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g, '')
       .trim();
 
+    const hasEstimatedStart = initialTask.estimated_start_date && !isNaN(new Date(initialTask.estimated_start_date).getTime());
+    const startInitial = hasEstimatedStart ? new Date(initialTask.estimated_start_date!) : new Date(deadline);
+
     return {
       title,
       description: cleanDesc,
@@ -56,7 +59,7 @@ export const useTaskFormState = ({ initialTask, initialStart }: UseTaskFormState
       priority: getPriorityFromLevel(priority_level),
       status,
       category,
-      currentDate: new Date(deadline),
+      currentDate: startInitial,
       duration: estimate_timer ? formatDuration(estimate_timer) : '',
       realTime: real_timer ? formatDuration(real_timer) : '',
     };

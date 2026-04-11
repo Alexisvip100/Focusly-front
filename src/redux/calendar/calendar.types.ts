@@ -4,8 +4,8 @@ export interface GoogleCalendarEvent {
   google_event_id: string;
   title: string;
   notes_encrypted: string;
-  deadline: string; // ISO string
-  estimated_start_date: string; // ISO string
+  deadline: string;
+  estimated_start_date: string;
   status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'OnHold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
   priority_level: number;
   subtasks: any[];

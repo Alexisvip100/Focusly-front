@@ -32,6 +32,8 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
     subtasks: t.subtasks || [],
     links: t.links || [],
     google_event_id: t.google_event_id,
+    estimated_start_date: t.estimated_start_date,
+    estimated_end_date: t.estimated_end_date,
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
   });
 
@@ -47,6 +49,9 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
         priority_level,
         category,
         tags,
+        google_event_id,
+        estimated_start_date,
+        estimated_end_date,
       } = task;
 
       const { data } = await updateTaskMutation({
@@ -62,6 +67,9 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
             deadline,
             subtasks,
             category,
+            google_event_id,
+            estimated_start_date,
+            estimated_end_date,
             tags:
               tags?.map((t: string | { name: string }) => (typeof t === 'string' ? t : t.name)) ||
               [],
@@ -117,6 +125,9 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
             deadline: parentTask.deadline,
             subtasks: newSubtasks,
             category: parentTask.category,
+            google_event_id: parentTask.google_event_id,
+            estimated_start_date: parentTask.estimated_start_date,
+            estimated_end_date: parentTask.estimated_end_date,
             tags:
               parentTask.tags?.map((t: string | { name: string }) =>
                 typeof t === 'string' ? t : t.name
