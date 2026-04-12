@@ -1,5 +1,5 @@
 import { client } from '@/api/apollo';
-import { REMOVE_WORKSPACE, GET_WORKSPACES } from '@/api/graphql';
+import { REMOVE_WORKSPACE, GET_WORKSPACES } from '../workspaces.graphql';
 import { sileo } from 'sileo';
 
 export const useWorkspaceActions = () => {

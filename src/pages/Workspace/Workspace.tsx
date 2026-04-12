@@ -4,7 +4,7 @@ import { WorkspaceEditor } from './components/Editor/WorkspaceEditor';
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_HAS_WORKSPACES, GET_WORKSPACE_BY_ID } from '@/api/graphql';
+import { GET_HAS_WORKSPACES, GET_WORKSPACE_BY_ID } from './workspaces.graphql';
 import { useEffect } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 import { useSearchParams } from 'react-router-dom';

@@ -1,6 +1,6 @@
 import { useMemo, useEffect } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_TASKS } from '@/api/graphql';
+import { GET_TASKS } from '@/pages/Home/components/CreateTaskModal/tasks.graphql';
 import type { TaskResponse, TaskFilterInput, TaskSortInput } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import { setTasks } from '@/redux/tasks/task.slice';

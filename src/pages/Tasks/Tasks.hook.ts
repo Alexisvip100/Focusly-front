@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GET_TAGS } from '@/api/graphql';
+import { GET_TAGS } from '@/pages/Home/components/CreateTaskModal/tasks.graphql';
 import { useAppSelector } from '@/redux/hooks';
 import { useMemo } from 'react';
 
@@ -15,11 +15,6 @@ export const useTasks = () => {
   const ui = useTasksUI();
 
   // 2. Filters Hook
-  // We need to pass the base tasks to the filter hook
-  // but we can't get base tasks until we have the filters...
-  // Actually, the original logic fetched base tasks with filters.
-
-  // Let's stick to a composition that works:
   const filters = useTasksFilters([]); // Placeholder tasks initially
 
   const data = useTasksData({

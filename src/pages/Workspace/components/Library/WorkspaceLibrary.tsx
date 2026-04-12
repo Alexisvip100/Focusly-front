@@ -47,7 +47,7 @@ import {
 } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import { GET_WORKSPACES, GET_FOLDERS, CREATE_FOLDER, UPDATE_WORKSPACE, UPDATE_FOLDER, DELETE_FOLDER } from '@/api/graphql';
+import { GET_WORKSPACES, GET_FOLDERS, CREATE_FOLDER, UPDATE_WORKSPACE, UPDATE_FOLDER, DELETE_FOLDER } from '../../workspaces.graphql';
 import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
 import { Menu, MenuItem, Divider, ListItemIcon, ListItemText } from '@mui/material';
 import { CreateFolderModal } from './modals/CreateFolderModal';

@@ -191,24 +191,22 @@ export const CalendarEvent = (props: CalendarEventProps) => {
           </MenuItem>
         )}
 
+        {event.type === 'task' && <Divider />}
         {event.type === 'task' && (
-          <>
-            <Divider />
-            <Box sx={{ px: 2, py: 1 }}>
-              <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
-                Priority
-              </Typography>
-              <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, mb: 0.5 }}>
-                {[1, 2, 3, 4].map((level) => (
-                  <Box
-                    key={level}
-                    onClick={(e) => onPriorityChange(e, level)}
-                    sx={priorityCircleSx(PRIORITY_COLORS[level].main, currentPriority === level)}
-                  />
-                ))}
-              </Stack>
-            </Box>
-          </>
+          <Box sx={{ px: 2, py: 1 }}>
+            <Typography variant="caption" fontWeight={700} color="text.disabled" sx={{ textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+              Priority
+            </Typography>
+            <Stack direction="row" spacing={1.5} sx={{ mt: 1.5, mb: 0.5 }}>
+              {[1, 2, 3, 4].map((level) => (
+                <Box
+                  key={level}
+                  onClick={(e) => onPriorityChange(e, level)}
+                  sx={priorityCircleSx(PRIORITY_COLORS[level].main, currentPriority === level)}
+                />
+              ))}
+            </Stack>
+          </Box>
         )}
 
         <Divider />

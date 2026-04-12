@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery } from '@apollo/client';
 import moment from 'moment';
-import { GET_TASKS } from '@/api/graphql';
+import { GET_TASKS } from '../../CreateTaskModal/tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 
 interface UseFocusModeTasksProps {
