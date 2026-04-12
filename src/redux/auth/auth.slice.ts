@@ -52,9 +52,16 @@ const getInitialState = (): AuthState => {
 
 export const logout = createAsyncThunk<void, LogoutReason | undefined>(
   'auth/logout',
-  async (reason = 'manual', { dispatch }) => {
+  async (reason = 'manual', { dispatch, getState }) => {
     try {
-      await fetch(`${API_BASE_URL}/auth/logout`, { method: 'POST' });
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+
+      await fetch(`${API_BASE_URL}/auth/logout`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId }),
+      });
       await auth.signOut();
     } catch (error) {
       console.error('Logout error:', error);

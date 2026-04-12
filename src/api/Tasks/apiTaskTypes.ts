@@ -69,9 +69,15 @@ export interface TaskResponse {
   filters?: TaskFilterInput;
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
-  google_event_id?: string;
-  estimated_start_date?: string;
-  estimated_end_date?: string;
+    google_event_id?: string;
+    participants?: {
+      name: string;
+      email: string;
+      avatar?: string;
+      responseStatus?: string;
+    }[];
+    estimated_start_date?: string;
+    estimated_end_date?: string;
 }
 
 export interface updateTask {

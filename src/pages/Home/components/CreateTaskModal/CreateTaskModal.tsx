@@ -15,6 +15,7 @@ import {
   CircularProgress,
   List,
   ListItemText,
+  Avatar,
 } from '@mui/material';
 import {
   Close as CloseIcon, AccessTime as AccessTimeIcon, Add as AddIcon,
@@ -37,6 +38,9 @@ import {
   Category as CategoryIcon,
   Visibility as VisibilityIcon,
   PauseCircleOutline as OnHoldIcon,
+  MoreVert as MoreVertIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
   VideoCall as VideoCallIcon,
 } from '@mui/icons-material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -152,6 +156,8 @@ export const CreateTaskModal = ({
   const [realTimeAnchor, setRealTimeAnchor] = useState<HTMLDivElement | null>(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
+  const [isLinksExpanded, setIsLinksExpanded] = useState(true);
+  const [isCollaboratorsExpanded, setIsCollaboratorsExpanded] = useState(true);
 
   const getTimerSuggestions = (val: string) => {
     const clean = val.trim();
@@ -221,7 +227,29 @@ export const CreateTaskModal = ({
     }
   };
 
-  const hasMeetLink = shouldGenerateMeet || links.some(l => l.url.includes('meet.google.com') || l.title.includes('Google Meet') || l.url.includes('hangouts'));
+  const hasMeetLink = shouldGenerateMeet || links.some(l => 
+    l.url.includes('meet.google.com') || 
+    l.title.toLowerCase().includes('google meet') || 
+    l.url.includes('hangouts') ||
+    l.title.toLowerCase().includes('reunión') ||
+    l.title.toLowerCase().includes('join')
+  );
+
+  const getLinkIcon = (url: string) => {
+    try {
+      const domain = new URL(url).hostname;
+      return {
+        src: `https://www.google.com/s2/favicons?domain=${domain}&sz=128`,
+        isImage: true
+      };
+    } catch {
+      return {
+        icon: <LinkIcon sx={{ fontSize: 16 }} />,
+        isImage: false,
+        color: 'primary.main'
+      };
+    }
+  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -870,185 +898,394 @@ export const CreateTaskModal = ({
             <Box sx={{ mt: 2, borderBottom: '1px solid', borderColor: 'divider' }} />
           </Box>
 
-          <Box sx={{ px: 4, mb: 4 }}>
-            <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+          {/* LINK AND RESOURCE SECTION */}
+          <Box sx={{ px: 4, mb: 1 }}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              sx={{ cursor: 'pointer', mb: isLinksExpanded ? 2 : 0 }}
+              onClick={() => setIsLinksExpanded(!isLinksExpanded)}
+            >
               <Box display="flex" alignItems="center" gap={1}>
-                <LinkIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 600 }}>
-                  LINKS & RESOURCES
+                <LinkIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.5px' }}>
+                  LINK AND RESOURCE
                 </Typography>
+                {!isLinksExpanded && links.length > 0 && (
+                  <Box
+                    sx={{
+                      ml: 1,
+                      px: 0.8,
+                      py: 0.1,
+                      borderRadius: '6px',
+                      bgcolor: 'primary.main',
+                      color: 'primary.contrastText',
+                      fontSize: '10px',
+                      fontWeight: 800,
+                    }}
+                  >
+                    {links.length}
+                  </Box>
+                )}
               </Box>
-              <Box display="flex" alignItems="center" gap={1}>
-                {/* VIDEO MEETING BUTTON */}
-                <Button
-                  size="small"
-                  onClick={handleGenerateMeet}
-                  disabled={isGeneratingMeet || hasMeetLink}
-                  startIcon={isGeneratingMeet ? <CircularProgress size={14} color="inherit" /> : <VideoCallIcon sx={{ fontSize: 16 }} />}
-                  sx={{
-                    textTransform: 'none',
-                    borderRadius: '8px',
-                    px: 1,
-                    py: 0.25,
-                    fontSize: '12px',
-                    fontWeight: 600,
-                    color: hasMeetLink ? 'text.disabled' : 'secondary.main',
-                    bgcolor: hasMeetLink ? 'action.hover' : 'secondary.main' + '15',
-                    '&:hover': {
-                      bgcolor: 'secondary.main',
-                      color: '#fff',
-                    },
-                  }}
+              <Box display="flex" alignItems="center" gap={0.5}>
+                <IconButton 
+                  size="small" 
+                  sx={{ p: 0.5 }}
+                  onClick={() => setIsLinksExpanded(!isLinksExpanded)}
                 >
-                  {hasMeetLink ? 'Meet Added' : 'Add Meet'}
-                </Button>
-
-                {!isAddingLink && (
-                <IconButton
-                  size="small"
-                  onClick={() => setIsAddingLink(true)}
-                  sx={{ color: 'primary.main' }}
-                >
-                  <AddIcon sx={{ fontSize: 18 }} />
+                  {isLinksExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
                 </IconButton>
-              )}
-            </Box>
-          </Box>
-
-            <Stack gap={1} mb={isAddingLink ? 2 : 0}>
-              {links.map((link, index) => (
-                <Box
-                  key={index}
-                  sx={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    p: 1,
-                    borderRadius: '8px',
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                  }}
-                >
-                  <Box display="flex" alignItems="center" gap={1.5}>
-                    <LinkIcon sx={{ fontSize: 18, color: 'primary.main' }} />
-                    <Box>
-                      <Typography variant="body2" sx={{ fontWeight: 600, lineHeight: 1.2 }}>
-                        {link.title}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'text.secondary',
-                          display: 'block',
-                          maxWidth: '300px',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
-                        }}
-                      >
-                        {link.url}
-                      </Typography>
-                    </Box>
-                  </Box>
-                  <Box display="flex" alignItems="center">
-                    <IconButton
-                      size="small"
-                      component="a"
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      sx={{ color: 'primary.main' }}
-                    >
-                      {link.title.toLowerCase().includes('meet') ? (
-                        <Typography
-                          variant="caption"
-                          sx={{
-                            fontWeight: 700,
-                            bgcolor: 'primary.main',
-                            color: 'white',
-                            px: 1,
-                            py: 0.5,
-                            borderRadius: '4px',
-                          }}
-                        >
-                          JOIN
-                        </Typography>
-                      ) : (
-                        <LaunchIcon sx={{ fontSize: 16 }} />
-                      )}
-                    </IconButton>
-                    <IconButton size="small" onClick={() => handleRemoveLink(index)}>
-                      <CloseIcon sx={{ fontSize: 16 }} />
-                    </IconButton>
-                  </Box>
-                </Box>
-              ))}
-            </Stack>
-
-            {isAddingLink && (
-              <Box
-                sx={{
-                  p: 2,
-                  borderRadius: '8px',
-                  bgcolor: (theme) =>
-                    theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
-                  border: '1px dashed',
-                  borderColor: 'primary.main',
-                }}
-              >
-                <Stack gap={1.5}>
-                  <TextField
-                    size="small"
-                    placeholder="Link Title (e.g., Google Meet, Design Doc)"
-                    value={newLinkTitle}
-                    onChange={(e) => setNewLinkTitle(e.target.value)}
-                    fullWidth
-                    variant="standard"
-                    InputProps={{ disableUnderline: true, sx: { fontSize: '14px', fontWeight: 500 } }}
-                  />
-                  <TextField
-                    size="small"
-                    placeholder="URL (https://...)"
-                    value={newLinkUrl}
-                    onChange={(e) => setNewLinkUrl(e.target.value)}
-                    fullWidth
-                    variant="standard"
-                    InputProps={{ disableUnderline: true, sx: { fontSize: '13px', color: 'primary.main' } }}
-                  />
-                  <Box display="flex" justifyContent="flex-end" gap={1} mt={0.5}>
+                {isLinksExpanded && (
+                  <Box display="flex" alignItems="center" gap={1}>
+                    {/* VIDEO MEETING BUTTON */}
                     <Button
                       size="small"
-                      onClick={() => {
-                        setIsAddingLink(false);
-                        setNewLinkTitle('');
-                        setNewLinkUrl('');
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleGenerateMeet();
+                      }}
+                      disabled={isGeneratingMeet || hasMeetLink}
+                      startIcon={isGeneratingMeet ? <CircularProgress size={14} color="inherit" /> : <VideoCallIcon sx={{ fontSize: 16 }} />}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '8px',
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: hasMeetLink ? 'text.disabled' : (theme => theme.palette.mode === 'dark' ? '#38bdf8' : 'secondary.main'),
+                        bgcolor: hasMeetLink ? 'action.hover' : (theme => theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(2, 132, 199, 0.1)'),
+                        '&:hover': {
+                          bgcolor: 'secondary.main',
+                          color: '#fff',
+                        },
                       }}
                     >
-                      Cancel
+                      {hasMeetLink ? 'Meet Added' : 'Add Meet'}
                     </Button>
+
                     <Button
                       size="small"
-                      variant="contained"
-                      disableElevation
-                      disabled={!newLinkTitle || !newLinkUrl}
-                      onClick={() => {
-                        handleAddLink(newLinkTitle, newLinkUrl);
-                        setNewLinkTitle('');
-                        setNewLinkUrl('');
-                        setIsAddingLink(false);
+                      startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsAddingLink(true);
+                      }}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '8px',
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: 'primary.main',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.1)',
+                        '&:hover': { 
+                          bgcolor: 'primary.main',
+                          color: '#fff' 
+                        }
                       }}
                     >
                       Add Resource
                     </Button>
                   </Box>
-                </Stack>
+                )}
               </Box>
-            )}
+            </Box>
 
-            <Box sx={{ mt: 3, borderBottom: '1px solid', borderColor: 'divider' }} />
+            {isLinksExpanded && (
+              <>
+                {links.length > 0 && (
+                  <Box sx={{ mb: 2 }}>
+                    <Stack gap={1}>
+                      {links.map((link, idx) => (
+                        <Box
+                          key={idx}
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between',
+                            p: 1.2,
+                            borderRadius: '10px',
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                            border: '1px solid',
+                            borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                            transition: 'all 0.2s',
+                          }}
+                        >
+                          <Box display="flex" alignItems="center" gap={1.5} sx={{ minWidth: 0, flex: 1 }}>
+                            <Box
+                              sx={{
+                                width: 32,
+                                height: 32,
+                                borderRadius: '8px',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                bgcolor: getLinkIcon(link.url).isImage ? 'transparent' : getLinkIcon(link.url).color,
+                                color: '#fff',
+                                flexShrink: 0,
+                                overflow: 'hidden'
+                              }}
+                            >
+                              {getLinkIcon(link.url).isImage ? (
+                                <Avatar 
+                                  src={getLinkIcon(link.url).src} 
+                                  variant="rounded"
+                                  sx={{ width: 20, height: 20, bgcolor: 'transparent' }}
+                                >
+                                   <LinkIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
+                                </Avatar>
+                              ) : (
+                                getLinkIcon(link.url).icon
+                              )}
+                            </Box>
+                            <Box sx={{ minWidth: 0, flex: 1 }}>
+                              <Typography variant="body2" sx={{ fontWeight: 600, color: 'text.primary', mb: 0.2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {link.title}
+                              </Typography>
+                              <Typography variant="caption" sx={{ color: 'primary.main', fontWeight: 500, display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                {link.url}
+                              </Typography>
+                            </Box>
+                          </Box>
+                          <Box display="flex" alignItems="center" gap={0.5}>
+                            <IconButton
+                              size="small"
+                              href={link.url}
+                              target="_blank"
+                              sx={{
+                                color: 'primary.main',
+                                '&:hover': { bgcolor: 'primary.main', color: 'primary.contrastText' }
+                              }}
+                            >
+                              <LaunchIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => handleRemoveLink(idx)}
+                              sx={{
+                                color: 'text.secondary',
+                                opacity: 0.5,
+                                '&:hover': { color: 'error.main', opacity: 1 }
+                              }}
+                            >
+                              <CloseIcon sx={{ fontSize: 16 }} />
+                            </IconButton>
+                          </Box>
+                        </Box>
+                      ))}
+                    </Stack>
+                  </Box>
+                )}
+
+                {isAddingLink && (
+                  <Box
+                    sx={{
+                      p: 2,
+                      borderRadius: '8px',
+                      bgcolor: (theme) =>
+                        theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)',
+                      border: '1px dashed',
+                      borderColor: 'primary.main',
+                      mb: 2,
+                    }}
+                  >
+                    <Stack gap={1.5}>
+                      <TextField
+                        size="small"
+                        placeholder="Link Title (e.g., Google Meet, Design Doc)"
+                        value={newLinkTitle}
+                        onChange={(e) => setNewLinkTitle(e.target.value)}
+                        fullWidth
+                        variant="standard"
+                        InputProps={{ disableUnderline: true, sx: { fontSize: '14px', fontWeight: 500 } }}
+                      />
+                      <TextField
+                        size="small"
+                        placeholder="URL (https://...)"
+                        value={newLinkUrl}
+                        onChange={(e) => setNewLinkUrl(e.target.value)}
+                        fullWidth
+                        variant="standard"
+                        InputProps={{ disableUnderline: true, sx: { fontSize: '13px', color: 'primary.main' } }}
+                      />
+                      <Box display="flex" justifyContent="flex-end" gap={1} mt={0.5}>
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            setIsAddingLink(false);
+                            setNewLinkTitle('');
+                            setNewLinkUrl('');
+                          }}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size="small"
+                          variant="contained"
+                          disableElevation
+                          disabled={!newLinkTitle || !newLinkUrl}
+                          onClick={() => {
+                            handleAddLink(newLinkTitle, newLinkUrl);
+                            setNewLinkTitle('');
+                            setNewLinkUrl('');
+                            setIsAddingLink(false);
+                          }}
+                        >
+                          Add Resource
+                        </Button>
+                      </Box>
+                    </Stack>
+                  </Box>
+                )}
+              </>
+            )}
+            <Box sx={{ mt: 1, borderBottom: '1px solid', borderColor: 'divider' }} />
           </Box>
+
+          {/* COLLABORATORS SECTION */}
+          {initialTask?.participants && initialTask.participants.length > 0 && (
+            <Box sx={{ px: 4, mb: 4 }}>
+              <Box
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+                sx={{ cursor: 'pointer', mb: isCollaboratorsExpanded ? 2 : 0 }}
+                onClick={() => setIsCollaboratorsExpanded(!isCollaboratorsExpanded)}
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <GroupsIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+                  <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 700, letterSpacing: '0.5px' }}>
+                    COLLABORATORS
+                  </Typography>
+                  {!isCollaboratorsExpanded && initialTask.participants.length > 0 && (
+                    <Box
+                      sx={{
+                        ml: 1,
+                        px: 0.8,
+                        py: 0.1,
+                        borderRadius: '6px',
+                        bgcolor: 'primary.main',
+                        color: 'primary.contrastText',
+                        fontSize: '10px',
+                        fontWeight: 800,
+                      }}
+                    >
+                      {initialTask.participants.length}
+                    </Box>
+                  )}
+                </Box>
+                <Box display="flex" alignItems="center" gap={0.5}>
+                  <IconButton size="small" sx={{ p: 0.5 }}>
+                    {isCollaboratorsExpanded ? <ExpandLessIcon sx={{ fontSize: 18 }} /> : <ExpandMoreIcon sx={{ fontSize: 18 }} />}
+                  </IconButton>
+                  {isCollaboratorsExpanded && (
+                    <Button
+                      size="small"
+                      startIcon={<AddIcon sx={{ fontSize: 16 }} />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                      }}
+                      sx={{
+                        textTransform: 'none',
+                        borderRadius: '8px',
+                        px: 1.5,
+                        py: 0.5,
+                        fontSize: '12px',
+                        fontWeight: 700,
+                        color: 'primary.main',
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.1)',
+                        '&:hover': { 
+                          bgcolor: 'primary.main',
+                          color: '#fff' 
+                        }
+                      }}
+                    >
+                      Add Collaborator
+                    </Button>
+                  )}
+                </Box>
+              </Box>
+
+              {isCollaboratorsExpanded && (
+                <Box
+                  sx={{
+                    maxHeight: '220px',
+                    overflowY: 'auto',
+                    pr: 1, // Space for the scrollbar
+                    '&::-webkit-scrollbar': {
+                      width: '6px',
+                    },
+                    '&::-webkit-scrollbar-track': {
+                      bgcolor: 'transparent',
+                    },
+                    '&::-webkit-scrollbar-thumb': {
+                      bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+                      borderRadius: '10px',
+                      '&:hover': {
+                        bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.2)' : 'rgba(0,0,0,0.2)',
+                      }
+                    }
+                  }}
+                >
+                  <Stack gap={1}>
+                    {initialTask.participants.map((person, idx) => (
+                      <Box
+                        key={idx}
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'space-between',
+                          p: 1.5,
+                          borderRadius: '12px',
+                          bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)',
+                          border: '1px solid',
+                          borderColor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+                          transition: 'all 0.2s',
+                          '&:hover': {
+                            bgcolor: (theme) => theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.04)',
+                            borderColor: 'divider'
+                          }
+                        }}
+                      >
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <Avatar
+                            src={person.avatar}
+                            sx={{
+                              width: 40,
+                              height: 40,
+                              fontSize: '15px',
+                              fontWeight: 600,
+                              bgcolor: (theme) => person.avatar ? 'transparent' : (theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(56, 189, 248, 0.1)'),
+                              color: '#38bdf8',
+                              border: person.avatar ? 'none' : '1px solid rgba(56, 189, 248, 0.3)'
+                            }}
+                          >
+                            {person.name.charAt(0)}
+                          </Avatar>
+                          <Box>
+                            <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.2 }}>
+                              {person.name}
+                            </Typography>
+                            <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
+                              {person.email}
+                            </Typography>
+                          </Box>
+                        </Box>
+                        <IconButton size="small" sx={{ color: 'text.secondary', opacity: 0.5 }}>
+                          <MoreVertIcon sx={{ fontSize: 18 }} />
+                        </IconButton>
+                      </Box>
+                    ))}
+                  </Stack>
+                </Box>
+              )}
+              <Box sx={{ mt: 3, borderBottom: '1px solid', borderColor: 'divider' }} />
+            </Box>
+          )}
 
           <Box sx={{ px: 4, mb: 4 }}>
             <Box display="flex" alignItems="center" gap={1} mb={1}>
