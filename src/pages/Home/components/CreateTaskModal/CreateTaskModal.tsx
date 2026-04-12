@@ -1344,7 +1344,7 @@ export const CreateTaskModal = ({
           </Button>
           <Button
             onClick={
-              initialTask && initialTask.user_id !== 'google-user'
+              initialTask && (initialTask as any).task_type !== 'GoogleTask'
                 ? handleUpdate
                 : handleSave
             }
@@ -1353,7 +1353,7 @@ export const CreateTaskModal = ({
           >
             {loadingSave ? (
               <CircularProgress size={24} color="inherit" />
-            ) : initialTask && initialTask.user_id !== 'google-user' ? (
+            ) : initialTask && (initialTask as any).task_type !== 'GoogleTask' ? (
               'Save Changes'
             ) : (
               'Create Task'

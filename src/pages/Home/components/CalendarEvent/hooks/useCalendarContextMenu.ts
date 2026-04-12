@@ -14,6 +14,8 @@ import type { Task } from '@/redux/tasks/task.types';
 
 import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 
+import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+
 export const useCalendarContextMenu = () => {
   const { user } = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -26,7 +28,7 @@ export const useCalendarContextMenu = () => {
     if (!user) return;
     
     // Check if it's a Google event mirrored task - we probably shouldn't duplicate these directly via Focusly API or they lose sync
-    if (task.user_id === 'google-user') {
+    if (task.task_type === 'GoogleTask') {
         sileo.error({ title: 'Cannot duplicate Google events via context menu' });
         return;
     }
@@ -127,6 +129,7 @@ export const useCalendarContextMenu = () => {
 
   const handleDeleteGoogleEvent = async (eventId: string) => {
     try {
+      await deleteGoogleEvent(eventId);
       dispatch(removeEvent({ id: eventId }));
       sileo.success({ 
           title: 'Event deleted',

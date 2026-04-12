@@ -21,6 +21,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     created_at: event.created_at || new Date().toISOString(),
     updated_at: event.updated_at || new Date().toISOString(),
     links: event.links || [],
+    task_type: 'GoogleTask',
     google_event_id: event.id,
     subtasks: (event.subtasks || []) as any,
     tags: event.tags || [],
@@ -79,6 +80,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       };
     }),
     links: t.links || [],
+    task_type: (t as any).task_type || 'PlatformTask',
     google_event_id: t.google_event_id,
     participants: t.participants || [],
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],

@@ -7,8 +7,8 @@ import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask, upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
-import { setEvents } from '@/redux/calendar/calendar.slice';
-import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
+import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
+import { fetchGoogleEvents, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 import type { TaskData } from '../../CreateTaskModal';
 import type { ICalendarEvent } from '../../CalendarEvent';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
@@ -270,9 +270,15 @@ export const useCalendarView = () => {
   const handleDeleteTask = async (taskId: string) => {
     try {
       const taskToDelete = tasks.find(t => t.id === taskId);
-      const isFocuslyTask = taskToDelete?.user_id !== 'google-user';
+      const isGoogleTask = taskToDelete?.task_type === 'GoogleTask';
 
-      if (isFocuslyTask) {
+      if (isGoogleTask) {
+        // Pure Google Calendar event — delete via REST API
+        const eventId = taskToDelete?.google_event_id || taskId;
+        await deleteGoogleEvent(eventId);
+        dispatch(removeEvent({ id: taskId }));
+      } else {
+        // PlatformTask — delete via GraphQL (backend handles Google sync if needed)
         await deleteTaskMutation({
           variables: { id: taskId },
           refetchQueries: [
@@ -294,7 +300,7 @@ export const useCalendarView = () => {
       sileo.error({
         title: 'Failed to delete task',
         description: 'Please try again later.',
-        fill: 'rgba(239, 68, 68, 0.9)', // Solid Red
+        fill: 'rgba(239, 68, 68, 0.9)',
       });
     }
   };

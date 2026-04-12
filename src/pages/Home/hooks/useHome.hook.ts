@@ -10,6 +10,7 @@ import { TaskBar } from '../components/Sidebar/types/Sidebar.types';
 import type { Task } from '@/redux/tasks/task.types';
 import type { TaskSearchItems } from '../../Workspace/types/workspace.types';
 import { mapGoogleEventToTask } from '@/api/Tasks/taskMapper';
+import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 
 export const useHome = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -189,14 +190,10 @@ export const useHome = () => {
   const deleteTask = async () => {
     if (taskDetailsTask?.id) {
       try {
-        const isGoogleEvent = !!taskDetailsTask.google_event_id;
-        const isFocuslyTask = (taskDetailsTask as Task).user_id !== 'google-user';
-        
-        if (isGoogleEvent && taskDetailsTask.google_event_id) {
-          dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
-        }
+        const isGoogleTask = (taskDetailsTask as Task).task_type === 'GoogleTask';
 
-        if (isFocuslyTask) {
+        if (!isGoogleTask) {
+          // Focusly task (may also have google_event_id — backend handles that)
           await deleteTaskMutation({
             variables: { id: taskDetailsTask.id },
             refetchQueries: [
@@ -205,6 +202,11 @@ export const useHome = () => {
             ],
           });
           dispatch(removeTask({ id: taskDetailsTask.id }));
+        } else {
+          // Pure Google Calendar event — delete via REST API, not GraphQL
+          const eventId = taskDetailsTask.google_event_id || taskDetailsTask.id;
+          await deleteGoogleEvent(eventId);
+          dispatch(removeEvent({ id: taskDetailsTask.id }));
         }
       } catch (e) {
         console.error('Failed to delete task', e);
