@@ -2,7 +2,7 @@ import { useCallback, useMemo, useEffect, useRef } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
 import debounce from 'lodash.debounce';
-import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '@/api/graphql';
+import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 import { sileo } from 'sileo';

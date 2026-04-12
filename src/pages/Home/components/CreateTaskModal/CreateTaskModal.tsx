@@ -1264,14 +1264,14 @@ export const CreateTaskModal = ({
                               border: person.avatar ? 'none' : '1px solid rgba(56, 189, 248, 0.3)'
                             }}
                           >
-                            {person.name.charAt(0)}
+                            {person.name?.charAt(0) || person.email?.charAt(0) || '?'}
                           </Avatar>
                           <Box>
                             <Typography variant="body2" sx={{ fontWeight: 700, color: 'text.primary', mb: 0.2 }}>
-                              {person.name}
+                              {person.name || person.email || 'Unknown Collaborator'}
                             </Typography>
                             <Typography variant="caption" sx={{ color: 'text.secondary', fontWeight: 500 }}>
-                              {person.email}
+                              {person.email || 'No email provided'}
                             </Typography>
                           </Box>
                         </Box>

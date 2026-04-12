@@ -1,11 +1,10 @@
 import { useMutation } from '@apollo/client';
+import { GET_TOTAL_WORKSPACES, GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import {
   UPDATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-  GET_TOTAL_WORKSPACES,
-  GET_WORKSPACES,
-} from '@/api/graphql';
+} from '../../CreateTaskModal/tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 
 interface UseFocusModeActionsProps {

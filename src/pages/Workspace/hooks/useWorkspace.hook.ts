@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useQuery } from '@apollo/client';
-import { GET_TOTAL_WORKSPACES } from '@/api/graphql';
+import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
 import { useAppSelector } from '@/redux/hooks';
 import { useWorkspaceForm } from './useWorkspaceForm.hook';
 import { useWorkspaceTasks } from './useWorkspaceTasks.hook';

@@ -1,12 +1,12 @@
 import { useMutation } from '@apollo/client';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import { 
   CREATE_TASK, 
   UPDATE_TASK, 
   DELETE_TASK, 
   GET_TASKS,
-  GET_WORKSPACES 
-} from '@/api/graphql';
+} from '../../CreateTaskModal/tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
 import { sileo } from 'sileo';

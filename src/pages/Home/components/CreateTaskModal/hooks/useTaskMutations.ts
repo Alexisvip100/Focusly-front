@@ -1,15 +1,14 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
+import { GET_WORKSPACES, REMOVE_WORKSPACE } from '@/pages/Workspace/workspaces.graphql';
 import {
   CREATE_TASK,
   UPDATE_TASK,
   DELETE_TASK,
   ADD_SUBTASK,
-  REMOVE_WORKSPACE,
   GET_TASKS,
-  GET_WORKSPACES,
-} from '@/api/graphql';
+} from '../tasks.graphql';
 import { sileo } from 'sileo';
 import { createGoogleEvent, updateGoogleEvent, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 import { removeTask } from '@/redux/tasks/task.slice';
