@@ -65,6 +65,12 @@ export interface Task {
     } | null;
   } | null;
   links?: { title: string; url: string }[];
+  participants?: {
+    name: string;
+    email: string;
+    avatar?: string;
+    responseStatus?: string;
+  }[];
   google_event_id?: string;
 }
 

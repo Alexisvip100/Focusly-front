@@ -26,6 +26,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
+    participants: (event as any).participants || [],
   };
 };
 
@@ -79,6 +80,7 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     }),
     links: t.links || [],
     google_event_id: t.google_event_id,
+    participants: t.participants || [],
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
