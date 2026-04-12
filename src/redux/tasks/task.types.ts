@@ -71,6 +71,7 @@ export interface Task {
     avatar?: string;
     responseStatus?: string;
   }[];
+  task_type?: 'PlatformTask' | 'GoogleTask';
   google_event_id?: string;
 }
 

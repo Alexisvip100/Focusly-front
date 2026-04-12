@@ -305,8 +305,14 @@ export const useTaskMutations = ({
     }
 
     try {
-      // Removed Google delete sync to match one-way import strategy
-      if (initialTask.user_id !== 'google-user') {
+      const isGoogleTask = (initialTask as any).task_type === 'GoogleTask';
+
+      if (isGoogleTask) {
+        // GoogleTask — delete via REST API directly
+        const eventId = initialTask.google_event_id || initialTask.id;
+        await deleteGoogleEvent(eventId);
+      } else {
+        // PlatformTask — delete via GraphQL (backend handles Google sync if needed)
         await deleteTaskMutation({
           variables: { id: initialTask.id },
           refetchQueries: [
@@ -314,8 +320,8 @@ export const useTaskMutations = ({
             { query: GET_WORKSPACES, variables: { search: '' } },
           ],
         });
-        dispatch(removeTask({ id: initialTask.id }));
       }
+      dispatch(removeTask({ id: initialTask.id }));
       resetForm();
     } catch (e) {
       console.error(e);

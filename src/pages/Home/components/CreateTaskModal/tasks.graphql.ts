@@ -44,6 +44,7 @@ export const GET_TASKS = gql`
         url
       }
       google_event_id
+      task_type
       estimated_start_date
       estimated_end_date
       participants {
@@ -78,6 +79,7 @@ export const GET_TASKS_TITLES = gql`
         url
       }
       google_event_id
+      task_type
       estimated_start_date
       estimated_end_date
       participants {
@@ -150,6 +152,7 @@ export const UPDATE_TASK = gql`
         url
       }
       google_event_id
+      task_type
       estimated_start_date
       estimated_end_date
       participants {
@@ -199,6 +202,7 @@ export const CREATE_TASK = gql`
         url
       }
       google_event_id
+      task_type
       estimated_start_date
       estimated_end_date
       participants {
