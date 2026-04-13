@@ -80,7 +80,8 @@ export const EventContainer = styled(Box, {
       width: '100%',
       display: 'flex',
       flexDirection: 'column',
-      padding: '2px 8px',
+      justifyContent: 'center',
+      padding: '1px 6px',
       borderLeft: `3px solid ${variant.main}`,
       borderRadius: '4px',
       overflow: 'hidden',
@@ -90,7 +91,7 @@ export const EventContainer = styled(Box, {
       filter: overlapIndex > 0 ? `hue-rotate(${hueRotation}deg) brightness(${brightnessIdx})` : 'none',
       '&:hover': {
         backgroundColor: isDark ? darken(variant.main, 0.2) : lighten(variant.main, 0.1),
-        zIndex: 50, // Jump to top
+        zIndex: 50,
       },
     };
   }

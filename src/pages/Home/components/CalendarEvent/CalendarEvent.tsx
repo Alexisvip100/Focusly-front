@@ -129,24 +129,34 @@ export const CalendarEvent = (props: CalendarEventProps) => {
       overlapIndex={event.overlapIndex}
       onContextMenu={handleContextMenu}
     >
-      <div className="event-card-inner">
-        <div className="event-icon-container">
+      <div className="event-card-inner" style={{ display: 'flex', alignItems: 'flex-start', gap: '4px', height: '100%', minWidth: 0 }}>
+        <div className="event-icon-container" style={{ flexShrink: 0, paddingTop: '1px' }}>
           {isMeeting ? (
-            <VideocamIcon sx={{ fontSize: '18px', color: '#3B82F6' }} />
+            <VideocamIcon sx={{ fontSize: '14px', color: '#3B82F6' }} />
           ) : (
-            <CalendarTodayIcon sx={{ fontSize: '16px', color: '#ffffff' }} />
+            <CalendarTodayIcon sx={{ fontSize: '12px', color: '#ffffff' }} />
           )}
         </div>
-        <div className="event-info">
+        <div className="event-info" style={{ minWidth: 0, flex: 1, overflow: 'hidden' }}>
           <Typography
             variant="caption"
-            sx={{ fontWeight: 700, fontSize: '13px', lineHeight: 1.2, display: 'block', color: 'inherit' }}
+            sx={{
+              fontWeight: 700,
+              fontSize: '12px',
+              lineHeight: 1.3,
+              display: 'block',
+              color: 'inherit',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
+            }}
+            title={title}
           >
             {title}
           </Typography>
           <Typography
             variant="caption"
-            sx={{ fontSize: '11px', fontWeight: 500, display: 'block', opacity: 0.8, color: 'inherit' }}
+            sx={{ fontSize: '10px', fontWeight: 500, display: 'block', opacity: 0.75, color: 'inherit', lineHeight: 1.2 }}
           >
             {timeRange}
           </Typography>
