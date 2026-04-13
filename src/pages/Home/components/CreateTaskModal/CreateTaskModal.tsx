@@ -1344,16 +1344,16 @@ export const CreateTaskModal = ({
           </Button>
           <Button
             onClick={
-              initialTask && (initialTask as any).task_type !== 'GoogleTask'
+              initialTask && initialTask.task_type !== 'GoogleTask'
                 ? handleUpdate
                 : handleSave
             }
             variant="contained"
             sx={saveButtonSx}
           >
-            {loadingSave ? (
+            {loadingSave? (
               <CircularProgress size={24} color="inherit" />
-            ) : initialTask && (initialTask as any).task_type !== 'GoogleTask' ? (
+            ) : initialTask && initialTask?.task_type === 'PlatformTask'  || initialTask?.task_type === 'GoogleTask' ? (
               'Save Changes'
             ) : (
               'Create Task'

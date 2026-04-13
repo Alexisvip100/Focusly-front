@@ -223,4 +223,16 @@ export const CalendarContainer = styled(Box, {
     '& .event-info': { flexDirection: 'row', alignItems: 'center', gap: '4px' },
     '& .event-info span:last-child': { display: 'none' },
   },
+
+  // Week / Day view event overrides
+  '& .rbc-time-view .rbc-event': {
+    overflow: 'visible',
+    '& .event-card-inner': {
+      overflow: 'hidden',
+    },
+  },
+  // Short events in week/day view (30 min or less)
+  '& .rbc-time-view .rbc-event[style*="height"]': {
+    minHeight: '20px !important',
+  },
 }));
