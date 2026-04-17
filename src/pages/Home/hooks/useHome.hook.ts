@@ -9,7 +9,7 @@ import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { TaskBar } from '../components/Sidebar/types/Sidebar.types';
 import type { Task } from '@/redux/tasks/task.types';
 import type { TaskSearchItems } from '../../Workspace/types/workspace.types';
-import { mapGoogleEventToTask } from '@/api/Tasks/taskMapper';
+import { mapGoogleEventToTask, normalizeGoogleId } from '@/api/Tasks/taskMapper';
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 
 export const useHome = () => {
@@ -180,6 +180,16 @@ export const useHome = () => {
       tags: updatedTask.tags?.map((t: { name: string } | string) => (typeof t === 'string' ? t : t.name)) || [],
     };
     dispatch(upsertTaskRedux(mappedTask));
+
+
+    if (mappedTask.google_event_id) {
+      const normalizedId = normalizeGoogleId(mappedTask.google_event_id);
+      const matchingEvents = reduxEvents.filter((e) => {
+        const eventNormId = normalizeGoogleId(e.id);
+        return eventNormId === normalizedId;
+      });
+      matchingEvents.forEach((e) => dispatch(removeEvent({ id: e.id })));
+    }
     
     // Also update tempTask to keep the modal state in sync
     if (tempTask && tempTask.id === updatedTask.id) {

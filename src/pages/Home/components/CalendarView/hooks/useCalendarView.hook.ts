@@ -2,7 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
-import { addDays, addMonths, addWeeks, subDays, subMonths, subWeeks } from 'date-fns';
+import { 
+  addDays, addMonths, addWeeks, subDays, subMonths, subWeeks,
+  startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay
+} from 'date-fns';
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
@@ -16,7 +19,7 @@ import { GET_TASKS, DELETE_TASK } from '../../CreateTaskModal/tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
-import { mapResponseToTask } from '@/api/Tasks/taskMapper';
+import { mapResponseToTask, normalizeGoogleId } from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
@@ -26,8 +29,38 @@ export const useCalendarView = () => {
   const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const [currentView, setCurrentView] = useState<View>(Views.MONTH);
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Initialize state from URL if available
+  const [currentView, setCurrentView] = useState<View>(() => {
+    const v = searchParams.get('v');
+    const validViews: View[] = [Views.MONTH, Views.WEEK, Views.DAY];
+    return validViews.includes(v as View) ? (v as View) : Views.MONTH;
+  });
+
+  const [currentDate, setCurrentDate] = useState(() => {
+    const d = searchParams.get('d');
+    if (d) {
+      const parsed = new Date(d);
+      if (!isNaN(parsed.getTime())) return parsed;
+    }
+    return new Date();
+  });
+
+  // Sync URL with state
+  useEffect(() => {
+    const newParams = new URLSearchParams(searchParams.toString());
+    const currentV = newParams.get('v');
+    const currentD = newParams.get('d');
+    
+    // Use local time date string for the URL to avoid timezone confusion in the calendar view
+    const dateStr = currentDate.toISOString().split('T')[0];
+    
+    if (currentV !== currentView || currentD !== dateStr) {
+      newParams.set('v', currentView as string);
+      newParams.set('d', dateStr);
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [currentView, currentDate, setSearchParams, searchParams]);
+
   const [slotContextMenu, setSlotContextMenu] = useState<{ mouseX: number; mouseY: number; date: Date } | null>(null);
   const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] = useState<string | null>(null);
   
@@ -38,9 +71,37 @@ export const useCalendarView = () => {
 
   const user = useSelector((state: RootState) => state.auth.user);
 
+  const dateRange = useMemo(() => {
+    let start: Date;
+    let end: Date;
+
+    if (currentView === Views.MONTH) {
+      // Fetch some days before and after to cover the calendar grid overflow
+      start = subDays(startOfMonth(currentDate), 7);
+      end = addDays(endOfMonth(currentDate), 7);
+    } else if (currentView === Views.WEEK) {
+      start = startOfWeek(currentDate);
+      end = endOfWeek(currentDate);
+    } else {
+      start = startOfDay(currentDate);
+      end = endOfDay(currentDate);
+    }
+
+    return {
+      start: start.toISOString(),
+      end: end.toISOString(),
+    };
+  }, [currentDate, currentView]);
+
   const { data: tasksData, loading: isTasksQueryLoading } = useQuery(GET_TASKS, {
     skip: !user?.id,
-    variables: { userId: user?.id },
+    variables: { 
+      userId: user?.id,
+      filters: {
+        startDate: dateRange.start,
+        endDate: dateRange.end,
+      }
+    },
     fetchPolicy: 'cache-and-network',
   });
 
@@ -59,22 +120,23 @@ export const useCalendarView = () => {
 
   const isGoogleEventsLoading = shouldRestoreGoogleCalendar;
 
-  // Fetch Google Calendar Events on Mount if not present but user is from Google
+  // Fetch Google Calendar Events when the range or user changes
   useEffect(() => {
-    if (!shouldRestoreGoogleCalendar || !user?.id) {
+    if (user?.authProvider !== 'google' || !user?.id) {
       return;
     }
 
     let isMounted = true;
+    setResolvedGoogleCalendarUserId(null); // Mark as loading for this range
 
-    fetchGoogleEvents()
+    fetchGoogleEvents(dateRange.start, dateRange.end)
       .then((events) => {
         if (isMounted && events) {
           dispatch(setEvents(events));
         }
       })
       .catch((err) => {
-        console.error('Failed to restore Google Calendar events', err);
+        console.error('Failed to fetch Google Calendar events', err);
       })
       .finally(() => {
         if (isMounted) {
@@ -85,7 +147,7 @@ export const useCalendarView = () => {
     return () => {
       isMounted = false;
     };
-  }, [dispatch, shouldRestoreGoogleCalendar, user?.id]);
+  }, [dispatch, user?.id, user?.authProvider, dateRange]);
 
   const hasRenderableCalendarData =
     reduxEvents.length > 0 ||
@@ -96,14 +158,34 @@ export const useCalendarView = () => {
     !hasRenderableCalendarData && (isTasksQueryLoading || isGoogleEventsLoading);
 
   const events = useMemo(() => {
-    // 1. Map Google Calendar Events (Virtual)
+    // Helper for efficient binary search
+    const binarySearch = (sortedTasks: Task[], targetId: string): boolean => {
+      let left = 0;
+      let right = sortedTasks.length - 1;
+      while (left <= right) {
+        const mid = Math.floor((left + right) / 2);
+        const midId = normalizeGoogleId(sortedTasks[mid].google_event_id);
+        if (midId === targetId) return true;
+        if (midId < targetId) left = mid + 1;
+        else right = mid - 1;
+      }
+      return false;
+    };
+
+    // Pre-sort tasks that have google_event_id for efficient binary search
+    const tasksWithGoogleId = (tasks || [])
+      .filter(t => !!t.google_event_id)
+      .sort((a, b) => {
+        const idA = normalizeGoogleId(a.google_event_id);
+        const idB = normalizeGoogleId(b.google_event_id);
+        return idA.localeCompare(idB);
+      });
+
+    // 1. Map Google Calendar Events (Virtual) with Binary Search Deduplication
     const calendarEvents = reduxEvents
       .filter((e) => {
-        const normGoogleId = e.id.replace(/^_+/, '').split('_')[0];
-        return !(tasks || []).some(t => {
-          const tGoogleId = t.google_event_id?.replace(/^_+/, '').split('_')[0];
-          return tGoogleId === normGoogleId;
-        });
+        const normGoogleId = normalizeGoogleId(e.id);
+        return !binarySearch(tasksWithGoogleId, normGoogleId);
       })
       .map((ge) => {
         try {
@@ -247,6 +329,18 @@ export const useCalendarView = () => {
       
       // Use upsertTaskRedux to handle both updates and additions safely
       dispatch(upsertTaskRedux(task));
+
+      // If this task has a google_event_id, remove the matching virtual Google event
+      // from Redux so it doesn't show as a duplicate alongside the new DB task
+      if (task.google_event_id) {
+        const normalizedId = normalizeGoogleId(task.google_event_id);
+        // Find all matching Google events (could match by normalized ID or raw ID)
+        const matchingEvents = reduxEvents.filter((e) => {
+          const eventNormId = normalizeGoogleId(e.id);
+          return eventNormId === normalizedId;
+        });
+        matchingEvents.forEach((e) => dispatch(removeEvent({ id: e.id })));
+      }
       
       sileo.success({
         fill: '#ecfdf5ff',

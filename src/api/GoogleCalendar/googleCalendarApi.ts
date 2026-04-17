@@ -3,8 +3,15 @@ import type { GoogleCalendarEvent, RawGoogleEvent } from '@/redux/calendar/calen
 
 // Ya no necesitamos manejar la lógica de refresco ni localStorage en el cliente,
 // el backend lo hace automáticamente usando la sesión del usuario.
-export const fetchGoogleEvents = async (): Promise<GoogleCalendarEvent[]> => {
-  const response = await axios.get('/google-calendar/events');
+export const fetchGoogleEvents = async (
+  startDate?: string,
+  endDate?: string
+): Promise<GoogleCalendarEvent[]> => {
+  const params = new URLSearchParams();
+  if (startDate) params.append('timeMin', startDate);
+  if (endDate) params.append('timeMax', endDate);
+
+  const response = await axios.get(`/google-calendar/events?${params.toString()}`);
   return (response.data || []) as GoogleCalendarEvent[];
 };
 

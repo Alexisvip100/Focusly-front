@@ -3,6 +3,15 @@ import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 
 /**
+ * Normalizes a Google Calendar ID by removing leading underscores and 
+ * ignoring instance-specific suffixes (for recurring events).
+ */
+export const normalizeGoogleId = (id: string | null | undefined): string => {
+  if (!id) return '';
+  return id.replace(/^_+/, '').split('_')[0];
+};
+
+/**
  * Maps a Google Calendar event to a Focusly Task structure.
  * This is used for pre-filling the task modal when a user selects 
  * a Google event from the calendar views.
@@ -22,7 +31,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     updated_at: event.updated_at || new Date().toISOString(),
     links: event.links || [],
     task_type: 'GoogleTask',
-    google_event_id: event.id,
+    google_event_id: normalizeGoogleId(event.id),
     subtasks: (event.subtasks || []) as any,
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
