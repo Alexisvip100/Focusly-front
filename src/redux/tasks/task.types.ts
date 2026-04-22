@@ -73,6 +73,8 @@ export interface Task {
   }[];
   task_type?: 'PlatformTask' | 'GoogleTask';
   google_event_id?: string;
+  source?: 'google' | 'platform';
+  sync_status?: 'synced' | 'pending' | 'error';
 }
 
 export interface TaskState {

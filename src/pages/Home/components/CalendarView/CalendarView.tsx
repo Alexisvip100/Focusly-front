@@ -129,7 +129,6 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         />
       </Box>
 
-      {/* Slot Context Menu */}
       <Menu
         open={slotContextMenu !== null}
         onClose={closeSlotContextMenu}

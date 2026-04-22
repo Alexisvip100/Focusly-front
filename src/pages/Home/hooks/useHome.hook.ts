@@ -9,7 +9,8 @@ import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { TaskBar } from '../components/Sidebar/types/Sidebar.types';
 import type { Task } from '@/redux/tasks/task.types';
 import type { TaskSearchItems } from '../../Workspace/types/workspace.types';
-import { mapGoogleEventToTask, normalizeGoogleId } from '@/api/Tasks/taskMapper';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
+import { mapGoogleEventToTask, normalizeGoogleId, mapResponseToTask, getBaseGoogleId } from '@/api/Tasks/taskMapper';
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 
 export const useHome = () => {
@@ -170,29 +171,26 @@ export const useHome = () => {
     }
   };
 
-  const handleSaveTask = (updatedTask: Task) => {
-    // Map TaskResponse to Task if needed
-    const mappedTask: Task = {
-      ...updatedTask,
-      user_id: updatedTask.user_id || (taskDetailsTask as Task)?.user_id || user?.id || '',
-      notes_encrypted: updatedTask.notes_encrypted || '',
-      deadline: updatedTask.deadline || new Date().toISOString(),
-      tags: updatedTask.tags?.map((t: { name: string } | string) => (typeof t === 'string' ? t : t.name)) || [],
-    };
-    dispatch(upsertTaskRedux(mappedTask));
+  const handleSaveTask = (updatedTask: Task | TaskResponse) => {
+    // Standardize mapping from backend response to Redux Task type
+    const mappedTask = mapResponseToTask(updatedTask as TaskResponse);
 
+    dispatch(upsertTaskRedux(mappedTask));
 
     if (mappedTask.google_event_id) {
       const normalizedId = normalizeGoogleId(mappedTask.google_event_id);
+      const baseId = getBaseGoogleId(mappedTask.google_event_id);
+      
       const matchingEvents = reduxEvents.filter((e) => {
-        const eventNormId = normalizeGoogleId(e.id);
-        return eventNormId === normalizedId;
+        const eventId = normalizeGoogleId(e.id);
+        const eventBaseId = getBaseGoogleId(e.id);
+        return eventId === normalizedId || eventBaseId === baseId || eventId === baseId || eventBaseId === normalizedId;
       });
       matchingEvents.forEach((e) => dispatch(removeEvent({ id: e.id })));
     }
     
     // Also update tempTask to keep the modal state in sync
-    if (tempTask && tempTask.id === updatedTask.id) {
+    if (tempTask && tempTask.id === mappedTask.id) {
       setTempTask(mappedTask);
     }
   };

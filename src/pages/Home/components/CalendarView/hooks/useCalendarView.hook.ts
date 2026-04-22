@@ -19,7 +19,7 @@ import { GET_TASKS, DELETE_TASK } from '../../CreateTaskModal/tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
-import { mapResponseToTask, normalizeGoogleId } from '@/api/Tasks/taskMapper';
+import { mapResponseToTask, normalizeGoogleId, getBaseGoogleId } from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
@@ -165,8 +165,9 @@ export const useCalendarView = () => {
       while (left <= right) {
         const mid = Math.floor((left + right) / 2);
         const midId = normalizeGoogleId(sortedTasks[mid].google_event_id);
-        if (midId === targetId) return true;
-        if (midId < targetId) left = mid + 1;
+        const comparison = midId.localeCompare(targetId);
+        if (comparison === 0) return true;
+        if (comparison < 0) left = mid + 1;
         else right = mid - 1;
       }
       return false;
@@ -183,9 +184,17 @@ export const useCalendarView = () => {
 
     // 1. Map Google Calendar Events (Virtual) with Binary Search Deduplication
     const calendarEvents = reduxEvents
-      .filter((e) => {
-        const normGoogleId = normalizeGoogleId(e.id);
-        return !binarySearch(tasksWithGoogleId, normGoogleId);
+      .filter((ge) => {
+        const normGoogleId = normalizeGoogleId(ge.id);
+        const baseGoogleId = getBaseGoogleId(ge.id);
+        
+        // Robust Deduplication: 
+        // Hide if there's an exact match (this specific instance) 
+        // OR if the whole series has been imported/linked.
+        const isAlreadySaved = binarySearch(tasksWithGoogleId, normGoogleId) || 
+                              binarySearch(tasksWithGoogleId, baseGoogleId);
+                              
+        return !isAlreadySaved;
       })
       .map((ge) => {
         try {
@@ -322,36 +331,6 @@ export const useCalendarView = () => {
     setCurrentDate(date);
   };
 
-  const handleSaveTask = (taskData: TaskResponse | TaskData) => {
-    // If it's a full task response from GraphQL
-    if (taskData && 'id' in taskData && taskData.id) {
-      const task = mapResponseToTask(taskData as TaskResponse);
-      
-      // Use upsertTaskRedux to handle both updates and additions safely
-      dispatch(upsertTaskRedux(task));
-
-      // If this task has a google_event_id, remove the matching virtual Google event
-      // from Redux so it doesn't show as a duplicate alongside the new DB task
-      if (task.google_event_id) {
-        const normalizedId = normalizeGoogleId(task.google_event_id);
-        // Find all matching Google events (could match by normalized ID or raw ID)
-        const matchingEvents = reduxEvents.filter((e) => {
-          const eventNormId = normalizeGoogleId(e.id);
-          return eventNormId === normalizedId;
-        });
-        matchingEvents.forEach((e) => dispatch(removeEvent({ id: e.id })));
-      }
-      
-      sileo.success({
-        fill: '#ecfdf5ff',
-        title: 'Task saved successfully!',
-        duration: 4000,
-        description: 'Your changes have been synced.',
-      });
-    }
-    handleModalClose();
-  };
-
   const handleModalClose = () => {
     const newParams = new URLSearchParams(searchParams.toString());
     newParams.delete('taskId');
@@ -425,7 +404,6 @@ export const useCalendarView = () => {
     handleNavigateAction,
     handleSelectSlot,
     handleSelectEvent,
-    handleSaveTask,
     handleDeleteTask,
     handleModalClose,
     isFocusModeOpen,

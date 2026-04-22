@@ -3,12 +3,22 @@ import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 
 /**
- * Normalizes a Google Calendar ID by removing leading underscores and 
- * ignoring instance-specific suffixes (for recurring events).
+ * Cleans a Google Calendar ID by removing leading underscores.
+ * Unlike previous versions, this preserves the instance suffix for recurring 
+ * events to allow for granular instance-level synchronization.
  */
 export const normalizeGoogleId = (id: string | null | undefined): string => {
   if (!id) return '';
-  return id.replace(/^_+/, '').split('_')[0];
+  return id.replace(/^_+/, '');
+};
+
+/**
+ * Extracts the base ID of a Google Calendar event, ignoring the instance 
+ * specific suffix (useful for series-level deduplication).
+ */
+export const getBaseGoogleId = (id: string | null | undefined): string => {
+  if (!id) return '';
+  return normalizeGoogleId(id).split('_')[0];
 };
 
 /**
@@ -90,7 +100,8 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     }),
     links: t.links || [],
     task_type: (t as any).task_type || 'PlatformTask',
-    google_event_id: t.google_event_id,
+    google_event_id: normalizeGoogleId(t.google_event_id),
+    source: (t as any).source || 'platform',
     participants: t.participants || [],
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
