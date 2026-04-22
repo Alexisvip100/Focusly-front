@@ -4,7 +4,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
 import { 
   addDays, addMonths, addWeeks, subDays, subMonths, subWeeks,
-  startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay
+  startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay,
+  format,
 } from 'date-fns';
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
@@ -39,8 +40,11 @@ export const useCalendarView = () => {
   const [currentDate, setCurrentDate] = useState(() => {
     const d = searchParams.get('d');
     if (d) {
-      const parsed = new Date(d);
-      if (!isNaN(parsed.getTime())) return parsed;
+      // Split YYYY-MM-DD and create a local Date at midnight
+      const [year, month, day] = d.split('-').map(Number);
+      if (!isNaN(year) && !isNaN(month) && !isNaN(day)) {
+        return new Date(year, month - 1, day);
+      }
     }
     return new Date();
   });
@@ -52,7 +56,7 @@ export const useCalendarView = () => {
     const currentD = newParams.get('d');
     
     // Use local time date string for the URL to avoid timezone confusion in the calendar view
-    const dateStr = currentDate.toISOString().split('T')[0];
+    const dateStr = format(currentDate, 'yyyy-MM-dd');
     
     if (currentV !== currentView || currentD !== dateStr) {
       newParams.set('v', currentView as string);
@@ -156,44 +160,28 @@ export const useCalendarView = () => {
 
   const isCalendarLoading =
     !hasRenderableCalendarData && (isTasksQueryLoading || isGoogleEventsLoading);
-
   const events = useMemo(() => {
-    // Helper for efficient binary search
-    const binarySearch = (sortedTasks: Task[], targetId: string): boolean => {
-      let left = 0;
-      let right = sortedTasks.length - 1;
-      while (left <= right) {
-        const mid = Math.floor((left + right) / 2);
-        const midId = normalizeGoogleId(sortedTasks[mid].google_event_id);
-        const comparison = midId.localeCompare(targetId);
-        if (comparison === 0) return true;
-        if (comparison < 0) left = mid + 1;
-        else right = mid - 1;
+    // 1. Prepare a set of all synced Google Event IDs for efficient deduplication
+    // We store both exact normalized IDs and base IDs to catch series imports.
+    const syncedGoogleIds = new Set<string>();
+    tasks.forEach(t => {
+      if (t.google_event_id) {
+        const norm = normalizeGoogleId(t.google_event_id);
+        const base = getBaseGoogleId(t.google_event_id);
+        if (norm) syncedGoogleIds.add(norm);
+        if (base) syncedGoogleIds.add(base);
       }
-      return false;
-    };
+    });
 
-    // Pre-sort tasks that have google_event_id for efficient binary search
-    const tasksWithGoogleId = (tasks || [])
-      .filter(t => !!t.google_event_id)
-      .sort((a, b) => {
-        const idA = normalizeGoogleId(a.google_event_id);
-        const idB = normalizeGoogleId(b.google_event_id);
-        return idA.localeCompare(idB);
-      });
-
-    // 1. Map Google Calendar Events (Virtual) with Binary Search Deduplication
+    // 2. Map Google Calendar Events (Virtual) with robust Deduplication
     const calendarEvents = reduxEvents
       .filter((ge) => {
         const normGoogleId = normalizeGoogleId(ge.id);
         const baseGoogleId = getBaseGoogleId(ge.id);
         
-        // Robust Deduplication: 
-        // Hide if there's an exact match (this specific instance) 
-        // OR if the whole series has been imported/linked.
-        const isAlreadySaved = binarySearch(tasksWithGoogleId, normGoogleId) || 
-                              binarySearch(tasksWithGoogleId, baseGoogleId);
-                              
+        // Hide if there's any match in our synced IDs set
+        const isAlreadySaved = syncedGoogleIds.has(normGoogleId) || syncedGoogleIds.has(baseGoogleId);
+                               
         return !isAlreadySaved;
       })
       .map((ge) => {
@@ -246,7 +234,22 @@ export const useCalendarView = () => {
       };
     });
 
-    const allEvents = [...calendarEvents, ...taskEvents] as ICalendarEvent[];
+    // Final Content-Based Deduplication (The "Double-Check" Layer)
+    // Even if IDs don't match, we merge events with the same title, start, and end times.
+    const mergedEventsMap = new Map<string, ICalendarEvent>();
+
+    [...calendarEvents, ...taskEvents].forEach((event) => {
+      // Create a unique composite key for the event content
+      const key = `${event.title}_${event.start?.getTime()}_${event.end?.getTime()}`;
+      const existing = mergedEventsMap.get(key);
+
+      // Rule: Always prefer native 'task' type over virtual 'event' type if they overlap
+      if (!existing || (event.type === 'task' && existing.type === 'event')) {
+        mergedEventsMap.set(key, event as ICalendarEvent);
+      }
+    });
+
+    const allEvents = Array.from(mergedEventsMap.values());
     const sortedEvents = allEvents.sort((a, b) => {
       const aStart = a.start?.getTime() || 0;
       const bStart = b.start?.getTime() || 0;

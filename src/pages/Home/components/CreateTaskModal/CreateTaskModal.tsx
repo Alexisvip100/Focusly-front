@@ -158,6 +158,8 @@ export const CreateTaskModal = ({
   const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
   const [isLinksExpanded, setIsLinksExpanded] = useState(true);
   const [isCollaboratorsExpanded, setIsCollaboratorsExpanded] = useState(true);
+  
+  const isPureGoogleTask = initialTask?.task_type === 'GoogleTask';
 
   const getTimerSuggestions = (val: string) => {
     const clean = val.trim();
@@ -402,180 +404,186 @@ export const CreateTaskModal = ({
           </Box>
 
           <Box sx={propertyListSx}>
-            <Box sx={propertyRowSx}>
-              <Box sx={propertyLabelSx}>
-                <TodoIcon sx={{ fontSize: 18 }} />
-                <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                  Status
-                </Typography>
-              </Box>
-              <Box sx={propertyValueSx}>
-                <Chip
-                  icon={
-                    <>
-                      {status === 'Todo' && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                      {status === 'Planning' && <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />}
-                      {status === 'Pending' && <AccessTimeIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
-                      {status === 'OnHold' && <OnHoldIcon sx={{ fontSize: 16, color: 'error.main' }} />}
-                      {status === 'Review' && <VisibilityIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
-                      {status === 'Done' && <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'success.main' }} />}
-                      {status === 'Backlog' && <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                      {!status && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                    </>
-                  }
-                  label={status === 'OnHold' ? 'On Hold' : status || 'Todo'}
-                  onClick={(e) => setStatusAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    color:
-                      status === 'Todo' ? 'text.secondary' :
-                      status === 'Planning' ? 'info.main' :
-                      status === 'Pending' ? 'warning.main' :
-                      status === 'OnHold' ? 'error.main' :
-                      status === 'Review' ? 'secondary.main' :
-                      status === 'Done' ? 'success.main' :
-                      status === 'Backlog' ? 'text.secondary' :
-                      'primary.main',
-                    borderRadius: '8px',
-                    px: 1,
-                    height: '32px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' },
-                    '& .MuiChip-icon': {
-                      marginRight: '-4px',
-                      color: 'inherit'
-                    }
-                  }}
-                />
-              </Box>
-            </Box>
+            {!isPureGoogleTask && (
+              <Box sx={propertyRowSx}>
+                  <Box sx={propertyLabelSx}>
+                    <TodoIcon sx={{ fontSize: 18 }} />
+                    <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                      Status
+                    </Typography>
+                  </Box>
+                  <Box sx={propertyValueSx}>
+                    <Chip
+                      icon={
+                        <>
+                          {status === 'Todo' && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                          {status === 'Planning' && <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />}
+                          {status === 'Pending' && <AccessTimeIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
+                          {status === 'OnHold' && <OnHoldIcon sx={{ fontSize: 16, color: 'error.main' }} />}
+                          {status === 'Review' && <VisibilityIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
+                          {status === 'Done' && <CheckCircleOutlineIcon sx={{ fontSize: 16, color: 'success.main' }} />}
+                          {status === 'Backlog' && <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                          {!status && <TodoIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                        </>
+                      }
+                      label={status === 'OnHold' ? 'On Hold' : status || 'Todo'}
+                      onClick={(e) => setStatusAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        color:
+                          status === 'Todo' ? 'text.secondary' :
+                          status === 'Planning' ? 'info.main' :
+                          status === 'Pending' ? 'warning.main' :
+                          status === 'OnHold' ? 'error.main' :
+                          status === 'Review' ? 'secondary.main' :
+                          status === 'Done' ? 'success.main' :
+                          status === 'Backlog' ? 'text.secondary' :
+                          'primary.main',
+                        borderRadius: '8px',
+                        px: 1,
+                        height: '32px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        '&:hover': { bgcolor: 'action.hover' },
+                        '& .MuiChip-icon': {
+                          marginRight: '-4px',
+                          color: 'inherit'
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
 
-            {/* Priority Property */}
-            <Box sx={propertyRowSx}>
-              <Box sx={propertyLabelSx}>
-                <AttachFileIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
-                <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                  Priority
-                </Typography>
-              </Box>
-              <Box sx={propertyValueSx}>
-                <Chip
-                  icon={
-                    <FlagIcon sx={{ 
-                      fontSize: 16, 
-                      color: priority === 'High' ? 'error.main' : priority === 'Med' ? 'warning.main' : priority === 'Low' ? 'success.main' : 'inherit'
-                    }} />
-                  }
-                  label={priority || 'No priority'}
-                  onClick={(e) => setPriorityAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor:
-                      priority === 'High'
-                        ? 'rgba(239, 68, 68, 0.1)'
-                        : priority === 'Med'
-                          ? 'rgba(245, 158, 11, 0.1)'
-                          : priority === 'Low'
-                            ? 'rgba(16, 185, 129, 0.1)'
-                            : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
-                    border: '1px solid',
-                    borderColor:
-                      priority === 'High'
-                        ? 'error.main'
-                        : priority === 'Med'
-                          ? 'warning.main'
-                          : priority === 'Low'
-                            ? 'success.main'
-                            : 'divider',
-                    color:
-                      priority === 'High'
-                        ? 'error.main'
-                        : priority === 'Med'
-                          ? 'warning.main'
-                          : priority === 'Low'
-                            ? 'success.main'
-                            : 'text.secondary',
-                    borderRadius: '8px',
-                    px: 1,
-                    height: '32px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    '&:hover': { opacity: 0.8 },
-                    '& .MuiChip-icon': {
-                      marginRight: '-4px', // Tighter spacing with the label
-                      color: 'inherit'
-                    }
-                  }}
-                />
-              </Box>
-            </Box>
+              {/* Priority Property */}
+              {!isPureGoogleTask && (
+                <Box sx={propertyRowSx}>
+                  <Box sx={propertyLabelSx}>
+                    <AttachFileIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
+                    <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                      Priority
+                    </Typography>
+                  </Box>
+                  <Box sx={propertyValueSx}>
+                    <Chip
+                      icon={
+                        <FlagIcon sx={{ 
+                          fontSize: 16, 
+                          color: priority === 'High' ? 'error.main' : priority === 'Med' ? 'warning.main' : priority === 'Low' ? 'success.main' : 'inherit'
+                        }} />
+                      }
+                      label={priority || 'No priority'}
+                      onClick={(e) => setPriorityAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor:
+                          priority === 'High'
+                            ? 'rgba(239, 68, 68, 0.1)'
+                            : priority === 'Med'
+                              ? 'rgba(245, 158, 11, 0.1)'
+                              : priority === 'Low'
+                                ? 'rgba(16, 185, 129, 0.1)'
+                                : (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+                        border: '1px solid',
+                        borderColor:
+                          priority === 'High'
+                            ? 'error.main'
+                            : priority === 'Med'
+                              ? 'warning.main'
+                              : priority === 'Low'
+                                ? 'success.main'
+                                : 'divider',
+                        color:
+                          priority === 'High'
+                            ? 'error.main'
+                            : priority === 'Med'
+                              ? 'warning.main'
+                              : priority === 'Low'
+                                ? 'success.main'
+                                : 'text.secondary',
+                        borderRadius: '8px',
+                        px: 1,
+                        height: '32px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        '&:hover': { opacity: 0.8 },
+                        '& .MuiChip-icon': {
+                          marginRight: '-4px', // Tighter spacing with the label
+                          color: 'inherit'
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
 
-            {/* Category Property */}
-            <Box sx={propertyRowSx}>
-              <Box sx={propertyLabelSx}>
-                <AutoFixHighIcon sx={{ fontSize: 18 }} />
-                <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                  Category
-                </Typography>
-              </Box>
-              <Box sx={propertyValueSx}>
-                <Chip
-                  icon={
-                    <>
-                      {category === 'General' && <CategoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                      {category === 'Deep Work' && <AutoFixHighIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
-                      {category === 'Meeting' && <GroupsIcon sx={{ fontSize: 16, color: 'info.main' }} />}
-                      {category === 'Admin' && <AssignmentIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                      {category === 'Design' && <BrushIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
-                      {category === 'Development' && <CodeIcon sx={{ fontSize: 16, color: 'primary.main' }} />}
-                      {category === 'Marketing' && <TrendingUpIcon sx={{ fontSize: 16, color: 'error.main' }} />}
-                      {category === 'Planning' && <EventNoteIcon sx={{ fontSize: 16, color: 'info.main' }} />}
-                      {category === 'Research' && <PsychologyIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
-                      {category === 'Learning' && <SchoolIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
-                      {category === 'Personal' && <PersonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                      {!category && <CategoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
-                    </>
-                  }
-                  label={category || 'General'}
-                  onClick={(e) => setCategoryAnchor(e.currentTarget)}
-                  sx={{
-                    bgcolor: (theme) =>
-                      theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    color:
-                      category === 'General' ? 'text.secondary' :
-                      category === 'Deep Work' ? 'secondary.main' :
-                      category === 'Meeting' ? 'info.main' :
-                      category === 'Admin' ? 'text.secondary' :
-                      category === 'Design' ? 'warning.main' :
-                      category === 'Development' ? 'primary.main' :
-                      category === 'Marketing' ? 'error.main' :
-                      category === 'Planning' ? 'info.main' :
-                      category === 'Research' ? 'secondary.main' :
-                      category === 'Learning' ? 'warning.main' :
-                      category === 'Personal' ? 'text.secondary' :
-                      'text.secondary',
-                    borderRadius: '8px',
-                    px: 1,
-                    height: '32px',
-                    fontSize: '14px',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' },
-                    '& .MuiChip-icon': {
-                      marginRight: '-4px',
-                      color: 'inherit'
-                    }
-                  }}
-                />
-              </Box>
-            </Box>
+              {/* Category Property */}
+              {!isPureGoogleTask && (
+                <Box sx={propertyRowSx}>
+                  <Box sx={propertyLabelSx}>
+                    <AutoFixHighIcon sx={{ fontSize: 18 }} />
+                    <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                      Category
+                    </Typography>
+                  </Box>
+                  <Box sx={propertyValueSx}>
+                    <Chip
+                      icon={
+                        <>
+                          {category === 'General' && <CategoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                          {category === 'Deep Work' && <AutoFixHighIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
+                          {category === 'Meeting' && <GroupsIcon sx={{ fontSize: 16, color: 'info.main' }} />}
+                          {category === 'Admin' && <AssignmentIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                          {category === 'Design' && <BrushIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
+                          {category === 'Development' && <CodeIcon sx={{ fontSize: 16, color: 'primary.main' }} />}
+                          {category === 'Marketing' && <TrendingUpIcon sx={{ fontSize: 16, color: 'error.main' }} />}
+                          {category === 'Planning' && <EventNoteIcon sx={{ fontSize: 16, color: 'info.main' }} />}
+                          {category === 'Research' && <PsychologyIcon sx={{ fontSize: 16, color: 'secondary.main' }} />}
+                          {category === 'Learning' && <SchoolIcon sx={{ fontSize: 16, color: 'warning.main' }} />}
+                          {category === 'Personal' && <PersonIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                          {!category && <CategoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />}
+                        </>
+                      }
+                      label={category || 'General'}
+                      onClick={(e) => setCategoryAnchor(e.currentTarget)}
+                      sx={{
+                        bgcolor: (theme) =>
+                          theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        color:
+                          category === 'General' ? 'text.secondary' :
+                          category === 'Deep Work' ? 'secondary.main' :
+                          category === 'Meeting' ? 'info.main' :
+                          category === 'Admin' ? 'text.secondary' :
+                          category === 'Design' ? 'warning.main' :
+                          category === 'Development' ? 'primary.main' :
+                          category === 'Marketing' ? 'error.main' :
+                          category === 'Planning' ? 'info.main' :
+                          category === 'Research' ? 'secondary.main' :
+                          category === 'Learning' ? 'warning.main' :
+                          category === 'Personal' ? 'text.secondary' :
+                          'text.secondary',
+                        borderRadius: '8px',
+                        px: 1,
+                        height: '32px',
+                        fontSize: '14px',
+                        fontWeight: 600,
+                        cursor: 'pointer',
+                        '&:hover': { bgcolor: 'action.hover' },
+                        '& .MuiChip-icon': {
+                          marginRight: '-4px',
+                          color: 'inherit'
+                        }
+                      }}
+                    />
+                  </Box>
+                </Box>
+              )}
 
             {/* Date Property */}
             <Box sx={propertyRowSx}>
@@ -586,19 +594,19 @@ export const CreateTaskModal = ({
                 </Typography>
               </Box>
               <Box sx={{ ...propertyValueSx, position: 'relative' }}>
-                <Chip
-                  label={currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
-                  onClick={() => setDatePickerOpen(true)}
-                  variant="outlined"
-                  sx={{
-                    borderRadius: '8px',
-                    height: '32px',
-                    fontSize: '14px',
-                    fontWeight: 500,
-                    cursor: 'pointer',
-                    '&:hover': { bgcolor: 'action.hover' },
-                  }}
-                />
+                  <Chip
+                    label={currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
+                    onClick={() => setDatePickerOpen(true)}
+                    variant="outlined"
+                    sx={{
+                      borderRadius: '8px',
+                      height: '32px',
+                      fontSize: '14px',
+                      fontWeight: 500,
+                      cursor: 'pointer',
+                      '&:hover': { bgcolor: 'action.hover' },
+                    }}
+                  />
                 <DatePicker
                   open={datePickerOpen}
                   onClose={() => setDatePickerOpen(false)}
@@ -695,205 +703,209 @@ export const CreateTaskModal = ({
             </Box>
 
             {/* Tags Property */}
-            <Box sx={propertyRowSx}>
-              <Box sx={propertyLabelSx}>
-                <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
-                <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                  Tags
-                </Typography>
-              </Box>
-              <Box sx={propertyValueSx}>
-                {tags.map((tag, index) => {
-                  const colors = getTagColors(tag);
-                  return (
-                    <Chip
-                      key={index}
-                      label={tag}
-                      onDelete={() => setTags(tags.filter((_, i) => i !== index))}
-                      sx={{
-                        ...tagChipSx,
-                        bgcolor: colors.bgcolor,
-                        color: colors.color,
-                        border: '1px solid',
-                        borderColor: colors.borderColor,
-                        borderRadius: '12px',
-                        fontSize: '12px',
-                        height: '24px',
-                        '& .MuiChip-deleteIcon': {
+            {!isPureGoogleTask && (
+              <Box sx={propertyRowSx}>
+                <Box sx={propertyLabelSx}>
+                  <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
+                  <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                    Tags
+                  </Typography>
+                </Box>
+                <Box sx={propertyValueSx}>
+                  {tags.map((tag, index) => {
+                    const colors = getTagColors(tag);
+                    return (
+                      <Chip
+                        key={index}
+                        label={tag}
+                        onDelete={() => setTags(tags.filter((_, i) => i !== index))}
+                        sx={{
+                          ...tagChipSx,
+                          bgcolor: colors.bgcolor,
                           color: colors.color,
-                          fontSize: '14px',
-                          opacity: 0.7,
-                          '&:hover': { opacity: 1 },
-                        },
+                          border: '1px solid',
+                          borderColor: colors.borderColor,
+                          borderRadius: '12px',
+                          fontSize: '12px',
+                          height: '24px',
+                          '& .MuiChip-deleteIcon': {
+                            color: colors.color,
+                            fontSize: '14px',
+                            opacity: 0.7,
+                            '&:hover': { opacity: 1 },
+                          },
+                        }}
+                      />
+                    );
+                  })}
+                  {isAddingTag ? (
+                    <TextField
+                      autoFocus
+                      value={newTag}
+                      onChange={(e) => setNewTag(e.target.value)}
+                      onBlur={() => handleAddTag()}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') handleAddTag();
+                        else if (e.key === 'Escape') setIsAddingTag(false);
                       }}
+                      size="small"
+                      sx={addTagInputSx}
+                      placeholder="#"
                     />
-                  );
-                })}
-                {isAddingTag ? (
-                  <TextField
-                    autoFocus
-                    value={newTag}
-                    onChange={(e) => setNewTag(e.target.value)}
-                    onBlur={() => handleAddTag()}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') handleAddTag();
-                      else if (e.key === 'Escape') setIsAddingTag(false);
-                    }}
-                    size="small"
-                    sx={addTagInputSx}
-                    placeholder="#"
-                  />
-                ) : (
-                  <Chip
-                    icon={<AddIcon sx={{ fontSize: 14 }} />}
-                    label="Add Tag"
-                    onClick={() => setIsAddingTag(true)}
-                    sx={{
-                      height: 28,
-                      fontSize: 12,
-                      bgcolor: 'transparent',
-                      color: 'text.secondary',
-                      border: '1px dashed',
-                      borderColor: 'divider',
-                      '&:hover': { bgcolor: 'action.hover' },
-                    }}
-                  />
-                )}
-              </Box>
-            </Box>
+                  ) : (
+                    <Chip
+                      icon={<AddIcon sx={{ fontSize: 14 }} />}
+                      label="Add Tag"
+                      onClick={() => setIsAddingTag(true)}
+                      sx={{
+                        height: 28,
+                        fontSize: 12,
+                        bgcolor: 'transparent',
+                        color: 'text.secondary',
+                        border: '1px dashed',
+                        borderColor: 'divider',
+                                '&:hover': { bgcolor: 'action.hover' },
+                              }}
+                            />
+                          )}
+                        </Box>
+                    </Box>
+                    )}
 
-            <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
-              <Box sx={propertyLabelSx}>
-                <AccessTimeIcon sx={{ fontSize: 18 }} />
-                <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
-                  Time Tracking
-                </Typography>
-              </Box>
-              <Box sx={{ ...propertyValueSx, gap: 6 }}>
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                      <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'text.secondary',
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          letterSpacing: '0.5px',
+              {!isPureGoogleTask && (
+                <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
+                <Box sx={propertyLabelSx}>
+                  <AccessTimeIcon sx={{ fontSize: 18 }} />
+                  <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>
+                    Time Tracking
+                  </Typography>
+                </Box>
+                <Box sx={{ ...propertyValueSx, gap: 6 }}>
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+                        <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'text.secondary',
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            letterSpacing: '0.5px',
+                          }}
+                        >
+                          ESTIMATED
+                        </Typography>
+                      </Box>
+                      <TextField
+                        variant="standard"
+                        value={duration}
+                        onChange={(e) => 
+                          handleTimerChange(
+                            e.target.value, 
+                            setDuration, 
+                            setDurationSuggestions, 
+                            setDurationAnchor, 
+                            e.currentTarget.parentElement as HTMLDivElement
+                          )
+                        }
+                        onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
+                        placeholder="2h 00m"
+                        InputProps={{
+                          disableUnderline: true,
+                          sx: { fontSize: '15px', fontWeight: 700, color: 'text.primary' },
                         }}
+                        sx={{
+                          width: '80px',
+                          bgcolor: 'background.default',
+                          borderRadius: '10px',
+                          px: 1,
+                        }}
+                      />
+                      <Popover
+                        open={Boolean(durationAnchor)}
+                        anchorEl={durationAnchor}
+                        onClose={() => setDurationAnchor(null)}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        disableAutoFocus
+                        disableEnforceFocus
+                        slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
                       >
-                        ESTIMATED
-                      </Typography>
+                        <List dense sx={{ py: 0 }}>
+                          {durationSuggestions.map((s) => (
+                            <MenuItem key={s} onClick={() => { setDuration(s); setDurationAnchor(null); }}>
+                              <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }} />
+                            </MenuItem>
+                          ))}
+                        </List>
+                      </Popover>
                     </Box>
-                    <TextField
-                      variant="standard"
-                      value={duration}
-                      onChange={(e) => 
-                        handleTimerChange(
-                          e.target.value, 
-                          setDuration, 
-                          setDurationSuggestions, 
-                          setDurationAnchor, 
-                          e.currentTarget.parentElement as HTMLDivElement
-                        )
-                      }
-                      onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
-                      placeholder="2h 00m"
-                      InputProps={{
-                        disableUnderline: true,
-                        sx: { fontSize: '15px', fontWeight: 700, color: 'text.primary' },
-                      }}
-                      sx={{
-                        width: '80px',
-                        bgcolor: 'background.default',
-                        borderRadius: '10px',
-                        px: 1,
-                      }}
-                    />
-                    <Popover
-                      open={Boolean(durationAnchor)}
-                      anchorEl={durationAnchor}
-                      onClose={() => setDurationAnchor(null)}
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                      transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                      disableAutoFocus
-                      disableEnforceFocus
-                      slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
-                    >
-                      <List dense sx={{ py: 0 }}>
-                        {durationSuggestions.map((s) => (
-                          <MenuItem key={s} onClick={() => { setDuration(s); setDurationAnchor(null); }}>
-                            <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }} />
-                          </MenuItem>
-                        ))}
-                      </List>
-                    </Popover>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={1.5}>
+                    <Box sx={{ textAlign: 'center' }}>
+                      <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
+                        <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
+                        <Typography
+                          variant="caption"
+                          sx={{
+                            color: 'info.main',
+                            fontSize: '10px',
+                            fontWeight: 600,
+                            letterSpacing: '0.5px',
+                          }}
+                        >
+                          REAL
+                        </Typography>
+                      </Box>
+                      <TextField
+                        variant="standard"
+                        value={realTime}
+                        onChange={(e) => 
+                          handleTimerChange(
+                            e.target.value, 
+                            setRealTime, 
+                            setRealTimeSuggestions, 
+                            setRealTimeAnchor, 
+                            e.currentTarget.parentElement as HTMLDivElement
+                          )
+                        }
+                        onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
+                        placeholder="1h 30m"
+                        InputProps={{
+                          disableUnderline: true,
+                          sx: { fontSize: '15px', color: 'info.main', fontWeight: 700 },
+                        }}
+                        sx={{
+                          width: '80px',
+                          bgcolor: 'background.default',
+                          borderRadius: '10px',
+                          px: 1,
+                        }}
+                      />
+                      <Popover
+                        open={Boolean(realTimeAnchor)}
+                        anchorEl={realTimeAnchor}
+                        onClose={() => setRealTimeAnchor(null)}
+                        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+                        transformOrigin={{ vertical: 'top', horizontal: 'left' }}
+                        disableAutoFocus
+                        disableEnforceFocus
+                        slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
+                      >
+                        <List dense sx={{ py: 0 }}>
+                          {realTimeSuggestions.map((s) => (
+                            <MenuItem key={s} onClick={() => { setRealTime(s); setRealTimeAnchor(null); }}>
+                              <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600, color: 'info.main' }} />
+                            </MenuItem>
+                          ))}
+                        </List>
+                      </Popover>
+                    </Box>
                   </Box>
                 </Box>
-                <Box display="flex" alignItems="center" gap={1.5}>
-                  <Box sx={{ textAlign: 'center' }}>
-                    <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
-                      <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
-                      <Typography
-                        variant="caption"
-                        sx={{
-                          color: 'info.main',
-                          fontSize: '10px',
-                          fontWeight: 600,
-                          letterSpacing: '0.5px',
-                        }}
-                      >
-                        REAL
-                      </Typography>
-                    </Box>
-                    <TextField
-                      variant="standard"
-                      value={realTime}
-                      onChange={(e) => 
-                        handleTimerChange(
-                          e.target.value, 
-                          setRealTime, 
-                          setRealTimeSuggestions, 
-                          setRealTimeAnchor, 
-                          e.currentTarget.parentElement as HTMLDivElement
-                        )
-                      }
-                      onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
-                      placeholder="1h 30m"
-                      InputProps={{
-                        disableUnderline: true,
-                        sx: { fontSize: '15px', color: 'info.main', fontWeight: 700 },
-                      }}
-                      sx={{
-                        width: '80px',
-                        bgcolor: 'background.default',
-                        borderRadius: '10px',
-                        px: 1,
-                      }}
-                    />
-                    <Popover
-                      open={Boolean(realTimeAnchor)}
-                      anchorEl={realTimeAnchor}
-                      onClose={() => setRealTimeAnchor(null)}
-                      anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-                      transformOrigin={{ vertical: 'top', horizontal: 'left' }}
-                      disableAutoFocus
-                      disableEnforceFocus
-                      slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
-                    >
-                      <List dense sx={{ py: 0 }}>
-                        {realTimeSuggestions.map((s) => (
-                          <MenuItem key={s} onClick={() => { setRealTime(s); setRealTimeAnchor(null); }}>
-                            <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600, color: 'info.main' }} />
-                          </MenuItem>
-                        ))}
-                      </List>
-                    </Popover>
-                  </Box>
-                </Box>
               </Box>
-            </Box>
+            )}
 
             <Box sx={{ mt: 2, borderBottom: '1px solid', borderColor: 'divider' }} />
           </Box>

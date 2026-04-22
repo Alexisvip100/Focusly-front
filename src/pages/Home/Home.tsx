@@ -120,7 +120,7 @@ export const Home = () => {
 
       {isEditModalOpen && (
         <CreateTaskModal
-          key={taskDetailsTask?.id || 'create-task-modal'}
+          key={taskDetailsTask?.google_event_id || taskDetailsTask?.id || 'create-task-modal'}
           open={isEditModalOpen}
           onClose={closeTaskDetails}
           onSave={handleSaveTask}

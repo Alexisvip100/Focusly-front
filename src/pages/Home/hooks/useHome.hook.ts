@@ -172,12 +172,24 @@ export const useHome = () => {
   };
 
   const handleSaveTask = (updatedTask: Task | TaskResponse) => {
-    // Standardize mapping from backend response to Redux Task type
     const mappedTask = mapResponseToTask(updatedTask as TaskResponse);
+    const prevTaskId = taskIdParam;
 
+    // 1. Immediately update tempTask to lock the UI state to the new Task data
+    // This prevents the modal from closing when taskIdParam changes in the URL
+    setTempTask(mappedTask);
+
+    // 2. Update Redux store
     dispatch(upsertTaskRedux(mappedTask));
 
-    if (mappedTask.google_event_id) {
+    // 3. Cleanup virtual Google state to prevent duplication
+    if (mappedTask.google_event_id || (updatedTask as any).task_type === 'GoogleTask') {
+      // Remove the specific ID we just converted
+      if (prevTaskId) {
+        dispatch(removeEvent({ id: prevTaskId }));
+      }
+
+      // Secondary cleanup for any other virtual instances of the same event
       const normalizedId = normalizeGoogleId(mappedTask.google_event_id);
       const baseId = getBaseGoogleId(mappedTask.google_event_id);
       
@@ -186,13 +198,18 @@ export const useHome = () => {
         const eventBaseId = getBaseGoogleId(e.id);
         return eventId === normalizedId || eventBaseId === baseId || eventId === baseId || eventBaseId === normalizedId;
       });
-      matchingEvents.forEach((e) => dispatch(removeEvent({ id: e.id })));
+      
+      matchingEvents.forEach((e) => {
+        if (e.id !== prevTaskId) {
+          dispatch(removeEvent({ id: e.id }));
+        }
+      });
     }
-    
-    // Also update tempTask to keep the modal state in sync
-    if (tempTask && tempTask.id === mappedTask.id) {
-      setTempTask(mappedTask);
-    }
+
+    // 4. Update the URL: Transition taskId from the Google ID to the Native ID
+    const newParams = new URLSearchParams(searchParams);
+    newParams.set('taskId', mappedTask.id);
+    setSearchParams(newParams);
   };
 
   const deleteTask = async () => {
