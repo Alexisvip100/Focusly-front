@@ -10,9 +10,10 @@ import {
 import { sileo } from 'sileo';
 import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
-import { setTasks } from '@/redux/tasks/task.slice';
+import { setTasks, removeTask } from '@/redux/tasks/task.slice';
 import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
-import { fetchGoogleEvents } from '@/api/GoogleCalendar/googleCalendarApi';
+import { fetchGoogleEvents, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import type { ICalendarEvent } from '../../CalendarEvent';
 import { GET_TASKS, DELETE_TASK } from '../../CreateTaskModal/tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
