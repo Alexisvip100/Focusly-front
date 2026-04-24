@@ -18,20 +18,20 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="h4" fontWeight="bold">
-            {filter} Insights
+            Análisis de {filter === 'Daily' ? 'Hoy' : filter === 'Weekly' ? 'la Semana' : 'el Mes'}
           </Typography>
           <Typography variant="body1" color="text.secondary" mt={1}>
-            Productivity Overview
+            Resumen de Productividad
           </Typography>
         </Box>
         <Box display="flex" gap={2}>
           <ActionButton>
             <FileDownloadOutlined fontSize="small" />
-            Export
+            Exportar
           </ActionButton>
           <ActionButton primary>
             <Add fontSize="small" />
-            Create Report
+            Crear Reporte
           </ActionButton>
         </Box>
       </Box>
@@ -43,7 +43,7 @@ export const InsightsHeader: React.FC<InsightsHeaderProps> = ({
             active={filter === f}
             onClick={() => onFilterChange(f)}
           >
-            {f}
+            {f === 'Daily' ? 'Diario' : f === 'Weekly' ? 'Semanal' : 'Mensual'}
           </FilterButton>
         ))}
       </Box>

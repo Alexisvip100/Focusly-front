@@ -18,14 +18,14 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
   const isDark = theme.palette.mode === 'dark';
 
   return (
-    <ChartCard>
+    <ChartCard sx={{ height: 'auto', minHeight: '400px' }}>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="h6" fontWeight="bold">
-            Productivity Trends
+            Rendimiento de Enfoque
           </Typography>
           <Typography variant="caption" color="text.secondary">
-            Planned vs Actual Focus Hours
+            Meta Estimada vs. Tiempo Realizado
           </Typography>
         </Box>
         <Box display="flex" gap={2}>
@@ -38,7 +38,7 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
                 bgcolor: 'primary.main',
               }}
             />
-            <Typography variant="caption">Actual</Typography>
+            <Typography variant="caption">Tiempo Realizado</Typography>
           </Box>
           <Box display="flex" alignItems="center" gap={1}>
             <Box
@@ -49,7 +49,7 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
                 bgcolor: 'text.disabled',
               }}
             />
-            <Typography variant="caption">Planned</Typography>
+            <Typography variant="caption">Meta Estimada</Typography>
           </Box>
         </Box>
       </Box>

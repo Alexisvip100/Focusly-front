@@ -1,4 +1,5 @@
 export interface BottomSectionProps {
   goldenWindowValue: string;
-  heatmap?: number[];
+  heatmap: number[];
+  heatmapLabels?: string[];
 }

@@ -5,7 +5,7 @@ import { InsightsHeader } from './components/InsightsHeader';
 import { StatsCards } from './components/StatsCards';
 import { ProductivityTrendsChart } from './components/ProductivityTrendsChart';
 import { TimeDistributionChart } from './components/TimeDistributionChart';
-import { BottomSection } from './components/BottomSection';
+import { BottomSection } from './components/BottomSection/BottomSection';
 
 export const Insights = () => {
   const { stats, loading, filter, filters, setFilter } = useInsights();
@@ -47,6 +47,7 @@ export const Insights = () => {
       <BottomSection
         goldenWindowValue={stats.goldenWindow.value}
         heatmap={stats.heatmap}
+        heatmapLabels={stats.heatmapLabels}
       />
     </PageContainer>
   );

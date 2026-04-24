@@ -54,7 +54,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Total Focus Hours
+              Total Enfoque
             </Typography>
             <Typography variant="h4" fontWeight="bold" mt={1}>
               {totalFocusHours.value}
@@ -71,7 +71,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Task Completion
+              Tareas Listas
             </Typography>
             <Typography variant="h4" fontWeight="bold" mt={1}>
               {taskCompletion.value}
@@ -88,7 +88,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Energy Score
+              Nivel de Energía
             </Typography>
             <Typography variant="h4" fontWeight="bold" mt={1}>
               {energyScore.value}
@@ -105,7 +105,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Break Hours
+              Descansos
             </Typography>
             <Typography variant="h4" fontWeight="bold" mt={1}>
               {breakHours.value}
@@ -124,7 +124,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
         <Box display="flex" justifyContent="space-between" alignItems="start">
           <Box>
             <Typography variant="body2" color="text.secondary">
-              Golden Window
+              Ventana de Oro
             </Typography>
             <Typography variant="h5" fontWeight="bold" mt={1}>
               {goldenWindow.value}

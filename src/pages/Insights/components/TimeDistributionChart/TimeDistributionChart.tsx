@@ -2,7 +2,7 @@ import React from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { ChartCard } from '../../Insights.styles';
-import type { TimeDistributionChartProps } from './TimeDistributionChart.types';
+import type { TimeDistributionChartProps, DistributionEntry } from './TimeDistributionChart.types';
 
 function formatMinutes(val: number): string {
   const hours = Math.floor(val / 60);
@@ -15,6 +15,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
+  const [hoveredData, setHoveredData] = React.useState<DistributionEntry | null>(null);
 
   const hasData = data.some((d) => d.value > 0);
   const chartData = hasData
@@ -34,11 +35,13 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
   const displayCategories = [...data]
     .sort((a, b) => b.value - a.value)
     .slice(0, 4);
+  const activeSegments = data.filter((d) => d.value > 0).length;
+  const chartPadding = activeSegments > 1 ? 4 : 0;
 
   return (
-    <ChartCard>
+    <ChartCard sx={{ height: 'auto', minHeight: '400px' }}>
       <Typography variant="h6" fontWeight="bold">
-        Time Distribution
+        Distribución de Tiempo
       </Typography>
 
       <Box
@@ -48,19 +51,71 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
         justifyContent="center"
         sx={{ height: '220px', width: '100%' }}
       >
+        {/* Detached Info Box (Instead of floating tooltip) */}
+        {hoveredData && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff'),
+              p: 1.5,
+              border: '1px solid',
+              borderColor: 'divider',
+              borderRadius: 2,
+              boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 0.5,
+              minWidth: '160px',
+              zIndex: 10,
+              pointerEvents: 'none',
+              animation: 'fadeIn 0.2s ease-in-out',
+              '@keyframes fadeIn': {
+                from: { opacity: 0, transform: 'translateY(5px)' },
+                to: { opacity: 1, transform: 'translateY(0)' },
+              },
+            }}
+          >
+            <Box display="flex" alignItems="center" gap={1}>
+              <Box
+                sx={{
+                  width: 12,
+                  height: 12,
+                  borderRadius: '50%',
+                  bgcolor: hoveredData.color,
+                }}
+              />
+              <Typography variant="body2" fontWeight="800">
+                {hoveredData.name}
+              </Typography>
+            </Box>
+            <Typography variant="caption" color="text.secondary" sx={{ ml: 2.5 }}>
+              Tiempo: <b style={{ color: 'var(--mui-palette-text-primary)' }}>{formatMinutes(hoveredData.value)}</b>
+            </Typography>
+          </Box>
+        )}
+
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>
             <Pie
               data={chartData}
               innerRadius={65}
-              outerRadius={85}
-              paddingAngle={hasData ? 5 : 0}
+              outerRadius={90}
+              paddingAngle={chartPadding}
               dataKey="value"
               animationDuration={1000}
               stroke="none"
+              fillOpacity={1}
+              onMouseEnter={(_, index) => setHoveredData(chartData[index])}
+              onMouseLeave={() => setHoveredData(null)}
             >
               {chartData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={entry.color} />
+                <Cell 
+                  key={`cell-${index}`} 
+                  fill={entry.color}
+                  style={{ cursor: 'pointer', outline: 'none' }}
+                />
               ))}
             </Pie>
           </PieChart>
@@ -94,9 +149,9 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               lineHeight: 1.2,
             }}
           >
-            FOCUS
+            ACTIVIDAD DE
             <br />
-            ACTIVITY
+            ENFOQUE
           </Typography>
         </Box>
       </Box>

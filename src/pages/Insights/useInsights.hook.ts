@@ -30,6 +30,7 @@ export interface InsightsData {
   productivityTrends: TrendData[];
   timeDistribution: DistributionEntry[];
   heatmap: number[];
+  heatmapLabels: string[];
 }
 
 const FILTERS = ['Daily', 'Weekly', 'Monthly'] as const;
@@ -64,6 +65,7 @@ const DEFAULT_STATS: InsightsData = {
   productivityTrends: DEFAULT_TRENDS,
   timeDistribution: DEFAULT_DISTRIBUTION,
   heatmap: [],
+  heatmapLabels: [],
 };
 
 export const useInsights = () => {

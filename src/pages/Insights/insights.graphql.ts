@@ -39,6 +39,7 @@ export const GET_INSIGHTS = gql`
         color
       }
       heatmap
+      heatmapLabels
     }
   }
 `;
