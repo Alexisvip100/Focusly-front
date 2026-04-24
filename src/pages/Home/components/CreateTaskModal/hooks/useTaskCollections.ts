@@ -10,6 +10,7 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
       tags: [] as string[],
       subtasks: [] as { title: string; completed: boolean; timer: number }[],
       links: [] as { title: string; url: string }[],
+      collaborators: [] as { name: string; email: string; avatar?: string }[],
     };
 
     if (!initialTask) return defaults;
@@ -18,6 +19,7 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
       tags = [],
       subtasks = [],
       links = [],
+      collaborators = [],
     } = initialTask;
 
     const parsedTags = Array.isArray(tags)
@@ -40,10 +42,15 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
       ? deduplicateLinks(links.map((l) => ({ ...l })))
       : [];
 
+    const parsedCollaborators = Array.isArray(collaborators)
+      ? collaborators.map((c) => ({ ...c }))
+      : [];
+
     return {
       tags: parsedTags,
       subtasks: parsedSubtasks,
       links: parsedLinks,
+      collaborators: parsedCollaborators,
     };
   }, [initialTask]);
 
@@ -54,6 +61,9 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
     initialCollections.subtasks
   );
   const [links, setLinks] = useState<{ title: string; url: string }[]>(initialCollections.links);
+  const [collaborators, setCollaborators] = useState<{ name: string; email: string; avatar?: string }[]>(
+    initialCollections.collaborators
+  );
   const [newTag, setNewTag] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
@@ -121,10 +131,21 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
     setLinks((prev) => prev.map((l, i) => (i === index ? { title, url } : l)));
   };
 
+  const handleAddCollaborator = (name: string, email: string, avatar?: string) => {
+    if (email.trim()) {
+      setCollaborators((prev) => [...prev, { name: name.trim() || email.trim(), email: email.trim(), avatar }]);
+    }
+  };
+
+  const handleRemoveCollaborator = (index: number) => {
+    setCollaborators((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return {
     tags, setTags,
     subtasks, setSubtasks,
     links, setLinks,
+    collaborators, setCollaborators,
     newTag, setNewTag,
     isAddingTag, setIsAddingTag,
     newSubtask, setNewSubtask,
@@ -138,6 +159,9 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     initialCollections,
   };
-};
+}
+;

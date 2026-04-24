@@ -62,6 +62,9 @@ export const useCreateTaskModal = ({
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
+    collaborators, setCollaborators,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     initialCollections,
   } = useTaskCollections({
     initialTask,
@@ -117,6 +120,7 @@ export const useCreateTaskModal = ({
     setTags(initialCollections.tags);
     setSubtasks(initialCollections.subtasks);
     setLinks(initialCollections.links);
+    setCollaborators(initialCollections.collaborators);
     setNewSubtask('');
     setNewSubtaskDuration('');
     setNewTag('');
@@ -141,6 +145,7 @@ export const useCreateTaskModal = ({
       tags,
       subtasks,
       links,
+      collaborators,
       color,
       shouldGenerateMeet,
     });
@@ -160,6 +165,7 @@ export const useCreateTaskModal = ({
       tags,
       subtasks,
       links,
+      collaborators,
       color,
       shouldGenerateMeet,
     });
@@ -205,6 +211,9 @@ export const useCreateTaskModal = ({
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
+    collaborators,
+    handleAddCollaborator,
+    handleRemoveCollaborator,
     ...mutationsWithReset,
     handleSave: handleSaveWrapper,
     handleUpdate: handleUpdateWrapper,

@@ -70,7 +70,7 @@ export interface TaskResponse {
   sort?: TaskSortInput;
   links?: { title: string; url: string }[];
     google_event_id?: string;
-    participants?: {
+    collaborators?: {
       name: string;
       email: string;
       avatar?: string;

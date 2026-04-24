@@ -2,34 +2,20 @@ import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
 
-/**
- * Cleans a Google Calendar ID by removing leading underscores.
- * Unlike previous versions, this preserves the instance suffix for recurring 
- * events to allow for granular instance-level synchronization.
- */
 export const normalizeGoogleId = (id: string | null | undefined): string => {
   if (!id) return '';
   return id.replace(/^_+/, '');
 };
 
-/**
- * Extracts the base ID of a Google Calendar event, ignoring the instance 
- * specific suffix (useful for series-level deduplication).
- */
 export const getBaseGoogleId = (id: string | null | undefined): string => {
   if (!id) return '';
   return normalizeGoogleId(id).split('_')[0];
 };
 
-/**
- * Maps a Google Calendar event to a Focusly Task structure.
- * This is used for pre-filling the task modal when a user selects 
- * a Google event from the calendar views.
- */
 export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
   return {
     id: event.id,
-    user_id: 'google-user', // Marker for virtual/transient tasks from Google
+    user_id: 'google-user',
     title: event.title || 'Untitled',
     notes_encrypted: event.notes_encrypted || '',
     estimate_timer: event.estimate_timer || 30,
@@ -46,14 +32,15 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
-    participants: (event as any).participants || [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    collaborators: (event.collaborators || (event as any).attendees || (event as any).participants || []).map((c: any) => ({
+      ...c,
+      name: c.name || '',
+      avatar: c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`
+    })),
   };
 };
 
-/**
- * Standardizes the transformation of GraphQL TaskResponse into Redux Task type.
- * This prevents duplication and ensures consistent ID and Date handling.
- */
 export const mapResponseToTask = (t: TaskResponse): Task => {
   const safeISO = (d: string | null | undefined): string | null => {
     if (!d) return null;
@@ -99,10 +86,16 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       };
     }),
     links: t.links || [],
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     task_type: (t as any).task_type || 'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     source: (t as any).source || 'platform',
-    participants: t.participants || [],
+    collaborators: (t.collaborators || []).map(c => ({
+      ...c,
+      name: c.name || '',
+      avatar: c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`
+    })),
     tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),

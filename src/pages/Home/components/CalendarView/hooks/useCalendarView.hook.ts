@@ -344,16 +344,26 @@ export const useCalendarView = () => {
 
   const handleDeleteTask = async (taskId: string) => {
     try {
-      const taskToDelete = tasks.find(t => t.id === taskId);
-      const isGoogleTask = taskToDelete?.task_type === 'GoogleTask';
+      // 1. Identify if it's a persistent Platform Task or a virtual Google Event
+      const persistentTask = tasks.find(t => t.id === taskId);
+      const virtualEvent = reduxEvents.find(e => e.id === taskId);
+      
+      const isPlatformTask = !!persistentTask;
+      const isPureGoogleEvent = !!virtualEvent && !persistentTask;
 
-      if (isGoogleTask) {
-        // Pure Google Calendar event — delete via REST API
-        const eventId = taskToDelete?.google_event_id || taskId;
-        await deleteGoogleEvent(eventId);
-        dispatch(removeEvent({ id: taskId }));
-      } else {
-        // PlatformTask — delete via GraphQL (backend handles Google sync if needed)
+      if (isPlatformTask) {
+        // Point 2: Platform Task — Delete from BOTH Google and Platform
+        // Even though backend handles this, calling Google API from frontend provides immediate feedback
+        if (persistentTask.google_event_id) {
+          try {
+            await deleteGoogleEvent(persistentTask.google_event_id);
+            // Also remove from virtual state to prevent "ghost" duplicates
+            dispatch(removeEvent({ id: persistentTask.google_event_id }));
+          } catch (err) {
+            console.warn('Failed to delete Google event, proceeding with platform delete', err);
+          }
+        }
+
         await deleteTaskMutation({
           variables: { id: taskId },
           refetchQueries: [
@@ -362,9 +372,18 @@ export const useCalendarView = () => {
           ],
         });
         dispatch(removeTask({ id: taskId }));
+      } else if (isPureGoogleEvent || taskId.startsWith('_')) {
+        // Point 1: Pure Google Event (never saved to platform) — Delete only in Google
+        const eventId = virtualEvent?.id || taskId;
+        await deleteGoogleEvent(eventId);
+        dispatch(removeEvent({ id: taskId }));
       }
 
       handleModalClose();
+      
+      // Force a full state refresh as requested by the user
+      // This ensures all hooks and queries are re-initialized with the new data
+      window.location.reload();
       sileo.success({
         fill: 'rgba(239, 68, 68, 0.9)',
         title: 'Task deleted successfully!',

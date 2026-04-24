@@ -12,7 +12,7 @@ export interface GoogleCalendarEvent {
   tags: any[];
   links: { title: string; url: string }[];
   estimate_timer?: number;
-  participants?: { email: string; responseStatus?: string; avatar?: string }[];
+  collaborators?: { email: string; responseStatus?: string; avatar?: string }[];
   organizer_email?: string;
   location?: string;
   is_all_day: boolean;

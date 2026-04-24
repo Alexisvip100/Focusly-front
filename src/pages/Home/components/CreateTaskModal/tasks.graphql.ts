@@ -47,7 +47,7 @@ export const GET_TASKS = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      participants {
+      collaborators {
         name
         email
         avatar
@@ -82,7 +82,7 @@ export const GET_TASKS_TITLES = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      participants {
+      collaborators {
         name
         email
         avatar
@@ -155,7 +155,7 @@ export const UPDATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      participants {
+      collaborators {
         name
         email
         avatar
@@ -205,7 +205,7 @@ export const CREATE_TASK = gql`
       task_type
       estimated_start_date
       estimated_end_date
-      participants {
+      collaborators {
         name
         email
         avatar

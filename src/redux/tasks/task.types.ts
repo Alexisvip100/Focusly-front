@@ -65,7 +65,7 @@ export interface Task {
     } | null;
   } | null;
   links?: { title: string; url: string }[];
-  participants?: {
+  collaborators?: {
     name: string;
     email: string;
     avatar?: string;

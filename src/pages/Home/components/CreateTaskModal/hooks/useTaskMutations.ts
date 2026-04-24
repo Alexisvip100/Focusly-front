@@ -123,6 +123,7 @@ export const useTaskMutations = ({
       priority_level: priorityLevel,
       category: state.category,
       links,
+      collaborators: state.collaborators,
     };
 
     if (parentTask?.id) {
@@ -255,6 +256,12 @@ export const useTaskMutations = ({
           const { __typename, ...rest } = (typeof st === 'string' ? { title: st, completed: false, timer: 0 } : st);
           return rest;
         }),
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b)
+      },
+      collaborators: {
+        key: 'collaborators',
+        val: state.collaborators || [],
+        initial: initialTask.collaborators || [],
         isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b)
       }
     };

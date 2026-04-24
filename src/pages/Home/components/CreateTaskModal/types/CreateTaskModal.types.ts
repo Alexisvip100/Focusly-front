@@ -15,6 +15,7 @@ export interface TaskData {
   status?: Task['status'];
   realTime?: string;
   shouldGenerateMeet?: boolean;
+  collaborators?: { name: string; email: string; avatar?: string }[];
 }
 
 export interface CreateTaskModalProps {
@@ -59,6 +60,7 @@ export interface TaskInput {
   subtasks?: { title: string; completed: boolean; timer: number; notes_encrypted?: string }[];
   google_event_id?: string;
   user_id?: string;
+  collaborators?: { name: string; email: string; avatar?: string }[];
 }
 
 export interface UseTaskCollectionsProps {

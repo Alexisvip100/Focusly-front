@@ -183,7 +183,7 @@ export const useHome = () => {
     dispatch(upsertTaskRedux(mappedTask));
 
     // 3. Cleanup virtual Google state to prevent duplication
-    if (mappedTask.google_event_id || (updatedTask as any).task_type === 'GoogleTask') {
+    if (mappedTask.google_event_id || ('task_type' in updatedTask && updatedTask.task_type === 'GoogleTask')) {
       // Remove the specific ID we just converted
       if (prevTaskId) {
         dispatch(removeEvent({ id: prevTaskId }));
@@ -218,7 +218,17 @@ export const useHome = () => {
         const isGoogleTask = (taskDetailsTask as Task).task_type === 'GoogleTask';
 
         if (!isGoogleTask) {
-          // Focusly task (may also have google_event_id — backend handles that)
+          // Point 2: Platform Task — Delete from BOTH Google (if synced) and Platform
+          if (taskDetailsTask.google_event_id) {
+            try {
+              await deleteGoogleEvent(taskDetailsTask.google_event_id);
+              // Also remove from virtual state
+              dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
+            } catch (err) {
+              console.warn('Failed to delete synced Google event, proceeding with platform delete', err);
+            }
+          }
+
           await deleteTaskMutation({
             variables: { id: taskDetailsTask.id },
             refetchQueries: [
@@ -228,7 +238,7 @@ export const useHome = () => {
           });
           dispatch(removeTask({ id: taskDetailsTask.id }));
         } else {
-          // Pure Google Calendar event — delete via REST API, not GraphQL
+          // Point 1: Pure Google Event — Delete only in Google Calendar
           const eventId = taskDetailsTask.google_event_id || taskDetailsTask.id;
           await deleteGoogleEvent(eventId);
           dispatch(removeEvent({ id: taskDetailsTask.id }));
@@ -238,6 +248,7 @@ export const useHome = () => {
       }
     }
     closeTaskDetails();
+    window.location.reload();
   };
 
   return {
