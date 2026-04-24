@@ -15,7 +15,7 @@ import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
 import { fetchGoogleEvents, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import { GET_TASKS, DELETE_TASK } from '../../CreateTaskModal/tasks.graphql';
+import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';

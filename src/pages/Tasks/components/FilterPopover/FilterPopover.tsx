@@ -38,7 +38,7 @@ interface FilterPopoverProps {
   tags: string[];
 }
 
-import { getTagColors } from '../../../Home/components/CreateTaskModal/CreateTaskModal.utils';
+import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 
 export const FilterPopover: React.FC<FilterPopoverProps> = ({
   anchorEl,

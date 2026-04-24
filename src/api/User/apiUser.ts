@@ -17,3 +17,15 @@ export const UserGet = async (id: string): Promise<UserResponse> => {
   const response = await fetch(`${API_BASE_URL}/users/${id}`);
   return response.json();
 };
+
+export const UserUpdate = async (id: string, userData: Partial<UserResponse>): Promise<UserResponse> => {
+  const response = await fetch(`${API_BASE_URL}/users/${id}`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(userData),
+  });
+
+  return response.json();
+};

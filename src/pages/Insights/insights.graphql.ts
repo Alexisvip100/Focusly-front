@@ -23,8 +23,13 @@ export const GET_INSIGHTS = gql`
         change
         trend
       }
+      breakHours {
+        value
+        change
+        trend
+      }
       productivityTrends {
-        day
+        label
         actual
         planned
       }

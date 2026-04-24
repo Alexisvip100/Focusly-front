@@ -4,7 +4,7 @@ import {
   UPDATE_TASK,
   GET_TASKS,
   GET_TASKS_TITLES,
-} from '../../CreateTaskModal/tasks.graphql';
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 
 interface UseFocusModeActionsProps {

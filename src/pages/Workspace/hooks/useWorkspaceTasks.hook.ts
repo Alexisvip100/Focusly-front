@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useMutation, useQuery } from '@apollo/client';
 import { GET_TOTAL_WORKSPACES } from '../workspaces.graphql';
-import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Home/components/CreateTaskModal/tasks.graphql';
+import { GET_TASKS_TITLES, UPDATE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskSearchItems } from '../types/workspace.types';
 
 interface UseWorkspaceTasksProps {

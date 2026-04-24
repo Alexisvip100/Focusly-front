@@ -1,44 +1,31 @@
 import {
   Typography,
   Box,
-  Collapse,
   LinearProgress,
-  IconButton,
   Skeleton,
   Select,
   MenuItem,
 } from '@mui/material';
 import { useState } from 'react'; // Uncommented
 import { useSearchParams } from 'react-router-dom';
-import { CreateTaskModal } from '../Home/components/CreateTaskModal/CreateTaskModal';
+import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
 import { useTasks } from './Tasks.hook';
 import type { DateRangeFilter } from './hooks/useTasksFilters.hook';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { Task } from '@/redux/tasks/task.types';
 import {
-  CalendarToday as CalendarTodayIcon,
-  Flag as FlagIcon,
   Search as SearchIcon,
-  Add as AddIcon,
   FilterList as FilterListIcon,
   Sort as SortIcon,
-  CheckCircle as CheckCircleIcon,
   CheckBox as CheckBoxIcon,
-  SubdirectoryArrowRight as SubdirectoryArrowRightIcon,
-  RadioButtonUnchecked as RadioButtonUncheckedIcon,
-  History as HistoryIcon,
-  AccessTime as AccessTimeIcon,
-  Category as CategoryIcon,
   GridView as GridViewIcon,
   ViewList as ViewListIcon,
-  MoreHoriz as MoreHorizIcon,
   ViewColumn as ViewColumnIcon,
   Balance as BalanceIcon,
-  Link as LinkIcon,
+  CheckCircle as CheckCircleIcon,
 } from '@mui/icons-material';
 
 import {
-  CardLeft,
   CompletedButton,
   ControlsBar,
   FilterButton,
@@ -47,21 +34,16 @@ import {
   SectionTitle,
   SortButton,
   StyledTextField,
-  Tag,
-  TaskCard,
   TasksContainer,
   Title,
-  // New Imports
   ViewToggleGroup,
   ViewToggleButton,
   GridTaskContainer,
-  GridTaskCard,
-  GridCardHeader,
-  GridCardFooter,
-  ProgressBarContainer,
-  ProgressLabel,
   AnimatedContainer,
 } from './Tasks.styles';
+
+import { TaskCard } from './components/ListViewTask/ListViewTask.styles';
+import { GridTaskCard } from './components/GridViewTask/GridViewTask.styles';
 
 import { EmptyState } from '@/utils/EmptyState';
 
@@ -70,38 +52,8 @@ import { SortPopover } from './components/SortPopover/SortPopover';
 import { BoardView } from './components/BoardView/BoardView';
 import { WorkloadDashboard } from './components/WorkloadDashboard/WorkloadDashboard';
 import { DashboardMetrics } from './components/DashboardMetrics/DashboardMetrics';
-import {
-  differenceInHours,
-  differenceInDays,
-  differenceInWeeks,
-  differenceInMonths,
-  differenceInYears,
-} from 'date-fns';
-import {
-  formatDuration,
-  getTagColors,
-} from '../Home/components/CreateTaskModal/CreateTaskModal.utils';
-
-const formatTimeSinceCompletion = (dateString: string | undefined) => {
-  if (!dateString) return '';
-  const date = new Date(dateString);
-  const now = new Date();
-
-  const hours = differenceInHours(now, date);
-  if (hours < 24) return `${hours}h ago`;
-
-  const days = differenceInDays(now, date);
-  if (days < 7) return `${days}d ago`;
-
-  const weeks = differenceInWeeks(now, date);
-  if (weeks < 4) return `${weeks}w ago`;
-
-  const months = differenceInMonths(now, date);
-  if (months < 12) return `${months}mo ago`;
-
-  const years = differenceInYears(now, date);
-  return `${years}y ago`;
-};
+import { ListViewTask } from './components/ListViewTask/ListViewTask';
+import { GridViewTask } from './components/GridViewTask/GridViewTask';
 
 export const Tasks = () => {
   const {
@@ -167,452 +119,24 @@ export const Tasks = () => {
   };
 
   const renderTask = (task: TaskResponse) => (
-    <TaskCard
+    <ListViewTask
       key={task.id}
-      onClick={() => handleTaskClick(task)}
-      sx={{
-        borderLeft: '5px solid',
-        borderLeftColor:
-          task.priority_level === 3 ? '#58a6ff' : task.priority_level === 2 ? '#d29922' : '#ff7b72',
-        cursor: 'pointer',
-        transition: 'transform 0.2s',
-        '&:hover': {
-          transform: 'translateY(-2px)',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
-        },
-      }}
-    >
-      <CardLeft>
-        <IconButton
-          size="small"
-          onClick={(e) => {
-            e.stopPropagation();
-          }}
-          sx={{ p: 0, mr: 1 }}
-        >
-          {task.status === 'Done' && <CheckCircleIcon sx={{ fontSize: 24, color: '#3fb950' }} />}
-          {task.status === 'Todo' && (
-            <RadioButtonUncheckedIcon sx={{ fontSize: 24, color: '#58a6ff' }} />
-          )}
-          {task.status === 'Pending' && <AccessTimeIcon sx={{ fontSize: 24, color: '#d29922' }} />}
-          {task.status === 'Backlog' && (
-            <HistoryIcon sx={{ fontSize: 24, color: 'text.secondary' }} />
-          )}
-        </IconButton>
-        <Box>
-          <Box sx={{ display: 'flex', flexDirection: 'row', gap: 0.5 }}>
-            <Typography variant="body1" sx={{ fontWeight: 500, color: 'text.primary' }}>
-              {task.title}
-            </Typography>
-          </Box>
-
-          <Box sx={{ display: 'flex', gap: 2, alignItems: 'center', mt: 0.5 }}>
-            {task.priority_level > 0 && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <FlagIcon
-                  sx={{
-                    fontSize: 14,
-                    color:
-                      task.priority_level === 3
-                        ? '#58a6ff'
-                        : task.priority_level === 2
-                          ? '#d29922'
-                          : '#ff7b72',
-                  }}
-                />
-                <Typography
-                  variant="caption"
-                  sx={{
-                    color:
-                      task.priority_level >= 3
-                        ? '#ff7b72'
-                        : task.priority_level === 2
-                          ? '#d29922'
-                          : '#58a6ff',
-                  }}
-                >
-                  {task.priority_level >= 3
-                    ? 'High Priority'
-                    : task.priority_level === 2
-                      ? 'Medium Priority'
-                      : 'Low Priority'}
-                </Typography>
-              </Box>
-            )}
-            {(task.deadline || task.status === 'Done') && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                {task.status === 'Done' ? (
-                  <CheckCircleIcon sx={{ fontSize: 14, color: '#3fb950' }} />
-                ) : (
-                  <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                )}
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {task.status === 'Done'
-                    ? formatTimeSinceCompletion(task.updated_at)
-                    : new Date(task.deadline!).toLocaleDateString()}
-                </Typography>
-              </Box>
-            )}
-            {task.estimate_minutes > 0 && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <AccessTimeIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {task.estimate_minutes}m
-                </Typography>
-              </Box>
-            )}
-            {task.category && (
-              <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-                <CategoryIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {task.category}
-                </Typography>
-              </Box>
-            )}
-            <Box
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleTaskExpansion(task.id);
-              }}
-              sx={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.5,
-                cursor: 'pointer',
-                bgcolor: 'action.hover',
-                padding: 0.5,
-                borderRadius: 1,
-                '&:hover': {
-                  opacity: 0.8,
-                },
-              }}
-            >
-              <SubdirectoryArrowRightIcon
-                sx={{
-                  fontSize: 14,
-                  color:
-                    task.subtasks && task.subtasks.length > 0 ? 'text.secondary' : 'text.disabled', // Dim if empty
-                  transform: expandedTaskIds.has(task.id) ? 'rotate(90deg)' : 'none',
-                  transition: 'transform 0.2s',
-                }}
-              />
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {task.subtasks?.length || 0}
-              </Typography>
-            </Box>
-            {task.links && task.links.length > 0 && (
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 0.5,
-                  padding: 0.5,
-                  borderRadius: 1,
-                  bgcolor: 'action.hover',
-                }}
-              >
-                <LinkIcon sx={{ fontSize: 14, color: '#3b82f6' }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                  {task.links.length}
-                </Typography>
-              </Box>
-            )}
-          </Box>
-          {/* Subtasks Expansion using Collapse for smooth transition */}
-          <Collapse in={expandedTaskIds.has(task.id)} timeout="auto" unmountOnExit>
-            <Box
-              sx={{
-                mt: 1,
-                ml: 0.5,
-              }}
-            >
-              {task.subtasks &&
-                task.subtasks.length > 0 &&
-                task.subtasks.map((subtask, index) => {
-                  if (typeof subtask === 'string') return null;
-                  const isLast = index === task.subtasks.length - 1;
-                  return (
-                    <Box
-                      key={index}
-                      sx={{
-                        display: 'flex',
-                        position: 'relative',
-                        alignItems: 'center',
-                        gap: 1.5,
-                        pl: 3, // Indent for the connector
-                        pr: 2,
-                        py: 0.5,
-                        width: '100%',
-                      }}
-                    >
-                      {/* Tree Lines */}
-                      {/* Vertical Line */}
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          left: 0,
-                          top: 0,
-                          bottom: isLast ? '50%' : 0, // Stop at middle for last item to make L shape
-                          width: '1px',
-                          bgcolor: 'divider',
-                        }}
-                      />
-                      {/* Horizontal Line */}
-                      <Box
-                        sx={{
-                          position: 'absolute',
-                          left: 0,
-                          top: '50%',
-                          width: '16px', // Length of the horizontal connector
-                          height: '1px',
-                          bgcolor: 'divider',
-                        }}
-                      />
-
-                      <IconButton
-                        size="small"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleSubtaskToggle(task, index);
-                        }}
-                        sx={{ p: 0, minWidth: 0 }}
-                      >
-                        {/* Dynamic Status Icon for Subtask */}
-                        {subtask.status === 'Done' || subtask.completed ? (
-                          <CheckCircleIcon sx={{ fontSize: 16, color: '#3fb950' }} />
-                        ) : subtask.status === 'Todo' ? (
-                          <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: '#58a6ff' }} />
-                        ) : subtask.status === 'Pending' ? (
-                          <AccessTimeIcon sx={{ fontSize: 16, color: '#d29922' }} />
-                        ) : subtask.status === 'Backlog' ? (
-                          <HistoryIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                        ) : (
-                          <RadioButtonUncheckedIcon
-                            sx={{ fontSize: 16, color: 'text.secondary' }}
-                          />
-                        )}
-                      </IconButton>
-                      <Typography
-                        variant="body2"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleOpenSubtaskModal(task, index);
-                        }}
-                        sx={{
-                          color: subtask.completed ? 'text.secondary' : 'text.primary',
-                          flexGrow: 1,
-                          textDecoration: subtask.completed ? 'line-through' : 'none',
-                          cursor: 'pointer',
-                          '&:hover': {
-                            textDecoration: subtask.completed ? 'line-through' : 'underline',
-                          },
-                        }}
-                      >
-                        {subtask.title}
-                      </Typography>
-
-                      <Box sx={{ display: 'flex', gap: 1, alignItems: 'center', ml: 'auto' }}>
-                        {subtask.priority_level !== undefined && subtask.priority_level > 0 && (
-                          <FlagIcon
-                            sx={{
-                              fontSize: 14,
-                              color:
-                                subtask.priority_level === 3
-                                  ? '#58a6ff'
-                                  : subtask.priority_level === 2
-                                    ? '#d29922'
-                                    : '#ff7b72',
-                            }}
-                          />
-                        )}
-                        {subtask.category && (
-                          <CategoryIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                        )}
-
-                        {subtask.timer > 0 && (
-                          <Typography
-                            variant="caption"
-                            sx={{
-                              color: 'text.primary',
-                              fontSize: '11px',
-                              backgroundColor: 'action.hover',
-                              borderRadius: '4px',
-                              padding: '1px 4px',
-                            }}
-                          >
-                            {formatDuration(subtask.timer)}
-                          </Typography>
-                        )}
-                      </Box>
-                    </Box>
-                  );
-                })}
-              {/* Add New Subtask Button */}
-              <Box
-                sx={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: 1.5,
-                  pl: 3,
-                  pr: 2,
-                  py: 0.5,
-                  cursor: 'pointer',
-                  '&:hover': {
-                    bgcolor: 'rgba(255, 255, 255, 0.05)',
-                    borderRadius: 1,
-                  },
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleOpenSubtaskModal(task);
-                }}
-              >
-                <Box
-                  sx={{
-                    position: 'absolute',
-                    left: 0,
-                    top: 0,
-                    bottom: '50%',
-                    width: '1px',
-                    bgcolor: 'divider',
-                    visibility: 'hidden',
-                  }}
-                />
-                <AddIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-                <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                  Add new subtask
-                </Typography>
-              </Box>
-            </Box>
-          </Collapse>
-        </Box>
-      </CardLeft>
-    </TaskCard>
+      task={task}
+      expandedTaskIds={expandedTaskIds}
+      toggleTaskExpansion={toggleTaskExpansion}
+      handleSubtaskToggle={handleSubtaskToggle}
+      handleOpenSubtaskModal={handleOpenSubtaskModal}
+      onTaskClick={handleTaskClick}
+    />
   );
 
-  const renderGridTask = (task: TaskResponse) => {
-    const subtaskCount = task.subtasks?.length || 0;
-    const completedSubtasks = (task.subtasks || []).filter(
-      (s: string | { completed: boolean }) => typeof s !== 'string' && s.completed
-    ).length;
-    const progress = subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
-
-    return (
-      <GridTaskCard key={task.id} onClick={() => handleTaskClick(task)}>
-        <GridCardHeader>
-          <Tag
-            tagColor={getTagColors(task.category || 'General').bgcolor}
-            textColor={getTagColors(task.category || 'General').color}
-            sx={{
-              border: '1px solid',
-              borderColor: getTagColors(task.category || 'General').borderColor,
-              px: 1,
-              py: 0.25,
-              borderRadius: '6px',
-            }}
-          >
-            {task.category || 'General'}
-          </Tag>
-          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {task.links && task.links.length > 0 && (
-              <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} titleAccess={`${task.links.length} links`} />
-            )}
-            <IconButton size="small" sx={{ color: 'text.secondary', p: 0 }}>
-              <MoreHorizIcon />
-            </IconButton>
-          </Box>
-        </GridCardHeader>
-
-        <Box>
-          <Typography
-            variant="h6"
-            sx={{
-              fontSize: '16px',
-              fontWeight: 600,
-              color: 'text.primary',
-              lineHeight: 1.4,
-              mb: 1,
-            }}
-          >
-            {task.title}
-          </Typography>
-          <Typography
-            variant="body2"
-            sx={{
-              color: 'text.secondary',
-              fontSize: '13px',
-              lineHeight: 1.5,
-              display: '-webkit-box',
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: 'vertical',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Description placeholder if not in task object, using title for now or empty */}
-            Manage consistency across mobile and web dashboards...
-          </Typography>
-        </Box>
-
-        <Box sx={{ mt: 1, display: 'flex', gap: 2 }}>
-          {task.priority_level > 0 && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <FlagIcon
-                sx={{
-                  fontSize: 14,
-                  color:
-                    task.priority_level === 3
-                      ? 'error.main'
-                      : task.priority_level === 2
-                        ? '#f59e0b'
-                        : '#3b82f6',
-                }}
-              />
-              <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600 }}>
-                {task.priority_level === 3 ? 'High' : task.priority_level === 2 ? 'Medium' : 'Low'}
-              </Typography>
-            </Box>
-          )}
-          {task.deadline && (
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <CalendarTodayIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
-                {new Date(task.deadline).toLocaleDateString('en-US', {
-                  month: 'short',
-                  day: 'numeric',
-                })}
-              </Typography>
-            </Box>
-          )}
-        </Box>
-
-        <GridCardFooter>
-          <ProgressBarContainer>
-            <ProgressLabel>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
-                Subtasks: {completedSubtasks}/{subtaskCount}
-              </Typography>
-              <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '11px' }}>
-                {Math.round(progress)}%
-              </Typography>
-            </ProgressLabel>
-            <LinearProgress
-              variant="determinate"
-              value={Math.max(progress, 5)} // Min 5% to show bar
-              sx={{
-                height: 4,
-                borderRadius: 2,
-                bgcolor: 'action.hover',
-                '& .MuiLinearProgress-bar': {
-                  bgcolor: '#3b82f6',
-                  borderRadius: 2,
-                },
-              }}
-            />
-          </ProgressBarContainer>
-        </GridCardFooter>
-      </GridTaskCard>
-    );
-  };
+  const renderGridTask = (task: TaskResponse) => (
+    <GridViewTask
+      key={task.id}
+      task={task}
+      onTaskClick={handleTaskClick}
+    />
+  );
 
   return (
     <TasksContainer sx={{ position: 'relative' }}>
@@ -937,7 +461,7 @@ export const Tasks = () => {
       </MainContent>
 
       {isSubtaskModalOpen && (
-        <CreateTaskModal
+        <TaskDetailModal
           key={activeParentTask?.id ? `subtask-${activeParentTask.id}-${activeSubtaskIndex}` : 'new-subtask'}
           open={isSubtaskModalOpen}
           onClose={() => setIsSubtaskModalOpen(false)}

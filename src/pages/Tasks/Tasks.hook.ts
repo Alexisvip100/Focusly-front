@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { GET_TAGS } from '@/pages/Home/components/CreateTaskModal/tasks.graphql';
+import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { useAppSelector } from '@/redux/hooks';
 import { useMemo } from 'react';
 

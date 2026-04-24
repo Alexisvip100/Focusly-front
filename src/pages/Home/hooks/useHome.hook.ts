@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
-import { GET_TASKS, DELETE_TASK, UPDATE_TASK } from '../components/CreateTaskModal/tasks.graphql';
+import { GET_TASKS, DELETE_TASK, UPDATE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { removeTask, upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { TaskBar } from '../components/Sidebar/types/Sidebar.types';

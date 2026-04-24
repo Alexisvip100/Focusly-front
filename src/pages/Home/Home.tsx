@@ -8,7 +8,7 @@ import { Insights } from '../Insights/Insights';
 import Workspace from '../Workspace/Workspace';
 import { ChatAI } from '@/components/chat';
 import { FocusMode } from './components/FocusMode/FocusMode';
-import { CreateTaskModal } from './components/CreateTaskModal/CreateTaskModal';
+import { TaskDetailModal } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal';
 import { TaskDetailsFullModal } from '../Workspace/components/TaskDetailsFull/TaskDetailsFullModal';
 import { useHome } from './hooks/useHome.hook';
 import { Settings } from '../Settings/Settings';
@@ -119,7 +119,7 @@ export const Home = () => {
       />
 
       {isEditModalOpen && (
-        <CreateTaskModal
+        <TaskDetailModal
           key={taskDetailsTask?.google_event_id || taskDetailsTask?.id || 'create-task-modal'}
           open={isEditModalOpen}
           onClose={closeTaskDetails}

@@ -18,7 +18,7 @@ import {
 import {
   getPriorityFromLevel,
   formatDuration,
-} from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   RightSidebar,
   SidebarHeader,

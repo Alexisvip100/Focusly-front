@@ -10,11 +10,16 @@ import {
   StyledSlider,
 } from '../Dashboard.styles';
 
+import { useAppSelector } from '@/redux/hooks';
+import { UserUpdate } from '@/api/User/apiUser';
+import type { UserResponse } from '@/api/User/apiUserType';
+
 interface FocusBlocksStepProps {
   onNext: () => void;
 }
 
 const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
+  const { user } = useAppSelector((state) => state.auth);
   const [focusLength, setFocusLength] = useState<number>(45);
   const [shortBreak, setShortBreak] = useState<number>(5);
   const [longBreak, setLongBreak] = useState<number>(15);
@@ -35,6 +40,24 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
     setFocusLength(25);
     setShortBreak(5);
     setLongBreak(15);
+  };
+
+  const handleSave = async () => {
+    if (user?.id) {
+      try {
+        const currentSettings = (user.settings ?? {}) as Record<string, unknown>;
+        await UserUpdate(user.id, {
+          settings: {
+            ...currentSettings,
+            focusDurationPref: focusLength,
+            breakDurationPref: shortBreak,
+          },
+        } as Partial<UserResponse>);
+      } catch (error) {
+        console.error('Failed to save focus blocks', error);
+      }
+    }
+    onNext();
   };
 
   return (
@@ -288,7 +311,7 @@ const FocusBlocksStep: React.FC<FocusBlocksStepProps> = ({ onNext }) => {
           <Button
             variant="contained"
             fullWidth
-            onClick={onNext}
+            onClick={handleSave}
             sx={{
               py: 1.5,
               bgcolor: 'primary.main',

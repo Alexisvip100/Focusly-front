@@ -1,5 +1,5 @@
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK, GET_TASKS, GET_TASKS_TITLES } from '@/pages/Home/components/CreateTaskModal/tasks.graphql';
+import { UPDATE_TASK, GET_TASKS, GET_TASKS_TITLES } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import { upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';

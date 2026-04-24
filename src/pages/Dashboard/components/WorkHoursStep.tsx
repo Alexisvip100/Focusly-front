@@ -12,11 +12,16 @@ import {
   TimeInput,
 } from '../Dashboard.styles';
 
+import { useAppSelector } from '@/redux/hooks';
+import { UserUpdate } from '@/api/User/apiUser';
+import type { UserResponse } from '@/api/User/apiUserType';
+
 interface WorkHoursStepProps {
   onNext: () => void;
 }
 
 const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
+  const { user } = useAppSelector((state) => state.auth);
   const days = [
     { label: 'M', value: 'Mon' },
     { label: 'T', value: 'Tue' },
@@ -35,6 +40,27 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
     setSelectedDays((prev) =>
       prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
     );
+  };
+
+  const handleSave = async () => {
+    if (user?.id) {
+      try {
+        const currentSettings = (user.settings ?? {}) as Record<string, unknown>;
+        await UserUpdate(user.id, {
+          settings: {
+            ...currentSettings,
+            workHoursConfig: {
+              selectedDays,
+              startTime,
+              endTime,
+            },
+          },
+        } as unknown as Partial<UserResponse>);
+      } catch (error) {
+        console.error('Failed to save work hours', error);
+      }
+    }
+    onNext();
   };
 
   return (
@@ -185,7 +211,7 @@ const WorkHoursStep: React.FC<WorkHoursStepProps> = ({ onNext }) => {
         <Button
           variant="contained"
           fullWidth
-          onClick={onNext}
+          onClick={handleSave}
           sx={{
             py: 1.5,
             bgcolor: 'primary.main',

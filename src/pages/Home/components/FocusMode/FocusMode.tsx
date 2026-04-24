@@ -31,7 +31,7 @@ import type { FocusModeProps } from './FocusMode.types';
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import { EndSessionModal } from './components/EndSessionModal';
 import { CompletesSessionModal } from './components/CompletesSessionModal';
-import { getPriorityFromLevel } from './../CreateTaskModal/CreateTaskModal.utils';
+import { getPriorityFromLevel } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   MiniModeContainer,
   MiniTimerBox,

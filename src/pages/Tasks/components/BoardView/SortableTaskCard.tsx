@@ -3,8 +3,8 @@ import { CSS } from '@dnd-kit/utilities';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { Box, Typography } from '@mui/material';
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
-import { Tag } from '../../Tasks.styles';
-import { getTagColors } from '../../../Home/components/CreateTaskModal/CreateTaskModal.utils';
+import { Tag } from '../GridViewTask/GridViewTask.styles';
+import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import { memo } from 'react';
 
 interface SortableTaskCardProps {

@@ -6,7 +6,7 @@ import {
   UPDATE_TASK, 
   DELETE_TASK, 
   GET_TASKS,
-} from '../../CreateTaskModal/tasks.graphql';
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { removeTask, upsertTask } from '@/redux/tasks/task.slice';
 import { sileo } from 'sileo';

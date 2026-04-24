@@ -21,15 +21,9 @@ export const HeaderContainer = styled(Box)({
 // Top row of stats cards
 export const StatsGrid = styled(Box)({
   display: 'grid',
-  gridTemplateColumns: 'repeat(4, 1fr)',
+  gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
   gap: '16px',
   width: '100%',
-  '@media (max-width: 1200px)': {
-    gridTemplateColumns: 'repeat(2, 1fr)',
-  },
-  '@media (max-width: 600px)': {
-    gridTemplateColumns: '1fr',
-  },
 });
 
 export const StatCard = styled(Paper)(({ theme }) => ({

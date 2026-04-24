@@ -23,7 +23,7 @@ import {
 import {
   getPriorityFromLevel,
   formatDuration,
-} from '@/pages/Home/components/CreateTaskModal/CreateTaskModal.utils';
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskSearchItems } from '../../types/workspace.types';
 
 // Import local styles
