@@ -381,20 +381,17 @@ export const useCalendarView = () => {
 
       handleModalClose();
       
-      // Force a full state refresh as requested by the user
-      // This ensures all hooks and queries are re-initialized with the new data
-      window.location.reload();
       sileo.success({
-        fill: 'rgba(239, 68, 68, 0.9)',
         title: 'Task deleted successfully!',
-        description: 'The task has been removed from your schedule.',
+        fill: 'var(--sileo-delete-bg)',
+        duration: 4000,
       });
-    } catch (e) {
-      console.error('Failed to delete task', e);
+    } catch (err) {
+      console.error('Error deleting task:', err);
       sileo.error({
-        title: 'Failed to delete task',
-        description: 'Please try again later.',
-        fill: 'rgba(239, 68, 68, 0.9)',
+        title: 'Error deleting task',
+        fill: 'var(--sileo-error-bg)',
+        duration: 4000,
       });
     }
   };

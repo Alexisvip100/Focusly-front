@@ -34,11 +34,17 @@ export const useTasksUI = () => {
     setIsModalOpen(false);
   };
 
-  const triggerToast = (message: string, subMessage: string) => {
-    sileo.success({
+  const triggerToast = (
+    message: string,
+    subMessage: string,
+    type: 'success' | 'update' | 'delete' | 'warning' | 'error' = 'success'
+  ) => {
+    const method = type === 'warning' ? 'warning' : type === 'error' ? 'error' : 'success';
+
+    sileo[method]({
       title: message,
       description: subMessage,
-      fill: '#ecfdf5ff', // Light Green for success
+      fill: `var(--sileo-${type}-bg)`,
       duration: 4000,
     });
   };

@@ -7,7 +7,7 @@ export const useWorkspaceActions = () => {
     sileo.warning({
       title: 'Remove Workspace',
       description: 'Are you sure you want to remove this workspace?',
-      fill: '#f3f2f2ff',
+      fill: 'var(--sileo-warning-bg)',
       button: {
         title: 'Confirm',
         onClick: () => {
@@ -38,10 +38,16 @@ export const useWorkspaceActions = () => {
           });
         },
       });
-      sileo.success({ title: 'Workspace deleted', fill: '#fee2e2ff' }); // Light Red for deletion
+      sileo.success({ 
+        title: 'Workspace deleted', 
+        fill: 'var(--sileo-delete-bg)', 
+        });
     } catch (error) {
       console.error('Error deleting workspace:', error);
-      sileo.error({ title: 'Error deleting workspace', fill: '#fee2e2ff' });
+      sileo.error({ 
+        title: 'Error deleting workspace', 
+        fill: 'var(--sileo-error-bg)', 
+        });
     }
   };
 

@@ -44,7 +44,7 @@ export const useFocusModeTasks = ({
           isSubtask: true,
           parentId: activeTask.id,
           originalIndex: activeSubtaskIndex,
-          workspace: activeTask.workspace,
+          workspaces: activeTask.workspaces,
         };
       }
     }

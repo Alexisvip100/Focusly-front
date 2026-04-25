@@ -57,7 +57,7 @@ export const RippleDot = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const TimerCard = styled(Box)<{ isSeconds?: boolean }>(({ theme, isSeconds }) => ({
+export const TimerCard = styled(Box)<{ label?: string }>(({ theme, label }) => ({
   backgroundColor:
     theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(226, 232, 240, 0.4)',
   borderRadius: '32px',
@@ -74,7 +74,7 @@ export const TimerCard = styled(Box)<{ isSeconds?: boolean }>(({ theme, isSecond
       ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
       : '0 25px 50px -12px rgba(0, 0, 0, 0.05)',
   '&::after': {
-    content: `"${isSeconds ? 'SECONDS' : 'MINUTES'}"`,
+    content: `"${label || 'MINUTES'}"`,
     position: 'absolute',
     bottom: 24,
     fontSize: '12px',

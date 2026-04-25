@@ -18,7 +18,7 @@ export const ProductivityTrendsChart: React.FC<ProductivityTrendsChartProps> = (
   const isDark = theme.palette.mode === 'dark';
 
   return (
-    <ChartCard sx={{ height: 'auto', minHeight: '400px' }}>
+    <ChartCard>
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Box>
           <Typography variant="h6" fontWeight="bold">

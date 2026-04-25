@@ -53,7 +53,7 @@ export interface Task {
       }[];
   estimated_start_date?: string | null;
   estimated_end_date?: string | null;
-  workspace?: {
+  workspaces?: {
     id: string;
     title: string;
     content: string;
@@ -63,7 +63,7 @@ export interface Task {
       name: string;
       color?: string;
     } | null;
-  } | null;
+  }[];
   links?: { title: string; url: string }[];
   collaborators?: {
     name: string;

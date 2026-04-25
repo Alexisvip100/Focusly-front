@@ -3,11 +3,14 @@ import { WorkspaceEditor } from './components/Editor/WorkspaceEditor';
 
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
+import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
+import type { Step } from 'react-joyride';
 import { useQuery, useLazyQuery } from '@apollo/client';
-import { GET_HAS_WORKSPACES, GET_WORKSPACE_BY_ID } from './workspaces.graphql';
-import { useEffect } from 'react';
+import { GET_WORKSPACE_BY_ID, GET_WORKSPACES } from './workspaces.graphql';
+import { useEffect, useState } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 import { useSearchParams } from 'react-router-dom';
+import { Box, Typography } from '@mui/material';
 
 export const Workspace = ({
   isEditorOpen,
@@ -25,15 +28,57 @@ export const Workspace = ({
     reset,
     selectTask,
     handleSelectTask,
+    handleUpdateTask,
     tasksData,
     selectedSubtaskIndex,
   } = useWorkspace();
-  const { data: hasWorkspacesData, refetch: refetchHasWorkspaces } = useQuery(GET_HAS_WORKSPACES);
+
+  const [runOnboarding, setRunOnboarding] = useState(() => {
+    return localStorage.getItem('onboarding_workspace_completed') !== 'true';
+  });
+
+  const onboardingSteps: Step[] = [
+    {
+      target: 'body',
+      placement: 'center',
+      content: (
+        <Box>
+          <Typography variant="h6" fontWeight={700} gutterBottom>
+            Welcome to Your Workspace! 🧠
+          </Typography>
+          <Typography variant="body2">
+            This is where you plan your strategy and organize your thoughts.
+          </Typography>
+        </Box>
+      ),
+    },
+    {
+      target: '#joyride-workspace-search',
+      content: 'Quickly find your notes or folders using the search bar.',
+    },
+    {
+      target: '#joyride-workspace-folders',
+      content: 'Organize your notes into custom folders to keep everything structured.',
+    },
+    {
+      target: '#joyride-workspace-create-note',
+      content: 'Start a new strategic note to capture your next big idea.',
+    },
+  ];
+
+  const handleFinishOnboarding = () => {
+    setRunOnboarding(false);
+    localStorage.setItem('onboarding_workspace_completed', 'true');
+  };
+  const { data: workspacesData, loading: workspacesLoading } = useQuery(GET_WORKSPACES, { 
+    variables: { search: '' },
+    skip: isEditorOpen 
+  });
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
   const [searchParams, setSearchParams] = useSearchParams();
   const workspaceIdParam = searchParams.get('workspaceId');
 
-  const hasWorkspaces = hasWorkspacesData?.hasWorkspaces;
+  const hasWorkspaces = (workspacesData?.workspaces?.length ?? 0) > 0;
 
   // Sync workspaceId from URL to Editor state
   useEffect(() => {
@@ -82,10 +127,6 @@ export const Workspace = ({
     watch,
   ]);
 
-  useEffect(() => {
-    refetchHasWorkspaces();
-  }, [isEditorOpen, refetchHasWorkspaces]);
-
   const handleSelectWorkspace = (workspace: WorkspaceTypes) => {
     // URL Update
     const newParams = new URLSearchParams(searchParams);
@@ -122,35 +163,69 @@ export const Workspace = ({
 
   if (isEditorOpen) {
     return (
-      <WorkspaceEditor
-        onBack={() => {
-          onEditorChange(false);
-          refetchHasWorkspaces();
-          const newParams = new URLSearchParams(searchParams);
-          newParams.delete('workspaceId');
-          setSearchParams(newParams);
-        }}
-        register={register}
-        setValue={setValue}
-        watch={watch}
-        getValues={getValues}
-        selectTask={selectTask}
-        selectedSubtaskIndex={selectedSubtaskIndex}
-        handleSelectTask={handleSelectTask}
-        tasksData={tasksData}
-        onStartFocus={onStartFocus}
-        onOpenTaskDetails={onOpenTaskDetails}
-        isRightSidebarOpen={isSidebarOpen}
-        setIsRightSidebarOpen={onSidebarChange}
-      />
+      <>
+        <div id="joyride-workspace-editor" style={{ height: '100%', width: '100%' }}>
+          <WorkspaceEditor
+            onBack={() => {
+              onEditorChange(false);
+              const newParams = new URLSearchParams(searchParams);
+              newParams.delete('workspaceId');
+              setSearchParams(newParams);
+            }}
+            register={register}
+            setValue={setValue}
+            watch={watch}
+            getValues={getValues}
+            selectTask={selectTask}
+            selectedSubtaskIndex={selectedSubtaskIndex}
+            handleSelectTask={handleSelectTask}
+            handleUpdateTask={handleUpdateTask}
+            tasksData={tasksData}
+            onStartFocus={onStartFocus}
+            onOpenTaskDetails={onOpenTaskDetails}
+            isRightSidebarOpen={isSidebarOpen}
+            setIsRightSidebarOpen={onSidebarChange}
+          />
+        </div>
+        <OnboardingWrapper
+          steps={onboardingSteps}
+          run={runOnboarding}
+          onFinish={handleFinishOnboarding}
+        />
+      </>
     );
   }
 
+  // Show a blank screen while loading to avoid flickering between states
+  if (workspacesLoading) return null;
+
   if (hasWorkspaces) {
-    return <WorkspaceLibrary onCreate={handleCreateNew} onSelect={handleSelectWorkspace} />;
+    return (
+      <>
+        <div id="joyride-workspace-library" style={{ height: '100%', width: '100%' }}>
+          <WorkspaceLibrary onCreate={handleCreateNew} onSelect={handleSelectWorkspace} />
+        </div>
+        <OnboardingWrapper
+          steps={onboardingSteps}
+          run={runOnboarding}
+          onFinish={handleFinishOnboarding}
+        />
+      </>
+    );
   }
 
-  return <WorkspaceEmptyState onCreate={handleCreateNew} />;
+  return (
+    <>
+      <div id="joyride-workspace-empty" style={{ height: '100%', width: '100%' }}>
+        <WorkspaceEmptyState onCreate={handleCreateNew} />
+      </div>
+      <OnboardingWrapper
+        steps={onboardingSteps}
+        run={runOnboarding}
+        onFinish={handleFinishOnboarding}
+      />
+    </>
+  );
 };
 
 export default Workspace;

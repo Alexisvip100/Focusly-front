@@ -34,18 +34,18 @@ export const TaskActions = ({
             sileo.warning({
               title: 'Delete Task',
               description: 'Are you sure you want to delete this task?',
-              fill: 'rgba(239, 68, 68, 0.9)',
+              fill: 'var(--sileo-warning-bg)',
               button: {
                 title: 'Confirm',
                 onClick: () => {
                   sileo.promise(handleDelete(), {
-                    loading: { title: 'Deleting...', fill: 'rgba(239, 68, 68, 0.9)' },
+                    loading: { title: 'Deleting...', fill: 'var(--sileo-update-bg)', },
                     success: {
                       title: 'Task deleted successfully!',
                       duration: 4000,
-                      fill: 'rgba(239, 68, 68, 0.9)',
-                    },
-                    error: { title: 'Error deleting task', fill: 'rgba(239, 68, 68, 0.9)' },
+                      fill: 'var(--sileo-delete-bg)',
+                      },
+                    error: { title: 'Error deleting task', fill: 'var(--sileo-error-bg)', },
                   });
                   onClose();
                 },

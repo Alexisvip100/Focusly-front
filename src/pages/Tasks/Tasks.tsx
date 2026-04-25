@@ -54,6 +54,8 @@ import { WorkloadDashboard } from './components/WorkloadDashboard/WorkloadDashbo
 import { DashboardMetrics } from './components/DashboardMetrics/DashboardMetrics';
 import { ListViewTask } from './components/ListViewTask/ListViewTask';
 import { GridViewTask } from './components/GridViewTask/GridViewTask';
+import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
+import type { Step } from 'react-joyride';
 
 export const Tasks = () => {
   const {
@@ -79,6 +81,8 @@ export const Tasks = () => {
     updateTask, // Add this
     tags,
     isLoading,
+    activeSort,
+    activeFilterState,
   } = useTasks();
 
   const [, setSearchParams] = useSearchParams();
@@ -90,6 +94,49 @@ export const Tasks = () => {
   const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(null);
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
   const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(null);
+
+  const [runOnboarding, setRunOnboarding] = useState(() => {
+    return localStorage.getItem('onboarding_tasks_completed') !== 'true';
+  });
+
+  const onboardingSteps: Step[] = [
+    {
+      target: 'body',
+      placement: 'center',
+      content: (
+        <Box>
+          <Typography variant="h6" fontWeight={700} gutterBottom>
+            Welcome to Your Tasks! 🚀
+          </Typography>
+          <Typography variant="body2">
+            This is where you manage and prioritize your work. Let's take a quick tour!
+          </Typography>
+        </Box>
+      ),
+      disableBeacon: true,
+    },
+    {
+      target: '#joyride-tasks-view-toggle',
+      content: 'Switch between List, Grid, Board, and Workload views to find what works best for you.',
+    },
+    {
+      target: '#joyride-tasks-search',
+      content: 'Quickly find any task by searching for its title, tags, or projects.',
+    },
+    {
+      target: '#joyride-tasks-filters',
+      content: 'Use filters and sorting to stay focused on what matters most right now.',
+    },
+    {
+      target: '#joyride-tasks-completed',
+      content: 'Toggle completed tasks to review your progress or clear your workspace.',
+    },
+  ];
+
+  const handleFinishOnboarding = () => {
+    setRunOnboarding(false);
+    localStorage.setItem('onboarding_tasks_completed', 'true');
+  };
 
   const handleOpenSubtaskModal = (task: TaskResponse, index?: number) => {
     setActiveParentTask(task);
@@ -210,7 +257,7 @@ export const Tasks = () => {
               <MenuItem value="all">All Time</MenuItem>
             </Select>
 
-            <ViewToggleGroup>
+            <ViewToggleGroup id="joyride-tasks-view-toggle">
               <ViewToggleButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
                 <ViewListIcon fontSize="small" />
               </ViewToggleButton>
@@ -230,8 +277,9 @@ export const Tasks = () => {
           </Box>
         </Header>
 
-        <ControlsBar>
+        <ControlsBar id="joyride-tasks-filters">
           <StyledTextField
+            id="joyride-tasks-search"
             placeholder="Search tasks, tags, or projects..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
@@ -256,6 +304,7 @@ export const Tasks = () => {
               onClose={handleFilterClose}
               tags={tags}
               onApply={handleApplyFilters}
+              activeFilterState={activeFilterState}
             />
             <SortButton
               onClick={(e) => handleFilterClick(e, 'sort')}
@@ -271,8 +320,10 @@ export const Tasks = () => {
               anchorEl={sortAnchorEl}
               onClose={handleSortClose}
               onApply={handleApplySort}
+              activeSort={activeSort}
             />
             <CompletedButton
+              id="joyride-tasks-completed"
               onClick={(e) => handleFilterClick(e, 'completed')}
               sx={{
                 backgroundColor: isCompletedFilterActive ? '#14913e' : 'background.paper',
@@ -298,7 +349,7 @@ export const Tasks = () => {
           </Box>
         </ControlsBar>
 
-        <AnimatedContainer key={viewMode}>
+        <AnimatedContainer id="joyride-tasks-list" key={viewMode}>
           {isLoading && filteredTasks.length === 0 ? (
             // Structured skeletons for Tasks
             viewMode === 'grid' ? (
@@ -405,19 +456,25 @@ export const Tasks = () => {
                   id: 'high',
                   label: 'High Priority',
                   color: 'error.main',
-                  filter: (t: TaskResponse) => t.priority_level >= 3,
+                  filter: (t: TaskResponse) => (t.priority_level ?? 0) >= 3,
                 },
                 {
                   id: 'medium',
                   label: 'Medium Priority',
                   color: '#f59e0b',
-                  filter: (t: TaskResponse) => t.priority_level === 2,
+                  filter: (t: TaskResponse) => (t.priority_level ?? 0) === 2,
                 },
                 {
                   id: 'low',
                   label: 'Low Priority',
                   color: '#3b82f6',
-                  filter: (t: TaskResponse) => t.priority_level <= 1,
+                  filter: (t: TaskResponse) => (t.priority_level ?? 0) === 1,
+                },
+                {
+                  id: 'none',
+                  label: 'Other Tasks',
+                  color: '#94a3b8',
+                  filter: (t: TaskResponse) => !t.priority_level || t.priority_level === 0,
                 },
               ].map((section) => {
                 const sectionTasks = filteredTasks.filter(section.filter);
@@ -505,6 +562,11 @@ export const Tasks = () => {
           }
         />
       )}
+      <OnboardingWrapper
+        steps={onboardingSteps}
+        run={runOnboarding}
+        onFinish={handleFinishOnboarding}
+      />
     </TasksContainer>
   );
 };

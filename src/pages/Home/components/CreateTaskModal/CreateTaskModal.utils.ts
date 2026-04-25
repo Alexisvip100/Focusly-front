@@ -101,3 +101,21 @@ export const deduplicateLinks = (links: { title: string; url: string }[]) => {
     return true;
   });
 };
+
+export const getTimerSuggestions = (val: string) => {
+  const clean = val.trim();
+  if (!clean || clean.length > 8) return [];
+  const suggestions: string[] = [];
+  if (/^\d+$/.test(clean)) {
+    suggestions.push(`${clean}h`, `${clean}m`);
+  } else if (/^\d+h$/.test(clean)) {
+    suggestions.push(`${clean} 00m`, `${clean} 30m`);
+  } else {
+    const hmMatch = clean.match(/^(\d+h)\s*(\d+)$/);
+    if (hmMatch) {
+      suggestions.push(`${hmMatch[1]} ${hmMatch[2]}m`);
+      if (hmMatch[2].length === 1) suggestions.push(`${hmMatch[1]} ${hmMatch[2]}0m`);
+    }
+  }
+  return suggestions;
+};

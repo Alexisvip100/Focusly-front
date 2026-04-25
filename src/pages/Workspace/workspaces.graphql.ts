@@ -82,12 +82,6 @@ export const GET_TOTAL_WORKSPACES = gql`
   }
 `;
 
-export const GET_HAS_WORKSPACES = gql`
-  query HasWorkspaces {
-    hasWorkspaces
-  }
-`;
-
 export const GET_WORKSPACE_BY_ID = gql`
   query GetWorkspaceById($id: ID!) {
     workspace(id: $id) {

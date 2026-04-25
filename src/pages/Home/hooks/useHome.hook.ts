@@ -248,7 +248,6 @@ export const useHome = () => {
       }
     }
     closeTaskDetails();
-    window.location.reload();
   };
 
   return {

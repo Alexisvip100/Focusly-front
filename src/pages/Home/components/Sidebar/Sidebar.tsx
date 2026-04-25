@@ -153,7 +153,11 @@ const Sidebar = ({ activeTab, changeStatusTab }: SidebarProps) => {
 
       <AddTaskButton
         id="joyride-add-task"
-        onClick={() => setSearchParams({ action: 'create' })}
+        onClick={() => {
+          const newParams = new URLSearchParams(searchParams);
+          newParams.set('action', 'create');
+          setSearchParams(newParams);
+        }}
         startIcon={
           <AddIcon
             sx={{

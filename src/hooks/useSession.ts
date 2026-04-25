@@ -26,7 +26,7 @@ export const useSession = () => {
         sileo.info({
           title: 'Sesión Finalizada',
           description: 'Tu sesión se ha cerrado en otra pestaña. Inicia Sesión de nuevo para continuar.',
-          fill: '#e9e9e9ff',
+          fill: 'var(--sileo-update-bg)',
           duration: 5000,
         });
       } else {

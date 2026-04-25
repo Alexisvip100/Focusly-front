@@ -1,12 +1,12 @@
-import { useQuery } from '@apollo/client';
-import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import { useAppSelector } from '@/redux/hooks';
 import { useMemo } from 'react';
+import { useQuery } from '@apollo/client';
 
-import { useTasksData } from './hooks/useTasksData.hook';
-import { useTasksUI } from './hooks/useTasksUI.hook';
-import { useTasksFilters } from './hooks/useTasksFilters.hook';
-import { useTasksMutations } from './hooks/useTasksMutations.hook';
+import { useAppSelector } from '@/redux/hooks';
+import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import { useTasksData } from '@/pages/Tasks/hooks/useTasksData.hook';
+import { useTasksFilters } from '@/pages/Tasks/hooks/useTasksFilters.hook';
+import { useTasksMutations } from '@/pages/Tasks/hooks/useTasksMutations.hook';
+import { useTasksUI } from '@/pages/Tasks/hooks/useTasksUI.hook';
 
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
@@ -14,19 +14,37 @@ export const useTasks = () => {
   // 1. UI Hook
   const ui = useTasksUI();
 
-  // 2. Filters Hook
-  const filters = useTasksFilters([]); // Placeholder tasks initially
+  // 2. Filter Logic & State
+  // This hook manages the searchTerm, activeFilters (for server), and activeSort (for server)
+  // It also performs client-side filtering on whatever tasks are passed to it.
+  // We'll use a single instance and handle the "initial empty" case.
+  const filterLogic = useTasksFilters([]); 
 
+  // 3. Data Fetching
   const data = useTasksData({
     userId: user?.id,
-    filters: filters.activeFilters,
-    sort: filters.activeSort,
+    filters: filterLogic.activeFilters,
+    sort: filterLogic.activeSort,
   });
 
-  // Re-inject tasks into filters hook (or just use logic in a unified way)
-  const filterLogic = useTasksFilters(data.tasks);
+  // Re-run filter logic on the fetched data
+  // Since useTasksFilters is a hook that manages its own state,
+  // we can't easily "inject" tasks into it after initialization without a second instance
+  // or a refactor of useTasksFilters. 
+  // Let's use the second instance approach but ENSURE they share the SAME state if needed.
+  // Actually, for now, we'll just filter the data.tasks manually for the UI part
+  // so we don't have multiple states.
+  
+  const filteredTasks = useMemo(() => {
+    let result = data.tasks;
+    if (filterLogic.searchTerm) {
+      result = result.filter(t => t.title.toLowerCase().includes(filterLogic.searchTerm.toLowerCase()));
+    }
+    // We don't need to apply activeFilters/activeSort here because the server already did it!
+    return result;
+  }, [data.tasks, filterLogic.searchTerm]);
 
-  // 3. Mutations Hook
+  // 4. Mutations Hook
   const mutations = useTasksMutations({
     userId: user?.id,
     tasks: data.tasks,
@@ -82,13 +100,12 @@ export const useTasks = () => {
     setShowSuccessToast: ui.setShowSuccessToast,
     toastMessage: ui.toastMessage,
     toastSubMessage: ui.toastSubMessage,
-
-    // Methods
     updateTask: mutations.updateTask,
     handleAddSubtask: mutations.handleAddSubtask,
     handleApplySort: filterLogic.handleApplySort,
     handleApplyFilters: filterLogic.handleApplyFilters,
-    filteredTasks: filterLogic.filteredTasks,
+    activeFilterState: filterLogic.activeFilterState,
+    filteredTasks,
     tags,
   };
 };

@@ -36,6 +36,7 @@ interface FilterPopoverProps {
   onApply?: (filters: FilterState) => void;
   onClear?: () => void;
   tags: string[];
+  activeFilterState?: FilterState;
 }
 
 import { getTagColors } from '../../../Tasks/components/TaskDetailModal/TaskDetailModal.utils';
@@ -47,10 +48,22 @@ export const FilterPopover: React.FC<FilterPopoverProps> = ({
   onApply,
   onClear,
   tags,
+  activeFilterState,
 }) => {
-  const [selectedPriorities, setSelectedPriorities] = useState<string[]>([]);
-  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
+  const [selectedPriorities, setSelectedPriorities] = useState<string[]>(activeFilterState?.priorities || []);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>(activeFilterState?.categories || []);
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>(activeFilterState?.statuses || []);
+
+  const [prevOpen, setPrevOpen] = useState(open);
+
+  if (open && !prevOpen) {
+    setPrevOpen(true);
+    setSelectedPriorities(activeFilterState?.priorities || []);
+    setSelectedCategories(activeFilterState?.categories || []);
+    setSelectedStatuses(activeFilterState?.statuses || []);
+  } else if (!open && prevOpen) {
+    setPrevOpen(false);
+  }
 
   const toggleSelection = (
     item: string,

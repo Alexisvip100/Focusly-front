@@ -15,6 +15,7 @@ import { removeTask } from '@/redux/tasks/task.slice';
 import { deduplicateLinks, parseDuration, parseRealTime, getPriorityLevel } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskData, TaskInput, UseTaskMutationsProps } from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
+import type { Task } from '@/redux/tasks/task.types';
 
 export const useTaskMutations = ({
   onSave,
@@ -149,7 +150,7 @@ export const useTaskMutations = ({
           refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
         });
         if (data?.addSubtask) {
-          sileo.success({ title: 'Subtask added', fill: '#ecfdf5ff' });
+          sileo.success({ title: 'Subtask added', fill: 'var(--sileo-success-bg)', });
           onSave(data.addSubtask);
           resetForm();
         }
@@ -178,7 +179,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.createTask) {
-        sileo.success({ title: 'Task created', fill: '#ecfdf5ff' });
+        sileo.success({ title: 'Task created', fill: 'var(--sileo-success-bg)', });
         onSave(data.createTask);
         resetForm();
         onClose();
@@ -308,7 +309,7 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.updateTask) {
-        sileo.success({ title: 'Task updated', fill: '#ecfdf5ff' });
+        sileo.success({ title: 'Task updated', fill: 'var(--sileo-update-bg)', });
         onSave(data.updateTask);
         if (shouldClose) onClose();
       }
@@ -336,7 +337,7 @@ export const useTaskMutations = ({
           refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
         });
         if (data?.updateTask) {
-          sileo.success({ title: 'Subtask deleted', fill: '#ecfdf5ff' });
+          sileo.success({ title: 'Subtask deleted', fill: 'var(--sileo-delete-bg)', });
           onSave(data.updateTask);
           onClose();
         }

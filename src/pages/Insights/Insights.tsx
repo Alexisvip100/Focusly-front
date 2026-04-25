@@ -31,24 +31,32 @@ export const Insights = () => {
         onFilterChange={setFilter}
       />
 
-      <StatsCards
-        totalFocusHours={stats.totalFocusHours}
-        taskCompletion={stats.taskCompletion}
-        energyScore={stats.energyScore}
-        breakHours={stats.breakHours}
-        goldenWindow={stats.goldenWindow}
-      />
+      <Box id="joyride-insights-stats">
+        <StatsCards
+          totalFocusHours={stats.totalFocusHours}
+          taskCompletion={stats.taskCompletion}
+          energyScore={stats.energyScore}
+          breakHours={stats.breakHours}
+          goldenWindow={stats.goldenWindow}
+        />
+      </Box>
 
       <ChartsRow>
-        <ProductivityTrendsChart data={stats.productivityTrends} />
-        <TimeDistributionChart data={stats.timeDistribution} />
+        <Box id="joyride-insights-trends" sx={{ flex: 1 }}>
+          <ProductivityTrendsChart data={stats.productivityTrends} />
+        </Box>
+        <Box id="joyride-insights-distribution" sx={{ flex: 1 }}>
+          <TimeDistributionChart data={stats.timeDistribution} />
+        </Box>
       </ChartsRow>
 
-      <BottomSection
-        goldenWindowValue={stats.goldenWindow.value}
-        heatmap={stats.heatmap}
-        heatmapLabels={stats.heatmapLabels}
-      />
+      <Box id="joyride-insights-heatmap">
+        <BottomSection
+          goldenWindowValue={stats.goldenWindow.value}
+          heatmap={stats.heatmap}
+          heatmapLabels={stats.heatmapLabels}
+        />
+      </Box>
     </PageContainer>
   );
 };

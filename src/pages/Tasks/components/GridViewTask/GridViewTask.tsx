@@ -23,11 +23,17 @@ interface GridViewTaskProps {
 }
 
 export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
-  const subtaskCount = task.subtasks?.length || 0;
-  const completedSubtasks = (task.subtasks || []).filter(
-    (s: string | { completed: boolean }) => typeof s !== 'string' && s.completed
-  ).length;
-  const progress = subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
+    const taskColor = (() => {
+      if (task.notes_encrypted) {
+        const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
+        if (match && match[1]) return match[1];
+      }
+      return task.priority_level === 3 ? '#EF4444' : task.priority_level === 2 ? '#F59E0B' : '#22C55E';
+    })();
+
+    const subtaskCount = task.subtasks?.length || 0;
+    const completedSubtasks = task.subtasks?.filter(s => s.completed || s.status === 'Done')?.length || 0;
+    const progress = subtaskCount > 0 ? (completedSubtasks / subtaskCount) * 100 : 0;
 
   return (
     <GridTaskCard onClick={() => onTaskClick(task)}>
@@ -47,7 +53,7 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
         </Tag>
         <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
           {task.links && task.links.length > 0 && (
-            <LinkIcon sx={{ fontSize: 16, color: 'primary.main' }} titleAccess={`${task.links.length} links`} />
+            <LinkIcon sx={{ fontSize: 16, color: taskColor }} titleAccess={`${task.links.length} links`} />
           )}
           <IconButton size="small" sx={{ color: 'text.secondary', p: 0 }}>
             <MoreHorizIcon />
@@ -80,8 +86,7 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
             overflow: 'hidden',
           }}
         >
-          {/* Description placeholder if not in task object, using title for now or empty */}
-          Manage consistency across mobile and web dashboards...
+          {task.notes_encrypted?.replace(/\[COLOR:(.*?)\]/g, '').trim() || 'No description provided.'}
         </Typography>
       </Box>
 
@@ -91,12 +96,7 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
             <FlagIcon
               sx={{
                 fontSize: 14,
-                color:
-                  task.priority_level === 3
-                    ? 'error.main'
-                    : task.priority_level === 2
-                      ? '#f59e0b'
-                      : '#3b82f6',
+                color: taskColor,
               }}
             />
             <Typography variant="caption" sx={{ color: 'text.primary', fontWeight: 600 }}>
@@ -135,7 +135,7 @@ export const GridViewTask = ({ task, onTaskClick }: GridViewTaskProps) => {
               borderRadius: 2,
               bgcolor: 'action.hover',
               '& .MuiLinearProgress-bar': {
-                bgcolor: '#3b82f6',
+                bgcolor: taskColor,
                 borderRadius: 2,
               },
             }}

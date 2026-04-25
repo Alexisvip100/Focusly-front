@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import type { MouseEvent } from 'react';
 import { Box, Typography } from '@mui/material';
 import {
@@ -59,10 +60,20 @@ export const SearchPalette = ({
   handleSelectTask,
   setValue,
 }: SearchPaletteProps) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  const handleBlur = (e: React.FocusEvent) => {
+    // If the new focus target is inside the palette, don't close it
+    if (containerRef.current?.contains(e.relatedTarget as Node)) {
+      return;
+    }
+    setShowPalette(false);
+  };
+
   return (
     <Box sx={{ width: '100%', maxWidth: '600px', position: 'relative' }}>
       {showPalette ? (
-        <CommandPaletteContainer>
+        <CommandPaletteContainer ref={containerRef} onBlur={handleBlur} tabIndex={-1}>
           <CommandInputWrapper>
             <SearchIcon sx={{ color: 'info.main', fontSize: 20 }} />
             <CommandInput
@@ -77,7 +88,6 @@ export const SearchPalette = ({
                   : searchTerm
               }
               onChange={(e) => setSearchTerm(e.target.value)}
-              onBlur={() => setTimeout(() => setShowPalette(false), 200)}
               readOnly={!!selectTask}
             />
           </CommandInputWrapper>
@@ -89,12 +99,14 @@ export const SearchPalette = ({
             <CustomTabsContainer>
               <CustomTabButton
                 active={filterTab === 'TASKS'}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setFilterTab('TASKS')}
               >
                 TASKS
               </CustomTabButton>
               <CustomTabButton
                 active={filterTab === 'SUBTASKS'}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => setFilterTab('SUBTASKS')}
               >
                 SUBTASKS
@@ -131,10 +143,15 @@ export const SearchPalette = ({
                     <TaskItemContainer
                       active={isSelected}
                       onClick={() => {
-                        handleSelectTask(task, null);
-                        setValue('taskId', task.id);
-                        setValue('title', task.title);
-                        setShowPalette(false);
+                        if (isSelected) {
+                          handleSelectTask(null, null);
+                          setValue('taskId', undefined);
+                        } else {
+                          handleSelectTask(task, null);
+                          setValue('taskId', task.id);
+                          setValue('title', task.title);
+                          setShowPalette(false);
+                        }
                       }}
                     >
                       <Box
@@ -170,10 +187,15 @@ export const SearchPalette = ({
                           key={`${task.id}-sub-${index}`}
                           onClick={(e: MouseEvent<HTMLDivElement>) => {
                             e.stopPropagation();
-                            handleSelectTask(task, index);
-                            setValue('taskId', task.id);
-                            setValue('title', subtask.title);
-                            setShowPalette(false);
+                            if (isSubtaskSelected) {
+                              handleSelectTask(null, null);
+                              setValue('taskId', undefined);
+                            } else {
+                              handleSelectTask(task, index);
+                              setValue('taskId', task.id);
+                              setValue('title', subtask.title);
+                              setShowPalette(false);
+                            }
                           }}
                           sx={{
                             backgroundColor: isSubtaskSelected
@@ -265,7 +287,9 @@ export const SearchPalette = ({
                 to link selection
               </Typography>
             </Box>
-            <AddTaskButton>+ Create New Parent Task</AddTaskButton>
+            <AddTaskButton onMouseDown={(e) => e.preventDefault()}>
+              + Create New Parent Task
+            </AddTaskButton>
           </PaletteFooter>
         </CommandPaletteContainer>
       ) : selectTask ? (

@@ -68,13 +68,14 @@ export const useCalendarContextMenu = () => {
         const newTask = mapResponseToTask(data.createTask);
         dispatch(upsertTask(newTask));
         sileo.success({ 
-            title: 'Task duplicated',
-            fill: '#ecfdf5ff'
+          title: 'Task duplicated', 
+          fill: 'var(--sileo-success-bg)',
+          duration: 3000 
         });
       }
     } catch (error) {
       console.error('Failed to duplicate task:', error);
-      sileo.error({ title: 'Failed to duplicate task' });
+      sileo.error({ title: 'Failed to duplicate task', fill: 'var(--sileo-error-bg)', });
     }
   };
 
@@ -95,13 +96,14 @@ export const useCalendarContextMenu = () => {
         const updatedTask = mapResponseToTask(data.updateTask);
         dispatch(upsertTask(updatedTask));
         sileo.success({ 
-            title: 'Priority updated',
-            fill: '#ecfdf5ff'
+          title: `Priority updated to ${priorityLevel}`, 
+          fill: 'var(--sileo-update-bg)',
+          duration: 3000 
         });
       }
     } catch (error) {
       console.error('Failed to update priority:', error);
-      sileo.error({ title: 'Failed to update priority' });
+      sileo.error({ title: 'Failed to update priority', fill: 'var(--sileo-error-bg)', });
     }
   };
 
@@ -118,12 +120,13 @@ export const useCalendarContextMenu = () => {
       });
       dispatch(removeTask({ id: taskId }));
       sileo.success({ 
-          title: 'Task deleted',
-          fill: 'rgba(239, 68, 68, 0.9)'
+        title: 'Task deleted', 
+        fill: 'var(--sileo-delete-bg)',
+        duration: 3000 
       });
     } catch (error) {
       console.error('Failed to delete task:', error);
-      sileo.error({ title: 'Failed to delete task' });
+      sileo.error({ title: 'Failed to delete task', fill: 'var(--sileo-error-bg)', });
     }
   };
 
@@ -132,12 +135,13 @@ export const useCalendarContextMenu = () => {
       await deleteGoogleEvent(eventId);
       dispatch(removeEvent({ id: eventId }));
       sileo.success({ 
-          title: 'Event deleted',
-          fill: 'rgba(239, 68, 68, 0.9)'
+        title: 'Event deleted', 
+        fill: 'var(--sileo-delete-bg)',
+        duration: 3000 
       });
     } catch (error) {
       console.error('Failed to delete Google event:', error);
-      sileo.error({ title: 'Failed to delete event' });
+      sileo.error({ title: 'Failed to delete event', fill: 'var(--sileo-error-bg)', });
     }
   };
 

@@ -24,6 +24,7 @@ export const WorkspaceEditor = ({
   watch,
   selectTask,
   handleSelectTask,
+  handleUpdateTask,
   tasksData,
   selectedSubtaskIndex,
   onStartFocus,
@@ -132,6 +133,7 @@ export const WorkspaceEditor = ({
         setIsRightSidebarOpen={setIsRightSidebarOpen}
         selectedSubtaskIndex={selectedSubtaskIndex}
         selectTask={selectTask}
+        handleUpdateTask={handleUpdateTask}
         onOpenTaskDetails={onOpenTaskDetails}
         onStartFocus={onStartFocus}
       />

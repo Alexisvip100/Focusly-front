@@ -2,13 +2,15 @@ import { useCallback, useMemo, useEffect, useRef } from 'react';
 import { useMutation } from '@apollo/client';
 import { useForm, useWatch } from 'react-hook-form';
 import debounce from 'lodash.debounce';
-import { CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../workspaces.graphql';
+import { GET_WORKSPACES, CREATE_WORKSPACE, UPDATE_WORKSPACE } from '../workspaces.graphql';
 import type { WorkspaceFormData } from '../types/workspace.types';
 import { DEFAULT_WORKSPACE_DATA } from '@/utils';
 import { sileo } from 'sileo';
 
 export const useWorkspaceForm = () => {
-  const [createWorkspace] = useMutation(CREATE_WORKSPACE);
+  const [createWorkspace] = useMutation(CREATE_WORKSPACE, {
+    refetchQueries: [{ query: GET_WORKSPACES, variables: { search: '' } }],
+  });
   const [updateWorkspace] = useMutation(UPDATE_WORKSPACE);
 
   const { register, watch, setValue, getValues, reset, control } = useForm<WorkspaceFormData>({
@@ -55,9 +57,9 @@ export const useWorkspaceForm = () => {
       };
 
       await sileo.promise(savePromise(), {
-        loading: { title: 'Saving...', fill: '#e9e9e9ff' },
-        success: { title: 'Saved!', fill: '#e9e9e9ff' },
-        error: { title: 'Error saving', fill: '#e9e9e9ff' },
+        loading: { title: 'Saving...', fill: 'var(--sileo-update-bg)', },
+        success: { title: 'Saved!', fill: 'var(--sileo-success-bg)', },
+        error: { title: 'Error saving', fill: 'var(--sileo-error-bg)', },
       });
     },
     [createWorkspace, updateWorkspace, setValue]

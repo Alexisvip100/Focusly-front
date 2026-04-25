@@ -47,6 +47,7 @@ export interface WorkspaceEditorProps {
   getValues: UseFormGetValues<WorkspaceFormData>;
   selectTask: TaskSearchItems | null;
   handleSelectTask: (task: TaskSearchItems | null, subtaskIndex?: number | null) => void;
+  handleUpdateTask: (taskId: string, updates: Partial<TaskSearchItems>) => Promise<void>;
   tasksData: { tasks: TaskSearchItems[] } | undefined;
   selectedSubtaskIndex: number | null;
   onStartFocus?: (task?: TaskSearchItems | null, subtaskIndex?: number | null) => void;

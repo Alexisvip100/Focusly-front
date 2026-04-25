@@ -8,6 +8,7 @@ export type DateRangeFilter = 'today' | 'last7' | 'last30' | 'all';
 export const useTasksFilters = (tasks: TaskResponse[]) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [activeFilters, setActiveFilters] = useState<TaskFilterInput | undefined>(undefined);
+  const [activeFilterState, setActiveFilterState] = useState<FilterState | undefined>(undefined);
   const [activeSort, setActiveSort] = useState<TaskSortInput | undefined>(undefined);
   const [isCompletedFilterActive, setIsCompletedFilterActive] = useState(false);
   const [dateRange, setDateRange] = useState<DateRangeFilter>(() => {
@@ -137,8 +138,10 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
 
     if (!mappedStatus && mappedPriority === undefined && !mappedCategory) {
       setActiveFilters(undefined);
+      setActiveFilterState(undefined);
     } else {
       setActiveFilters(newFilterInput);
+      setActiveFilterState(filters);
     }
   };
 
@@ -146,6 +149,7 @@ export const useTasksFilters = (tasks: TaskResponse[]) => {
     searchTerm,
     setSearchTerm,
     activeFilters,
+    activeFilterState,
     activeSort,
     isCompletedFilterActive,
     setIsCompletedFilterActive,

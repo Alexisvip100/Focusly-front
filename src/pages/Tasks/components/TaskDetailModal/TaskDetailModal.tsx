@@ -4,10 +4,12 @@ import {
   DialogContent,
   Box,
   TextField,
+  Slide,
 } from '@mui/material';
+import type { TransitionProps } from '@mui/material/transitions';
+import React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-import { sileo } from 'sileo';
 import type { TaskDetailModalProps } from './types/TaskDetailModal.types';
 import type { Task } from '@/redux/tasks/task.types';
 import {
@@ -17,7 +19,6 @@ import {
   titleInputPropsSx,
 } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.styles';
 import { useTaskDetailModal } from './hooks/useTaskDetailModal.hooks';
-import { getTimerSuggestions } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 
 // Sub-components
 import { Collaborators } from './components/Collaborators/Collaborators';
@@ -26,6 +27,17 @@ import { TaskHeader } from './components/TaskHeader/TaskHeader';
 import { TaskResources } from './components/TaskResources/TaskResources';
 import { TaskDescription } from './components/TaskDescription/TaskDescription';
 import { TaskActions } from './components/TaskActions/TaskActions';
+
+import { TaskWorkspaces } from './components/TaskWorkspaces/TaskWorkspaces';
+
+const Transition = React.forwardRef(function Transition(
+  props: TransitionProps & {
+    children: React.ReactElement<any, any>;
+  },
+  ref: React.Ref<unknown>,
+) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export const TaskDetailModal = ({
   open,
@@ -58,9 +70,12 @@ export const TaskDetailModal = ({
     newLinkTitle, setNewLinkTitle,
     newLinkUrl, setNewLinkUrl,
     isAddingLink, setIsAddingLink,
-    shouldGenerateMeet, setShouldGenerateMeet,
-    generateMeetLinkNow,
     collaborators, handleAddCollaborator,
+    isGeneratingMeet,
+    handleGenerateMeet,
+    handleTimerChange,
+    hasMeetLink,
+    createURLWorkSpace,
   } = useTaskDetailModal({
     onSave,
     onClose,
@@ -72,59 +87,17 @@ export const TaskDetailModal = ({
   });
 
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
   const [isLinksExpanded, setIsLinksExpanded] = useState(true);
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
   
   const isPureGoogleTask = initialTask?.task_type === 'GoogleTask';
-
-  const handleTimerChange = (
-    value: string,
-    setter: (v: string) => void,
-    setSuggestions: (s: string[]) => void,
-    setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement
-  ) => {
-    setter(value);
-    const suggestions = getTimerSuggestions(value);
-    setSuggestions(suggestions);
-    setAnchor(suggestions.length > 0 ? target : null);
-  };
-
-  const handleGenerateMeet = async () => {
-    setIsGeneratingMeet(true);
-    try {
-      const meetUrl = await generateMeetLinkNow(undefined, {
-        title,
-        description,
-        deadline: currentDate ?? undefined,
-        duration,
-      });
-      if (meetUrl) {
-        handleAddLink('Google Meet', meetUrl);
-        setShouldGenerateMeet(true);
-        sileo.success({ title: 'Google Meet link generated!', description: 'Link added to resources.', fill: '#ecfdf5' });
-      } else {
-        sileo.error({ title: 'Could not generate Meet link', description: 'Make sure you are signed in with Google.', fill: '#fef2f2' });
-      }
-    } catch {
-      sileo.error({ title: 'Error generating Meet link', fill: '#fef2f2' });
-    } finally {
-      setIsGeneratingMeet(false);
-    }
-  };
-
-  const hasMeetLink = shouldGenerateMeet || links.some(l => 
-    l.url.includes('meet.google.com') || 
-    l.title.toLowerCase().includes('google meet') || 
-    l.url.includes('hangouts')
-  );
 
   return (
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <Dialog
         open={open}
         onClose={onClose}
+        TransitionComponent={Transition}
         fullWidth
         maxWidth={false}
         slotProps={{
@@ -203,6 +176,11 @@ export const TaskDetailModal = ({
           <Collaborators
             collaborators={collaborators}
             handleAddCollaborator={handleAddCollaborator}
+          />
+
+          <TaskWorkspaces 
+            workspaces={initialTask?.workspaces}
+            onNavigate={createURLWorkSpace}
           />
 
           <TaskDescription

@@ -1,7 +1,6 @@
 import React, { useEffect } from 'react';
 import { Typography, useTheme } from '@mui/material';
 import CheckIcon from '@mui/icons-material/Check';
-import FreeBreakfastIcon from '@mui/icons-material/FreeBreakfast';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 import type { Task } from '@/redux/tasks/task.types';
@@ -12,7 +11,6 @@ import {
   StatsContainer,
   StatCard,
   ActionButtonsContainer,
-  BreakButton,
   NextTaskButton,
 } from '../FocusMode.styles';
 
@@ -35,7 +33,6 @@ const formatHumanDuration = (minutes?: number) => {
 
 export const CompletesSessionModal: React.FC<CompletesSessionModalProps> = ({
   activeTask,
-  todaysTasks,
   onClose,
 }) => {
   const theme = useTheme();
@@ -72,26 +69,26 @@ export const CompletesSessionModal: React.FC<CompletesSessionModalProps> = ({
 
       <StatsContainer>
         <StatCard>
-          <Typography className="label">Time Spent</Typography>
+          <Typography className="label">Estimated Time</Typography>
           <Typography className="value">
             {formatHumanDuration(activeTask?.estimate_timer)}
           </Typography>
         </StatCard>
         <StatCard>
-          <Typography className="label">Daily Goal</Typography>
+          <Typography className="label">Real Time</Typography>
           <Typography className="value">
-            {todaysTasks.filter((t) => t.status === 'Done').length + 1}/{todaysTasks.length}{' '}
-            <span className="sub">tasks done</span>
+            {formatHumanDuration(Number(activeTask?.real_timer || activeTask?.duration || 0))}
           </Typography>
         </StatCard>
       </StatsContainer>
 
-      <ActionButtonsContainer>
-        <BreakButton startIcon={<FreeBreakfastIcon />}>Take a 5m Break</BreakButton>
-        <NextTaskButton endIcon={<ArrowForwardIcon />} onClick={onClose}>
-          Next Task:{' '}
-          {todaysTasks.find((t) => t.status !== 'Done' && t.id !== activeTask?.id)?.title ||
-            'No more tasks'}
+      <ActionButtonsContainer sx={{ display: 'flex', justifyContent: 'center' }}>
+        <NextTaskButton 
+          endIcon={<ArrowForwardIcon />} 
+          onClick={onClose}
+          sx={{ width: 'auto', px: 4 }}
+        >
+          Finish & Exit to Workspace
         </NextTaskButton>
       </ActionButtonsContainer>
     </CompletionContainer>

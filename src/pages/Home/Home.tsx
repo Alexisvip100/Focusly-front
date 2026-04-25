@@ -141,7 +141,7 @@ export const Home = () => {
         />
       )}
 
-      <OnboardingTour />
+      <OnboardingTour activeTab={activeTab} onTabChange={changeStatusTab} />
     </>
   );
 };

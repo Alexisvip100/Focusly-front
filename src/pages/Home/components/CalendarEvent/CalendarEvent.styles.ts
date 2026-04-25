@@ -18,6 +18,16 @@ export const getEventColor = (
   if (event.type === 'event') return GOOGLE_EVENT_COLOR;
 
   const task = event.resource as Task | undefined;
+  
+  // 1. Check for custom color tag in notes
+  if (task?.notes_encrypted) {
+    const colorMatch = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
+    if (colorMatch && colorMatch[1]) {
+      return { main: colorMatch[1] };
+    }
+  }
+
+  // 2. Fallback to priority color
   if (task?.priority_level) {
     return PRIORITY_COLORS[task.priority_level] || DEFAULT_COLOR;
   }

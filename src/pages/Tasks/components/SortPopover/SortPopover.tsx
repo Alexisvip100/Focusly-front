@@ -15,6 +15,7 @@ interface SortPopoverProps {
     onClose: () => void;
     onApply?: (sort: SortState) => void;
     onClear?: () => void;
+    activeSort?: SortState;
 }
 
 export interface SortState {
@@ -27,9 +28,19 @@ export interface TaskSortInput {
     order?: string;
 }
 
-export const SortPopover = ({ open, anchorEl, onClose, onApply, onClear }: SortPopoverProps) => {
-    const [selectedSort, setSelectedSort] = useState<string | undefined>(undefined);
-    const [selectedOrder, setSelectedOrder] = useState<string | undefined>(undefined);
+export const SortPopover = ({ open, anchorEl, onClose, onApply, onClear, activeSort }: SortPopoverProps) => {
+    const [selectedSort, setSelectedSort] = useState<string | undefined>(activeSort?.sort);
+    const [selectedOrder, setSelectedOrder] = useState<string | undefined>(activeSort?.order);
+
+    const [prevOpen, setPrevOpen] = useState(open);
+
+    if (open && !prevOpen) {
+        setPrevOpen(true);
+        setSelectedSort(activeSort?.sort);
+        setSelectedOrder(activeSort?.order);
+    } else if (!open && prevOpen) {
+        setPrevOpen(false);
+    }
 
     const handleSelect = (sort: string, order: string) => {
         if (selectedSort === sort && selectedOrder === order) {

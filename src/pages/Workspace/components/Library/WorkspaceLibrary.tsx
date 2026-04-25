@@ -127,9 +127,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
         },
       });
       sileo.success({
-        title: 'Success',
+        title: 'Workspace moved',
         description: folderId ? 'Workspace moved to folder' : 'Workspace moved to All Notes',
-        fill: '#ecfdf5ff', // Light Green
+        fill: 'var(--sileo-success-bg)',
         duration: 3000,
       });
     } catch (err) {
@@ -179,9 +179,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       setIsFolderModalOpen(false);
 
       sileo.success({
-        title: 'Save successfully folder',
+        title: 'Folder created',
         description: `Folder "${name}" has been created.`,
-        fill: '#e9e9e9ff',
+        fill: 'var(--sileo-success-bg)',
         duration: 4000,
       });
     } catch (err) {
@@ -198,10 +198,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       });
 
       sileo.success({
-        title: 'Folder updated',
-        description: `Folder "${name}" has been updated.`,
-        fill: '#e9e9e9ff',
-        duration: 4000,
+        title: 'Workspace updated',
+        description: 'Changes saved successfully',
+        fill: 'var(--sileo-update-bg)',
+        duration: 3000,
       });
     } catch (err) {
       console.error('Error updating folder:', err);
@@ -222,7 +222,7 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       sileo.success({
         title: 'Folder deleted',
         description: 'Folder has been removed. All workspaces were moved to All Notes.',
-        fill: '#e9e9e9ff',
+        fill: 'var(--sileo-delete-bg)',
         duration: 4000,
       });
     } catch (err) {
@@ -261,7 +261,7 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
           <HeaderSubtitle>Manage your strategic documents and brain dumps.</HeaderSubtitle>
         </Box>
         <Box display="flex" alignItems="center">
-          <SearchBar>
+          <SearchBar id="joyride-workspace-search">
             <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
             <input
               placeholder={searchMode === 'workspace' ? 'Search workspaces...' : 'Search folders...'}
@@ -304,7 +304,7 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
         </Box>
       </LibraryHeader>
 
-      <FolderSection>
+      <FolderSection id="joyride-workspace-folders">
         <FolderSectionHeader>
           <FolderIcon sx={{ fontSize: 16 }} />
           <Typography>FOLDERS</Typography>
@@ -491,7 +491,7 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
           )}
 
           {workspaces.length > 0 && (
-            <CreateCard onClick={onCreate}>
+            <CreateCard id="joyride-workspace-create-note" onClick={onCreate}>
               <Box
                 sx={{
                   width: 48,
@@ -674,6 +674,33 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                               alignItems: 'center',
                               justifyContent: 'center',
                               mr: 1.5,
+                              cursor: 'pointer',
+                              '&:hover': {
+                                color: 'error.main',
+                                transform: 'scale(1.1)',
+                              },
+                              transition: 'all 0.2s',
+                            }}
+                            onClick={async (e) => {
+                              e.stopPropagation();
+                              try {
+                                await updateWorkspace({
+                                  variables: {
+                                    updateWorkspaceInput: {
+                                      id: workspace.id,
+                                      taskId: null,
+                                    },
+                                  },
+                                });
+                                sileo.success({
+                                  title: 'Task unlinked',
+                                  description: 'The task association has been removed.',
+                                  fill: 'var(--sileo-update-bg)',
+                                  duration: 3000,
+                                });
+                              } catch (err) {
+                                console.error('Error unlinking task:', err);
+                              }
                             }}
                           >
                             <CheckBoxIcon sx={{ fontSize: 20 }} />

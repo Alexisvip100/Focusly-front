@@ -55,13 +55,20 @@ export const ListViewTask = ({
   handleOpenSubtaskModal,
   onTaskClick,
 }: ListViewTaskProps) => {
+    const taskColor = (() => {
+      if (task.notes_encrypted) {
+        const match = task.notes_encrypted.match(/\[COLOR:(.*?)\]/);
+        if (match && match[1]) return match[1];
+      }
+      return task.priority_level === 3 ? '#58a6ff' : task.priority_level === 2 ? '#d29922' : '#ff7b72';
+    })();
+
   return (
     <TaskCard
       onClick={() => onTaskClick(task)}
       sx={{
         borderLeft: '5px solid',
-        borderLeftColor:
-          task.priority_level === 3 ? '#58a6ff' : task.priority_level === 2 ? '#d29922' : '#ff7b72',
+        borderLeftColor: taskColor,
         cursor: 'pointer',
         transition: 'transform 0.2s',
         '&:hover': {

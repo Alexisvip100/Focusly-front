@@ -39,7 +39,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
   const chartPadding = activeSegments > 1 ? 4 : 0;
 
   return (
-    <ChartCard sx={{ height: 'auto', minHeight: '400px' }}>
+    <ChartCard>
       <Typography variant="h6" fontWeight="bold">
         Distribución de Tiempo
       </Typography>

@@ -4,6 +4,8 @@ import { useTaskFormState } from './useTaskFormState';
 import { useTaskCollections } from './useTaskCollections';
 import { useTaskMutations } from './useTaskMutations';
 import { useSearchParams } from 'react-router-dom';
+import { getTimerSuggestions } from '../TaskDetailModal.utils';
+import { sileo } from 'sileo';
 
 export const useTaskDetailModal = ({
   onSave,
@@ -181,6 +183,61 @@ export const useTaskDetailModal = ({
     }
   };
 
+  const [isGeneratingMeet, setIsGeneratingMeet] = useState(false);
+
+  const handleGenerateMeet = async () => {
+    setIsGeneratingMeet(true);
+    try {
+      const meetUrl = await mutationsWithReset.generateMeetLinkNow(undefined, {
+        title,
+        description,
+        deadline: currentDate ?? undefined,
+        duration,
+      });
+      if (meetUrl) {
+        handleAddLink('Google Meet', meetUrl);
+        setShouldGenerateMeet(true);
+        sileo.success({
+          title: 'Google Meet link generated!',
+          description: 'Link added to resources.',
+          fill: 'var(--sileo-success-bg)',
+        });
+      } else {
+        sileo.error({
+          title: 'Could not generate Meet link',
+          description: 'Make sure you are signed in with Google.',
+          fill: 'var(--sileo-error-bg)',
+        });
+      }
+    } catch {
+      sileo.error({
+        title: 'Error generating Meet link',
+        fill: 'var(--sileo-error-bg)',
+      });
+    } finally {
+      setIsGeneratingMeet(false);
+    }
+  };
+
+  const handleTimerChange = (
+    value: string,
+    setter: (v: string) => void,
+    setSuggestions: (s: string[]) => void,
+    setAnchor: (el: HTMLDivElement | null) => void,
+    target: HTMLDivElement
+  ) => {
+    setter(value);
+    const suggestions = getTimerSuggestions(value);
+    setSuggestions(suggestions);
+    setAnchor(suggestions.length > 0 ? target : null);
+  };
+
+  const hasMeetLink = shouldGenerateMeet || links.some(l => 
+    l.url.includes('meet.google.com') || 
+    l.title.toLowerCase().includes('google meet') || 
+    l.url.includes('hangouts')
+  );
+
   return {
     title, setTitle,
     description, setDescription,
@@ -221,6 +278,9 @@ export const useTaskDetailModal = ({
     createURLWorkSpace,
     shouldGenerateMeet,
     setShouldGenerateMeet,
-    generateMeetLinkNow: mutationsWithReset.generateMeetLinkNow,
+    isGeneratingMeet,
+    handleGenerateMeet,
+    handleTimerChange,
+    hasMeetLink,
   };
 };
