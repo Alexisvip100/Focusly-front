@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { useMutation } from '@apollo/client';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
-import { GET_WORKSPACES, REMOVE_WORKSPACE } from '@/pages/Workspace/workspaces.graphql';
+import {
+  GET_WORKSPACES,
+  REMOVE_WORKSPACE,
+} from '@/pages/Workspace/workspaces.graphql';
 import {
   CREATE_TASK,
   UPDATE_TASK,
@@ -10,10 +13,23 @@ import {
   GET_TASKS,
 } from '../tasks.graphql';
 import { sileo } from 'sileo';
-import { createGoogleEvent, updateGoogleEvent, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+import {
+  createGoogleEvent,
+  updateGoogleEvent,
+  deleteGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
 import { removeTask } from '@/redux/tasks/task.slice';
-import { deduplicateLinks, parseDuration, parseRealTime, getPriorityLevel } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
-import type { TaskData, TaskInput, UseTaskMutationsProps } from '../types/TaskDetailModal.types';
+import {
+  deduplicateLinks,
+  parseDuration,
+  parseRealTime,
+  getPriorityLevel,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import type {
+  TaskData,
+  TaskInput,
+  UseTaskMutationsProps,
+} from '../types/TaskDetailModal.types';
 import type { PriorityType } from '../TaskDetailModal.utils';
 import type { Task } from '@/redux/tasks/task.types';
 
@@ -38,7 +54,7 @@ export const useTaskMutations = ({
 
   const generateMeetLinkNow = async (
     googleEventId?: string,
-    state?: Partial<TaskData & { color: string }>
+    state?: Partial<TaskData & { color: string }>,
   ) => {
     try {
       if (googleEventId) {
@@ -55,13 +71,14 @@ export const useTaskMutations = ({
         const tempEvent = await createGoogleEvent({
           summary: state?.title || 'Focusly Meeting',
           description: state?.description || '',
-          start: { 
-            dateTime: state?.deadline?.toISOString() || new Date().toISOString() 
+          start: {
+            dateTime:
+              state?.deadline?.toISOString() || new Date().toISOString(),
           },
           end: {
             dateTime: new Date(
-              (state?.deadline?.getTime() || Date.now()) + 
-              (parseDuration(state?.duration || '30m') || 30) * 60000
+              (state?.deadline?.getTime() || Date.now()) +
+                (parseDuration(state?.duration || '30m') || 30) * 60000,
             ).toISOString(),
           },
           conferenceData: {
@@ -71,7 +88,7 @@ export const useTaskMutations = ({
             },
           },
         });
-        
+
         const meetLink = tempEvent.hangoutLink || null;
         if (tempEvent.id) {
           try {
@@ -81,7 +98,7 @@ export const useTaskMutations = ({
             console.warn('Failed to delete dummy meet event immediately', e);
           }
         }
-        
+
         return meetLink;
       }
     } catch (error) {
@@ -90,7 +107,9 @@ export const useTaskMutations = ({
     }
   };
 
-  const handleSave = async (state: TaskData & { color: string; shouldGenerateMeet?: boolean }) => {
+  const handleSave = async (
+    state: TaskData & { color: string; shouldGenerateMeet?: boolean },
+  ) => {
     if (!user) return;
     setLoadingSave(true);
 
@@ -109,7 +128,9 @@ export const useTaskMutations = ({
       .replace(/\[START_DATE:(.*?)\]/g, '')
       .trim();
 
-    const links = deduplicateLinks(state.links || []).map((l: { title: string; url: string }) => ({ title: l.title, url: l.url }));
+    const links = deduplicateLinks(state.links || []).map(
+      (l: { title: string; url: string }) => ({ title: l.title, url: l.url }),
+    );
     if (meetLink) {
       links.push({ title: 'Google Meet', url: meetLink });
     }
@@ -120,7 +141,9 @@ export const useTaskMutations = ({
       estimate_timer: estimateTimer,
       real_timer: realTimer,
       tags: state.tags,
-      deadline: state.deadline ? state.deadline.toISOString() : new Date().toISOString(),
+      deadline: state.deadline
+        ? state.deadline.toISOString()
+        : new Date().toISOString(),
       priority_level: priorityLevel,
       category: state.category,
       links,
@@ -137,7 +160,9 @@ export const useTaskMutations = ({
           estimate_timer: estimateTimer,
           priority_level: priorityLevel,
           status: state.status || 'Backlog',
-          deadline: state.deadline ? state.deadline.toISOString() : new Date().toISOString(),
+          deadline: state.deadline
+            ? state.deadline.toISOString()
+            : new Date().toISOString(),
           category: state.category,
           links,
         };
@@ -147,10 +172,15 @@ export const useTaskMutations = ({
             taskId: parentTask.id,
             subtask: subtaskInput,
           },
-          refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user.id } },
+          ],
         });
         if (data?.addSubtask) {
-          sileo.success({ title: 'Subtask added', fill: 'var(--sileo-success-bg)', });
+          sileo.success({
+            title: 'Subtask added',
+            fill: 'var(--sileo-success-bg)',
+          });
           onSave(data.addSubtask);
           resetForm();
         }
@@ -165,7 +195,8 @@ export const useTaskMutations = ({
       ...commonInput,
       user_id: user.id || '',
       status: state.status || 'Backlog',
-      google_event_id: (initialTask as { google_event_id?: string })?.google_event_id,
+      google_event_id: (initialTask as { google_event_id?: string })
+        ?.google_event_id,
       subtasks: state.subtasks?.map((st) => ({
         title: st.title,
         completed: st.completed,
@@ -179,7 +210,10 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.createTask) {
-        sileo.success({ title: 'Task created', fill: 'var(--sileo-success-bg)', });
+        sileo.success({
+          title: 'Task created',
+          fill: 'var(--sileo-success-bg)',
+        });
         onSave(data.createTask);
         resetForm();
         onClose();
@@ -190,23 +224,42 @@ export const useTaskMutations = ({
     setLoadingSave(false);
   };
 
-  const handleUpdate = async (state: TaskData & { color: string; shouldGenerateMeet?: boolean }, shouldClose = true) => {
+  const handleUpdate = async (
+    state: TaskData & { color: string; shouldGenerateMeet?: boolean },
+    shouldClose = true,
+  ) => {
     if (!user || !initialTask?.id) return;
     setLoadingSave(true);
-    const estimateTimer = state.duration ? parseDuration(state.duration) : initialTask.estimate_timer || 0;
-    const priorityLevel = state.priority ? getPriorityLevel(state.priority as PriorityType) : initialTask.priority_level || 2;
-    const realTimer = (state.realTime !== undefined && state.realTime !== null) ? parseRealTime(state.realTime) : initialTask.real_timer || 0;
+    const estimateTimer = state.duration
+      ? parseDuration(state.duration)
+      : initialTask.estimate_timer || 0;
+    const priorityLevel = state.priority
+      ? getPriorityLevel(state.priority as PriorityType)
+      : initialTask.priority_level || 2;
+    const realTimer =
+      state.realTime !== undefined && state.realTime !== null
+        ? parseRealTime(state.realTime)
+        : initialTask.real_timer || 0;
 
     // 1. Handle Subtask Update (Special case for nested structure)
     if (parentTask && typeof subtaskIndex === 'number') {
       const updatedSubtasks = [...(parentTask.subtasks || [])].map((st, i) => {
-        const baseSubtask = typeof st === 'string' ? { title: st, completed: false, timer: 0 } : st;
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const { __typename, real_timer, tags, collaborators, ...cleanSt } = baseSubtask as any;
+        const baseSubtask =
+          typeof st === 'string'
+            ? { title: st, completed: false, timer: 0 }
+            : st;
+        const cleanSt = { ...(baseSubtask as Record<string, unknown>) };
+        delete cleanSt.__typename;
+        delete (cleanSt as Record<string, unknown>).real_timer;
+        delete (cleanSt as Record<string, unknown>).tags;
+        delete (cleanSt as Record<string, unknown>).collaborators;
 
         if (i !== subtaskIndex) return cleanSt;
 
-        const subtaskColor = state.color || (initialTask as { color?: string | undefined }).color || '#3b82f6';
+        const subtaskColor =
+          state.color ||
+          (initialTask as { color?: string | undefined }).color ||
+          '#3b82f6';
         return {
           title: state.title || initialTask.title,
           timer: estimateTimer || 0,
@@ -215,7 +268,10 @@ export const useTaskMutations = ({
           estimate_timer: estimateTimer,
           priority_level: priorityLevel,
           status: state.status,
-          deadline: state.deadline instanceof Date ? state.deadline.toISOString() : state.deadline || initialTask.deadline,
+          deadline:
+            state.deadline instanceof Date
+              ? state.deadline.toISOString()
+              : state.deadline || initialTask.deadline,
           category: state.category,
           links: state.links?.map((l) => ({ title: l.title, url: l.url })),
         };
@@ -223,8 +279,12 @@ export const useTaskMutations = ({
 
       try {
         const { data } = await updateTaskMutation({
-          variables: { updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks } },
-          refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
+          variables: {
+            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
+          },
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user.id } },
+          ],
         });
         if (data?.updateTask) {
           onSave(data.updateTask);
@@ -239,51 +299,110 @@ export const useTaskMutations = ({
     }
 
     // 2. Handle Task Update (Config-driven diffing)
-    const taskColor = state.color || (initialTask as { color?: string | undefined }).color || '#3b82f6';
-    const cleanDesc = (state.description || '').replace(/\[COLOR:(.*?)\]/g, '').replace(/\[START_DATE:(.*?)\]/g, '').trim();
+    const taskColor =
+      state.color ||
+      (initialTask as { color?: string | undefined }).color ||
+      '#3b82f6';
+    const cleanDesc = (state.description || '')
+      .replace(/\[COLOR:(.*?)\]/g, '')
+      .replace(/\[START_DATE:(.*?)\]/g, '')
+      .trim();
 
     const currentNotes = `${cleanDesc} [COLOR:${taskColor}]`;
-    const currentDeadline = state.deadline instanceof Date ? state.deadline.toISOString() : state.deadline || initialTask.deadline || '';
+    const currentDeadline =
+      state.deadline instanceof Date
+        ? state.deadline.toISOString()
+        : state.deadline || initialTask.deadline || '';
 
     // Define which fields to compare and how
-    const configs: Record<string, { key: string; val: unknown; initial: unknown; isEqual?: (a: any, b: any) => boolean }> = {
+    const configs: Record<
+      string,
+      {
+        key: string;
+        val: unknown;
+        initial: unknown;
+        isEqual?: (a: unknown, b: unknown) => boolean;
+      }
+    > = {
       title: { key: 'title', val: state.title, initial: initialTask.title },
-      notes: { key: 'notes_encrypted', val: currentNotes, initial: initialTask.notes_encrypted },
-      status: { key: 'status', val: state.status, initial: initialTask.status },
-      category: { key: 'category', val: state.category, initial: initialTask.category },
-      estimate: { key: 'estimate_timer', val: estimateTimer, initial: initialTask.estimate_timer },
-      realTime: { key: 'real_timer', val: realTimer, initial: initialTask.real_timer },
-      deadline: { key: 'deadline', val: currentDeadline, initial: initialTask.deadline },
-      priority: { key: 'priority_level', val: priorityLevel, initial: initialTask.priority_level },
-      googleId: { key: 'google_event_id', val: (state as TaskData).google_event_id || initialTask.google_event_id, initial: initialTask.google_event_id },
-      tags: { 
-        key: 'tags', 
-        val: state.tags || [], 
-        initial: initialTask.tags || [], 
-        isEqual: (a, b) => JSON.stringify([...a].sort()) === JSON.stringify([...b].sort()) 
+      notes: {
+        key: 'notes_encrypted',
+        val: currentNotes,
+        initial: initialTask.notes_encrypted,
       },
-      links: { 
-        key: 'links', 
-        val: deduplicateLinks(state.links || []).map((l) => ({ title: l.title, url: l.url })), 
-        initial: (initialTask.links || []).map((l) => ({ title: l.title, url: l.url })),
-        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b)
+      status: { key: 'status', val: state.status, initial: initialTask.status },
+      category: {
+        key: 'category',
+        val: state.category,
+        initial: initialTask.category,
+      },
+      estimate: {
+        key: 'estimate_timer',
+        val: estimateTimer,
+        initial: initialTask.estimate_timer,
+      },
+      realTime: {
+        key: 'real_timer',
+        val: realTimer,
+        initial: initialTask.real_timer,
+      },
+      deadline: {
+        key: 'deadline',
+        val: currentDeadline,
+        initial: initialTask.deadline,
+      },
+      priority: {
+        key: 'priority_level',
+        val: priorityLevel,
+        initial: initialTask.priority_level,
+      },
+      googleId: {
+        key: 'google_event_id',
+        val: (state as TaskData).google_event_id || initialTask.google_event_id,
+        initial: initialTask.google_event_id,
+      },
+      tags: {
+        key: 'tags',
+        val: state.tags || [],
+        initial: initialTask.tags || [],
+        isEqual: (a, b) =>
+          JSON.stringify([...a].sort()) === JSON.stringify([...b].sort()),
+      },
+      links: {
+        key: 'links',
+        val: deduplicateLinks(state.links || []).map((l) => ({
+          title: l.title,
+          url: l.url,
+        })),
+        initial: (initialTask.links || []).map((l) => ({
+          title: l.title,
+          url: l.url,
+        })),
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
       subtasks: {
         key: 'subtasks',
-        val: (state.subtasks || []).map(({ __typename, ...rest }: any) => rest),
-        initial: (initialTask.subtasks || []).map((st: any) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { __typename, ...rest } = (typeof st === 'string' ? { title: st, completed: false, timer: 0 } : st);
+        val: (state.subtasks || []).map((st: Record<string, unknown>) => {
+          const rest = { ...st };
+          delete rest.__typename;
           return rest;
         }),
-        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b)
+        initial: (initialTask.subtasks || []).map((st: unknown) => {
+          const rest =
+            typeof st === 'string'
+              ? { title: st, completed: false, timer: 0 }
+              : { ...(st as Record<string, unknown>) };
+          delete (rest as Record<string, unknown>).__typename;
+          return rest;
+        }),
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
       },
       collaborators: {
         key: 'collaborators',
         val: state.collaborators || [],
         initial: initialTask.collaborators || [],
-        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b)
-      }
+        isEqual: (a, b) => JSON.stringify(a) === JSON.stringify(b),
+      },
     };
 
     const updateInput: Record<string, unknown> = { id: initialTask.id };
@@ -309,7 +428,10 @@ export const useTaskMutations = ({
         refetchQueries: [{ query: GET_TASKS, variables: { userId: user.id } }],
       });
       if (data?.updateTask) {
-        sileo.success({ title: 'Task updated', fill: 'var(--sileo-update-bg)', });
+        sileo.success({
+          title: 'Task updated',
+          fill: 'var(--sileo-update-bg)',
+        });
         onSave(data.updateTask);
         if (shouldClose) onClose();
       }
@@ -321,23 +443,34 @@ export const useTaskMutations = ({
 
   const handleDelete = async () => {
     if (!initialTask?.id) return;
-    
+
     // 1. Handle Subtask Deletion
     if (parentTask && typeof subtaskIndex === 'number') {
-      const updatedSubtasks = [...(parentTask.subtasks || [])].filter((_, i) => i !== subtaskIndex)
+      const updatedSubtasks = [...(parentTask.subtasks || [])]
+        .filter((_, i) => i !== subtaskIndex)
         .map((st) => {
-          // eslint-disable-next-line @typescript-eslint/no-unused-vars
-          const { __typename, real_timer, tags, collaborators, ...cleanSt } = st as any;
+          const cleanSt = { ...(st as Record<string, unknown>) };
+          delete cleanSt.__typename;
+          delete (cleanSt as Record<string, unknown>).real_timer;
+          delete (cleanSt as Record<string, unknown>).tags;
+          delete (cleanSt as Record<string, unknown>).collaborators;
           return cleanSt;
         });
 
       try {
         const { data } = await updateTaskMutation({
-          variables: { updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks } },
-          refetchQueries: [{ query: GET_TASKS, variables: { userId: user?.id } }],
+          variables: {
+            updateTaskInput: { id: parentTask.id, subtasks: updatedSubtasks },
+          },
+          refetchQueries: [
+            { query: GET_TASKS, variables: { userId: user?.id } },
+          ],
         });
         if (data?.updateTask) {
-          sileo.success({ title: 'Subtask deleted', fill: 'var(--sileo-delete-bg)', });
+          sileo.success({
+            title: 'Subtask deleted',
+            fill: 'var(--sileo-delete-bg)',
+          });
           onSave(data.updateTask);
           onClose();
         }
@@ -354,7 +487,9 @@ export const useTaskMutations = ({
     }
 
     try {
-      const isGoogleTask = (initialTask as Task & { task_type?: string }).task_type === 'GoogleTask';
+      const isGoogleTask =
+        (initialTask as Task & { task_type?: string }).task_type ===
+        'GoogleTask';
 
       if (isGoogleTask) {
         // GoogleTask — delete via REST API directly
@@ -377,7 +512,6 @@ export const useTaskMutations = ({
       console.error(e);
     }
   };
-
 
   const handleRemoveWorkspace = async (workspaceId: string) => {
     try {
