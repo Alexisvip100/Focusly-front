@@ -16,7 +16,7 @@ export const OnboardingWrapper = ({
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as string)) {
+    if (([STATUS.FINISHED, STATUS.SKIPPED] as string[]).includes(status)) {
       if (onFinish) onFinish();
     }
   };
