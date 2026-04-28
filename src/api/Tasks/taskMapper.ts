@@ -92,11 +92,13 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       };
     }),
     links: t.links || [],
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    task_type: (t as any).task_type || 'PlatformTask',
+    task_type:
+      ((t as unknown as Record<string, unknown>).task_type as string) ||
+      'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    source: (t as any).source || 'platform',
+    source:
+      ((t as unknown as Record<string, unknown>).source as string) ||
+      'platform',
     collaborators: (t.collaborators || []).map((c) => ({
       ...c,
       name: c.name || '',
