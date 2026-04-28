@@ -366,7 +366,8 @@ export const useTaskMutations = ({
         val: state.tags || [],
         initial: initialTask.tags || [],
         isEqual: (a, b) =>
-          JSON.stringify([...a].sort()) === JSON.stringify([...b].sort()),
+          JSON.stringify([...(a as unknown[])].sort()) ===
+          JSON.stringify([...(b as unknown[])].sort()),
       },
       links: {
         key: 'links',
