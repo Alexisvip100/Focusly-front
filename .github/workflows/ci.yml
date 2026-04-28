@@ -44,6 +44,13 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v4
 
+      - name: Use Node.js 22.x
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22.x
+
+      - name: Enable Corepack
+        run: corepack enable
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
