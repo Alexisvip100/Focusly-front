@@ -1,12 +1,12 @@
-import { 
-  Box, 
-  Typography, 
-  IconButton, 
+import {
+  Box,
+  Typography,
+  IconButton,
   Divider,
   Menu,
   MenuItem,
   alpha,
-  useTheme
+  useTheme,
 } from '@mui/material';
 import {
   ChevronRight,
@@ -49,9 +49,13 @@ interface EditorSidebarProps {
   setIsRightSidebarOpen: (b: boolean) => void;
   selectedSubtaskIndex: number | null;
   selectTask: TaskSearchItems | null;
-  handleUpdateTask?: (taskId: string, updates: Partial<TaskSearchItems>) => Promise<void>;
-  onOpenTaskDetails?: (task: any, mode?: any) => void;
-  onStartFocus?: (task: any, subtaskIndex: number | null) => void;
+  handleUpdateTask?: (
+    taskId: string,
+    updates: Partial<TaskSearchItems>,
+  ) => Promise<void>;
+  onOpenTaskDetails?: (task: TaskSearchItems, mode?: string) => void;
+  onStartFocus?: (task: TaskSearchItems, subtaskIndex: number | null) => void;
+  activeFocusTaskId?: string | null;
 }
 
 export const EditorSidebar = ({
@@ -62,9 +66,12 @@ export const EditorSidebar = ({
   handleUpdateTask,
   onOpenTaskDetails,
   onStartFocus,
+  activeFocusTaskId,
 }: EditorSidebarProps) => {
   const theme = useTheme();
-  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
+    null,
+  );
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
 
   const getPriorityColor = (level: number) => {
@@ -129,21 +136,31 @@ export const EditorSidebar = ({
     await handleStatusSelect('Done');
   };
 
-  const currentStatus = selectedSubtaskIndex !== null
-    ? selectTask?.subtasks?.[selectedSubtaskIndex]?.status || (selectTask?.subtasks?.[selectedSubtaskIndex]?.completed ? 'Done' : 'Todo')
-    : selectTask?.status || 'Todo';
+  const currentStatus =
+    selectedSubtaskIndex !== null
+      ? selectTask?.subtasks?.[selectedSubtaskIndex]?.status ||
+        (selectTask?.subtasks?.[selectedSubtaskIndex]?.completed
+          ? 'Done'
+          : 'Todo')
+      : selectTask?.status || 'Todo';
 
-  const currentPriorityLevel = selectedSubtaskIndex !== null
-    ? selectTask?.subtasks?.[selectedSubtaskIndex]?.priority_level ?? 0
-    : selectTask?.priority_level ?? 0;
+  const currentPriorityLevel =
+    selectedSubtaskIndex !== null
+      ? (selectTask?.subtasks?.[selectedSubtaskIndex]?.priority_level ?? 0)
+      : (selectTask?.priority_level ?? 0);
 
   const cleanDescription = (desc?: string) => {
     if (!desc) return 'No description provided.';
-    return desc
-      .replace(/\[COLOR:(.*?)\]/g, '')
-      .replace(/\[START_DATE:(.*?)\]/g, '')
-      .replace(/https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g, '')
-      .trim() || 'No description provided.';
+    return (
+      desc
+        .replace(/\[COLOR:(.*?)\]/g, '')
+        .replace(/\[START_DATE:(.*?)\]/g, '')
+        .replace(
+          /https?:\/\/(www\.)?(calendar\.google\.com|google\.com\/calendar|meet\.google\.com)[^\s]*/g,
+          '',
+        )
+        .trim() || 'No description provided.'
+    );
   };
 
   return (
@@ -181,14 +198,21 @@ export const EditorSidebar = ({
         <>
           <SidebarHeader sx={{ mb: 0 }}>
             <SectionTitle sx={{ mt: 0 }}>
-              {selectedSubtaskIndex !== null ? 'SUBTASK METADATA' : 'TASK METADATA'}
+              {selectedSubtaskIndex !== null
+                ? 'SUBTASK METADATA'
+                : 'TASK METADATA'}
             </SectionTitle>
           </SidebarHeader>
 
           <MetadataSection>
             {selectTask ? (
               <>
-                <Box display="flex" justifyContent="space-between" mb={3} alignItems="center">
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  mb={3}
+                  alignItems="center"
+                >
                   <MetaLabel>Priority</MetaLabel>
                   <Box
                     onClick={handlePriorityClick}
@@ -203,9 +227,14 @@ export const EditorSidebar = ({
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                       '&:hover': {
-                        backgroundColor: alpha(getPriorityColor(Number(currentPriorityLevel)), 0.1),
-                        borderColor: getPriorityColor(Number(currentPriorityLevel)),
-                      }
+                        backgroundColor: alpha(
+                          getPriorityColor(Number(currentPriorityLevel)),
+                          0.1,
+                        ),
+                        borderColor: getPriorityColor(
+                          Number(currentPriorityLevel),
+                        ),
+                      },
                     }}
                   >
                     <FlagIcon
@@ -226,7 +255,12 @@ export const EditorSidebar = ({
                   </Box>
                 </Box>
 
-                <Box display="flex" justifyContent="space-between" mb={3} alignItems="center">
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  mb={3}
+                  alignItems="center"
+                >
                   <MetaLabel>Status</MetaLabel>
                   <Box
                     onClick={handleStatusClick}
@@ -241,21 +275,32 @@ export const EditorSidebar = ({
                       cursor: 'pointer',
                       transition: 'all 0.2s',
                       '&:hover': {
-                        backgroundColor: alpha(getStatusColor(currentStatus), 0.1),
+                        backgroundColor: alpha(
+                          getStatusColor(currentStatus),
+                          0.1,
+                        ),
                         borderColor: getStatusColor(currentStatus),
-                      }
+                      },
                     }}
                   >
                     {currentStatus === 'Done' ? (
-                      <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />
+                      <CheckCircleIcon
+                        sx={{ fontSize: 16, color: 'success.main' }}
+                      />
                     ) : currentStatus === 'Pending' ? (
-                      <PauseCircleIcon sx={{ fontSize: 16, color: 'warning.main' }} />
+                      <PauseCircleIcon
+                        sx={{ fontSize: 16, color: 'warning.main' }}
+                      />
                     ) : currentStatus === 'Planning' ? (
                       <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
                     ) : currentStatus === 'Backlog' ? (
-                      <HistoryIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                      <HistoryIcon
+                        sx={{ fontSize: 16, color: 'secondary.main' }}
+                      />
                     ) : (
-                      <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                      <RadioButtonUncheckedIcon
+                        sx={{ fontSize: 16, color: 'info.main' }}
+                      />
                     )}
 
                     <Typography
@@ -270,12 +315,19 @@ export const EditorSidebar = ({
                   </Box>
                 </Box>
 
-                <Box display="flex" justifyContent="space-between" mb={3} alignItems="center">
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  mb={3}
+                  alignItems="center"
+                >
                   <MetaLabel>Estimated Time</MetaLabel>
                   <MetaValue sx={{ fontWeight: 600, color: 'text.primary' }}>
                     {selectedSubtaskIndex !== null
                       ? selectTask?.subtasks?.[selectedSubtaskIndex]?.timer
-                        ? formatDuration(selectTask.subtasks[selectedSubtaskIndex].timer)
+                        ? formatDuration(
+                            selectTask.subtasks[selectedSubtaskIndex].timer,
+                          )
                         : '0h'
                       : selectTask?.estimate_timer
                         ? formatDuration(selectTask.estimate_timer)
@@ -286,25 +338,34 @@ export const EditorSidebar = ({
                 <DescriptionContainer>
                   <DescriptionHeader>
                     <DescriptionIcon sx={{ fontSize: 14 }} />
-                    <Typography variant="caption" fontWeight={700}>DESCRIPTION</Typography>
+                    <Typography variant="caption" fontWeight={700}>
+                      DESCRIPTION
+                    </Typography>
                   </DescriptionHeader>
-                  <Typography 
-                    variant="body2" 
-                    sx={{ 
-                      color: theme.palette.text.secondary, 
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      color: theme.palette.text.secondary,
                       whiteSpace: 'pre-wrap',
                       lineHeight: 1.6,
-                      fontSize: '13px'
+                      fontSize: '13px',
                     }}
                   >
                     {selectedSubtaskIndex !== null
-                      ? cleanDescription(selectTask?.subtasks?.[selectedSubtaskIndex]?.notes_encrypted)
+                      ? cleanDescription(
+                          selectTask?.subtasks?.[selectedSubtaskIndex]
+                            ?.notes_encrypted,
+                        )
                       : cleanDescription(selectTask?.notes_encrypted)}
                   </Typography>
                 </DescriptionContainer>
               </>
             ) : (
-              <Typography variant="body2" color="text.secondary" sx={{ textAlign: 'center', py: 4 }}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ textAlign: 'center', py: 4 }}
+              >
                 Select a task to see details
               </Typography>
             )}
@@ -330,23 +391,54 @@ export const EditorSidebar = ({
           <Box sx={{ flexGrow: 1 }} />
 
           <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
-            <StartFocusButton
-              startIcon={<FlashOnIcon />}
-              disabled={!selectTask}
-              onClick={() => {
-                if (onStartFocus && selectTask) {
-                  onStartFocus(selectTask, selectedSubtaskIndex);
-                }
-              }}
-            >
-              Focus Mode
-            </StartFocusButton>
-            <MarkDoneButton 
-              disabled={!selectTask || currentStatus === 'Done'}
-              onClick={handleMarkDone}
-            >
-              {currentStatus === 'Done' ? 'Completed' : 'Mark Done'}
-            </MarkDoneButton>
+            {activeFocusTaskId === selectTask?.id ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1.5,
+                  bgcolor: `${theme.palette.primary.main}15`,
+                  color: theme.palette.primary.main,
+                  p: 2,
+                  borderRadius: '12px',
+                  border: `1px solid ${theme.palette.primary.main}33`,
+                }}
+              >
+                <Box
+                  sx={{
+                    width: 8,
+                    height: 8,
+                    borderRadius: '50%',
+                    bgcolor: theme.palette.primary.main,
+                    boxShadow: `0 0 10px ${theme.palette.primary.main}`,
+                  }}
+                />
+                <Typography variant="body2" fontWeight={700} letterSpacing={1}>
+                  IN PROGRESS
+                </Typography>
+              </Box>
+            ) : (
+              <>
+                <StartFocusButton
+                  startIcon={<FlashOnIcon />}
+                  disabled={!selectTask}
+                  onClick={() => {
+                    if (onStartFocus && selectTask) {
+                      onStartFocus(selectTask, selectedSubtaskIndex);
+                    }
+                  }}
+                >
+                  Focus Mode
+                </StartFocusButton>
+                <MarkDoneButton
+                  disabled={!selectTask || currentStatus === 'Done'}
+                  onClick={handleMarkDone}
+                >
+                  {currentStatus === 'Done' ? 'Completed' : 'Mark Done'}
+                </MarkDoneButton>
+              </>
+            )}
           </Box>
         </>
       )}
@@ -364,17 +456,24 @@ export const EditorSidebar = ({
             boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             border: '1px solid',
             borderColor: 'divider',
-          }
+          },
         }}
       >
         {(['High', 'Med', 'Low', 'No priority'] as PriorityType[]).map((p) => (
-          <MenuItem 
-            key={p} 
+          <MenuItem
+            key={p}
             onClick={() => handlePrioritySelect(getPriorityLevel(p))}
             sx={{ gap: 1.5, py: 1.2, borderRadius: '8px', mx: 1, my: 0.5 }}
           >
-            <FlagIcon sx={{ fontSize: 18, color: getPriorityColor(getPriorityLevel(p)) }} />
-            <Typography variant="body2" fontWeight={600}>{p}</Typography>
+            <FlagIcon
+              sx={{
+                fontSize: 18,
+                color: getPriorityColor(getPriorityLevel(p)),
+              }}
+            />
+            <Typography variant="body2" fontWeight={600}>
+              {p}
+            </Typography>
           </MenuItem>
         ))}
       </Menu>
@@ -391,23 +490,51 @@ export const EditorSidebar = ({
             boxShadow: '0 10px 30px rgba(0,0,0,0.2)',
             border: '1px solid',
             borderColor: 'divider',
-          }
+          },
         }}
       >
-        {['Todo', 'Planning', 'Pending', 'OnHold', 'Review', 'Done', 'Backlog'].map((s) => (
-          <MenuItem 
-            key={s} 
+        {[
+          'Todo',
+          'Planning',
+          'Pending',
+          'OnHold',
+          'Review',
+          'Done',
+          'Backlog',
+        ].map((s) => (
+          <MenuItem
+            key={s}
             onClick={() => handleStatusSelect(s)}
             sx={{ gap: 1.5, py: 1.2, borderRadius: '8px', mx: 1, my: 0.5 }}
           >
-            {s === 'Todo' && <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: 'info.main' }} />}
-            {s === 'Planning' && <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />}
-            {s === 'Pending' && <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />}
-            {s === 'OnHold' && <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: 'error.main' }} />}
-            {s === 'Review' && <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />}
-            {s === 'Done' && <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />}
-            {s === 'Backlog' && <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />}
-            <Typography variant="body2" fontWeight={600}>{s === 'OnHold' ? 'On Hold' : s}</Typography>
+            {s === 'Todo' && (
+              <RadioButtonUncheckedIcon
+                sx={{ fontSize: 18, color: 'info.main' }}
+              />
+            )}
+            {s === 'Planning' && (
+              <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />
+            )}
+            {s === 'Pending' && (
+              <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+            )}
+            {s === 'OnHold' && (
+              <RadioButtonUncheckedIcon
+                sx={{ fontSize: 18, color: 'error.main' }}
+              />
+            )}
+            {s === 'Review' && (
+              <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+            )}
+            {s === 'Done' && (
+              <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+            )}
+            {s === 'Backlog' && (
+              <HistoryIcon sx={{ fontSize: 18, color: 'text.secondary' }} />
+            )}
+            <Typography variant="body2" fontWeight={600}>
+              {s === 'OnHold' ? 'On Hold' : s}
+            </Typography>
           </MenuItem>
         ))}
       </Menu>

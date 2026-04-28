@@ -2,7 +2,10 @@ import React from 'react';
 import { Box, Typography, useTheme } from '@mui/material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { ChartCard } from '../../Insights.styles';
-import type { TimeDistributionChartProps, DistributionEntry } from './TimeDistributionChart.types';
+import type {
+  TimeDistributionChartProps,
+  DistributionEntry,
+} from './TimeDistributionChart.types';
 
 function formatMinutes(val: number): string {
   const hours = Math.floor(val / 60);
@@ -15,7 +18,8 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
 }) => {
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
-  const [hoveredData, setHoveredData] = React.useState<DistributionEntry | null>(null);
+  const [hoveredData, setHoveredData] =
+    React.useState<DistributionEntry | null>(null);
 
   const hasData = data.some((d) => d.value > 0);
   const chartData = hasData
@@ -49,7 +53,8 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
         display="flex"
         alignItems="center"
         justifyContent="center"
-        sx={{ height: '220px', width: '100%' }}
+        mt={-2}
+        sx={{ height: '310px', width: '100%' }}
       >
         {/* Detached Info Box (Instead of floating tooltip) */}
         {hoveredData && (
@@ -58,7 +63,8 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               position: 'absolute',
               top: 0,
               left: 0,
-              bgcolor: (theme) => (theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff'),
+              bgcolor: (theme) =>
+                theme.palette.mode === 'dark' ? '#1e293b' : '#ffffff',
               p: 1.5,
               border: '1px solid',
               borderColor: 'divider',
@@ -90,8 +96,15 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
                 {hoveredData.name}
               </Typography>
             </Box>
-            <Typography variant="caption" color="text.secondary" sx={{ ml: 2.5 }}>
-              Tiempo: <b style={{ color: 'var(--mui-palette-text-primary)' }}>{formatMinutes(hoveredData.value)}</b>
+            <Typography
+              variant="caption"
+              color="text.secondary"
+              sx={{ ml: 2.5 }}
+            >
+              Tiempo:{' '}
+              <b style={{ color: 'var(--mui-palette-text-primary)' }}>
+                {formatMinutes(hoveredData.value)}
+              </b>
             </Typography>
           </Box>
         )}
@@ -111,8 +124,8 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               onMouseLeave={() => setHoveredData(null)}
             >
               {chartData.map((entry, index) => (
-                <Cell 
-                  key={`cell-${index}`} 
+                <Cell
+                  key={`cell-${index}`}
                   fill={entry.color}
                   style={{ cursor: 'pointer', outline: 'none' }}
                 />
@@ -181,11 +194,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
                 {item.name}
               </Typography>
             </Box>
-            <Typography
-              variant="caption"
-              fontWeight="700"
-              color="text.primary"
-            >
+            <Typography variant="caption" fontWeight="700" color="text.primary">
               {formatMinutes(item.value)}
             </Typography>
           </Box>

@@ -46,25 +46,44 @@ export interface WorkspaceEditorProps {
   watch: UseFormWatch<WorkspaceFormData>;
   getValues: UseFormGetValues<WorkspaceFormData>;
   selectTask: TaskSearchItems | null;
-  handleSelectTask: (task: TaskSearchItems | null, subtaskIndex?: number | null) => void;
-  handleUpdateTask: (taskId: string, updates: Partial<TaskSearchItems>) => Promise<void>;
+  handleSelectTask: (
+    task: TaskSearchItems | null,
+    subtaskIndex?: number | null,
+  ) => void;
+  handleUpdateTask: (
+    taskId: string,
+    updates: Partial<TaskSearchItems>,
+  ) => Promise<void>;
   tasksData: { tasks: TaskSearchItems[] } | undefined;
   selectedSubtaskIndex: number | null;
-  onStartFocus?: (task?: TaskSearchItems | null, subtaskIndex?: number | null) => void;
+  onStartFocus?: (
+    task?: TaskSearchItems | null,
+    subtaskIndex?: number | null,
+  ) => void;
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   onToggleSubtask?: (taskId: string, index: number) => void;
   isRightSidebarOpen: boolean;
   setIsRightSidebarOpen: (isOpen: boolean) => void;
   saveStatus?: 'idle' | 'saving' | 'saved';
+  workspaces?: WorkspaceTypes[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getCustomSlashMenuItems: (editor: any) => any[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  getWorkspaceMentionMenuItems: (editor: any) => any[];
+  activeFocusTaskId?: string | null;
 }
 
 export interface WorkspaceProps {
   isEditorOpen: boolean;
   onEditorChange: (isOpen: boolean) => void;
-  onStartFocus?: (task?: TaskSearchItems | null, subtaskIndex?: number | null) => void;
+  onStartFocus?: (
+    task?: TaskSearchItems | null,
+    subtaskIndex?: number | null,
+  ) => void;
   onOpenTaskDetails?: (task: TaskSearchItems, mode?: 'view' | 'edit') => void;
   isSidebarOpen: boolean;
   onSidebarChange: (isOpen: boolean) => void;
+  activeFocusTaskId?: string | null;
 }
 export interface TaskSearchItems {
   id: string;

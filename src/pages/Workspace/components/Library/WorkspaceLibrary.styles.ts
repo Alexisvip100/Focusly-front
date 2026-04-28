@@ -34,7 +34,10 @@ export const HeaderSubtitle = styled(Typography)(({ theme }) => ({
 export const SearchBar = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(0, 0, 0, 0.04)',
   borderRadius: '28px',
   padding: '8px 16px',
   width: '380px',
@@ -42,7 +45,8 @@ export const SearchBar = styled(Box)(({ theme }) => ({
   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
   '&:focus-within': {
     borderColor: theme.palette.primary.main,
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fff',
+    backgroundColor:
+      theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : '#fff',
     boxShadow: `0 0 0 4px ${theme.palette.primary.main}11`,
   },
   '& input': {
@@ -64,7 +68,10 @@ export const SearchBar = styled(Box)(({ theme }) => ({
 export const ActionCapsule = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(0, 0, 0, 0.04)',
   borderRadius: '32px',
   padding: '4px',
   gap: '4px',
@@ -72,7 +79,10 @@ export const ActionCapsule = styled(Box)(({ theme }) => ({
   marginLeft: theme.spacing(1),
   transition: 'all 0.2s',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(0, 0, 0, 0.06)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.06)',
   },
 }));
 
@@ -138,7 +148,10 @@ export const FolderList = styled(Box)(({ theme }) => ({
     height: '4px',
   },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(0,0,0,0.1)',
     borderRadius: '10px',
   },
   '&::-webkit-scrollbar-track': {
@@ -148,7 +161,7 @@ export const FolderList = styled(Box)(({ theme }) => ({
 
 export const FolderCapsule = styled(Box, {
   shouldForwardProp: (prop) => prop !== 'active' && prop !== 'color',
-})<{ active?: boolean; color?: string }>(({ theme, active }) => ({
+})<{ active?: boolean; color?: string }>(({ theme, active, color }) => ({
   display: 'flex',
   alignItems: 'center',
   padding: '10px 20px 10px 10px',
@@ -160,7 +173,7 @@ export const FolderCapsule = styled(Box, {
     : theme.palette.mode === 'dark'
       ? 'rgba(255, 255, 255, 0.03)'
       : 'rgba(0, 0, 0, 0.02)',
-  border: `1px solid ${active ? (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : theme.palette.primary.main) : 'transparent'}`,
+  border: `1px solid ${active ? color || (theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.15)' : theme.palette.primary.main) : 'transparent'}`,
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
   minWidth: '180px',
@@ -180,7 +193,9 @@ export const FolderCapsule = styled(Box, {
         : 'rgba(0, 0, 0, 0.05)',
     transform: 'translateY(-2px)',
     boxShadow:
-      theme.palette.mode === 'dark' ? '0 8px 20px rgba(0,0,0,0.4)' : '0 8px 20px rgba(0,0,0,0.1)',
+      theme.palette.mode === 'dark'
+        ? '0 8px 20px rgba(0,0,0,0.4)'
+        : '0 8px 20px rgba(0,0,0,0.1)',
   },
 }));
 
@@ -229,7 +244,10 @@ export const MoreFoldersCapsule = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   padding: '16px 16px 16px 16px',
   borderRadius: '40px',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(0, 0, 0, 0.04)',
   border: `1px solid ${theme.palette.divider}`,
   cursor: 'pointer',
   transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
@@ -274,7 +292,8 @@ export const FolderOptionsIconButton = styled(Box)(({ theme }) => ({
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.7)',
+  backgroundColor:
+    theme.palette.mode === 'dark' ? 'rgba(0,0,0,0.3)' : 'rgba(255,255,255,0.7)',
   color: theme.palette.text.secondary,
   opacity: 0,
   transform: 'scale(0.8)',
@@ -303,11 +322,15 @@ export const FilterButton = styled(Box, {
   display: 'flex',
   alignItems: 'center',
   gap: theme.spacing(1),
-  backgroundColor: active ? 'rgba(24, 243, 255, 0.1)' : 'rgba(255, 255, 255, 0.03)',
+  backgroundColor: active
+    ? 'rgba(24, 243, 255, 0.1)'
+    : 'rgba(255, 255, 255, 0.03)',
   color: active ? '#18f3ff' : theme.palette.text.secondary,
   border: `1px solid ${active ? '#18f3ff44' : 'transparent'}`,
   '&:hover': {
-    backgroundColor: active ? 'rgba(24, 243, 255, 0.15)' : 'rgba(255, 255, 255, 0.07)',
+    backgroundColor: active
+      ? 'rgba(24, 243, 255, 0.15)'
+      : 'rgba(255, 255, 255, 0.07)',
   },
 }));
 

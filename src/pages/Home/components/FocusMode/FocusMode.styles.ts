@@ -1,4 +1,11 @@
-import { Box, styled, keyframes, IconButton, Button, Typography } from '@mui/material';
+import {
+  Box,
+  styled,
+  keyframes,
+  IconButton,
+  Button,
+  Typography,
+} from '@mui/material';
 import type { Theme } from '@mui/material';
 
 // Animations
@@ -21,8 +28,9 @@ export const MiniModeContainer = styled(Box)(({ theme }) => ({
   color: theme.palette.text.primary,
   padding: theme.spacing(2),
   borderRadius: '16px',
-  bottom: '32px',
-  right: '32px',
+  // Remove default positioning to rely on transform
+  bottom: 'auto',
+  right: 'auto',
   boxShadow:
     theme.palette.mode === 'dark'
       ? '0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5)'
@@ -33,7 +41,9 @@ export const MiniModeContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   minWidth: 380,
   userSelect: 'none',
-  transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+  // Optimize for dragging: avoid 'all' transitions
+  transition: 'opacity 0.3s ease, box-shadow 0.3s ease, transform 0.05s linear',
+  willChange: 'transform',
 }));
 
 export const RippleDot = styled(Box)(({ theme }) => ({
@@ -57,32 +67,36 @@ export const RippleDot = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const TimerCard = styled(Box)<{ label?: string }>(({ theme, label }) => ({
-  backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(226, 232, 240, 0.4)',
-  borderRadius: '32px',
-  width: 220,
-  height: 240,
-  display: 'flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  border: `1px solid ${theme.palette.divider}`,
-  position: 'relative',
-  boxShadow:
-    theme.palette.mode === 'dark'
-      ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
-      : '0 25px 50px -12px rgba(0, 0, 0, 0.05)',
-  '&::after': {
-    content: `"${label || 'MINUTES'}"`,
-    position: 'absolute',
-    bottom: 24,
-    fontSize: '12px',
-    fontWeight: 700,
-    letterSpacing: 2,
-    color: theme.palette.text.secondary,
-  },
-}));
+export const TimerCard = styled(Box)<{ label?: string }>(
+  ({ theme, label }) => ({
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.03)'
+        : 'rgba(226, 232, 240, 0.4)',
+    borderRadius: '32px',
+    width: 220,
+    height: 240,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    border: `1px solid ${theme.palette.divider}`,
+    position: 'relative',
+    boxShadow:
+      theme.palette.mode === 'dark'
+        ? '0 25px 50px -12px rgba(0, 0, 0, 0.5)'
+        : '0 25px 50px -12px rgba(0, 0, 0, 0.05)',
+    '&::after': {
+      content: `"${label || 'MINUTES'}"`,
+      position: 'absolute',
+      bottom: 24,
+      fontSize: '12px',
+      fontWeight: 700,
+      letterSpacing: 2,
+      color: theme.palette.text.secondary,
+    },
+  }),
+);
 
 // Redesigned Control Footer
 export const FooterContainer = styled(Box)(({ theme }) => ({
@@ -90,7 +104,9 @@ export const FooterContainer = styled(Box)(({ theme }) => ({
   justifyContent: 'space-between',
   alignItems: 'center',
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(241, 245, 249, 0.8)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.05)'
+      : 'rgba(241, 245, 249, 0.8)',
   backdropFilter: 'blur(20px)',
   borderRadius: '24px',
   padding: theme.spacing(2),
@@ -151,9 +167,15 @@ export const HeaderActionGroup = styled(Box)(({ theme }) => ({
 
 export const HeaderIconButton = styled(IconButton)(({ theme }) => ({
   color: theme.palette.text.secondary,
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.05)'
+      : 'rgba(0,0,0,0.05)',
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.1)'
+        : 'rgba(0,0,0,0.1)',
   },
 }));
 
@@ -219,14 +241,19 @@ export const AddTimeButton = styled(Button)(({ theme }) => ({
   fontSize: '15px',
   fontWeight: 500,
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(0,0,0,0.05)',
     color: theme.palette.text.primary,
   },
 }));
 
 export const PlayPauseButton = styled(IconButton)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.08)' : 'rgba(226, 232, 240, 0.8)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.08)'
+      : 'rgba(226, 232, 240, 0.8)',
   color: theme.palette.text.primary,
   width: 64,
   height: 64,
@@ -234,7 +261,9 @@ export const PlayPauseButton = styled(IconButton)(({ theme }) => ({
   margin: '0 16px',
   '&:hover': {
     backgroundColor:
-      theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.8)' : 'rgba(203, 213, 225, 0.8)',
+      theme.palette.mode === 'dark'
+        ? 'rgba(51, 65, 85, 0.8)'
+        : 'rgba(203, 213, 225, 0.8)',
   },
 }));
 
@@ -260,7 +289,10 @@ export const AmbientContainer = styled(Box)(({ theme }) => ({
 }));
 
 export const AmbientIconButton = styled(IconButton)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? 'rgba(255,255,255,0.1)'
+      : 'rgba(0,0,0,0.05)',
   color: theme.palette.text.secondary,
   '&:hover': {
     color: theme.palette.text.primary,
@@ -269,14 +301,20 @@ export const AmbientIconButton = styled(IconButton)(({ theme }) => ({
 
 // Mini Mode styles
 export const MiniTimerBox = styled(Box)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#000000' : theme.palette.background.default,
+  backgroundColor:
+    theme.palette.mode === 'dark'
+      ? '#000000'
+      : theme.palette.background.default,
   borderRadius: '12px',
   padding: theme.spacing(1.5),
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
   width: '70px',
-  border: theme.palette.mode === 'light' ? `1px solid ${theme.palette.divider}` : 'none',
+  border:
+    theme.palette.mode === 'light'
+      ? `1px solid ${theme.palette.divider}`
+      : 'none',
 }));
 
 export const MiniInfoBox = styled(Box)({
@@ -350,32 +388,35 @@ export const TaskQueueList = styled(Box)(({ theme }) => ({
   },
 }));
 
-export const QueueItemContainer = styled(Box)<{ isActive?: boolean; isNext?: boolean }>(
-  ({ theme, isActive, isNext }) => ({
+export const QueueItemContainer = styled(Box)<{
+  isActive?: boolean;
+  isNext?: boolean;
+}>(({ theme, isActive, isNext }) => ({
+  backgroundColor: isActive
+    ? theme.palette.mode === 'dark'
+      ? 'rgba(59, 130, 246, 0.1)'
+      : 'rgba(59, 130, 246, 0.05)'
+    : theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.03)'
+      : 'rgba(241, 245, 249, 0.5)',
+  borderRadius: '12px',
+  padding: theme.spacing(2),
+  border: '1px solid',
+  borderColor: isActive ? theme.palette.primary.main : theme.palette.divider,
+  display: 'flex',
+  flexDirection: 'column',
+  gap: theme.spacing(1),
+  cursor: 'pointer',
+  transition: 'all 0.2s ease',
+  '&:hover': {
     backgroundColor: isActive
-      ? theme.palette.mode === 'dark'
-        ? 'rgba(59, 130, 246, 0.1)'
-        : 'rgba(59, 130, 246, 0.05)'
-      : theme.palette.mode === 'dark'
-        ? 'rgba(255, 255, 255, 0.03)'
-        : 'rgba(241, 245, 249, 0.5)',
-    borderRadius: '12px',
-    padding: theme.spacing(2),
-    border: '1px solid',
-    borderColor: isActive ? theme.palette.primary.main : theme.palette.divider,
-    display: 'flex',
-    flexDirection: 'column',
-    gap: theme.spacing(1),
-    cursor: 'pointer',
-    transition: 'all 0.2s ease',
-    '&:hover': {
-      backgroundColor: isActive ? 'rgba(59, 130, 246, 0.15)' : 'rgba(255, 255, 255, 0.05)',
-    },
-    ...(isNext && {
-      opacity: 0.8,
-    }),
-  })
-);
+      ? 'rgba(59, 130, 246, 0.15)'
+      : 'rgba(255, 255, 255, 0.05)',
+  },
+  ...(isNext && {
+    opacity: 0.8,
+  }),
+}));
 
 export const QueueItemHeader = styled(Box)({
   display: 'flex',
@@ -383,18 +424,24 @@ export const QueueItemHeader = styled(Box)({
   alignItems: 'center',
 });
 
-export const StatusBadge = styled(Box)<{ status: 'CURRENT' | 'NEXT' | 'LATER' | 'SUBTASK' }>(
-  ({ status }) => ({
-    fontSize: '10px',
-    fontWeight: 700,
-    letterSpacing: 1,
-    color: status === 'CURRENT' ? '#3b82f6' : status === 'SUBTASK' ? '#8b5cf6' : '#64748b',
-    textTransform: 'uppercase',
-    backgroundColor: status === 'SUBTASK' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
-    padding: status === 'SUBTASK' ? '2px 8px' : '0',
-    borderRadius: status === 'SUBTASK' ? '4px' : '0',
-  })
-);
+export const StatusBadge = styled(Box)<{
+  status: 'CURRENT' | 'NEXT' | 'LATER' | 'SUBTASK';
+}>(({ status }) => ({
+  fontSize: '10px',
+  fontWeight: 700,
+  letterSpacing: 1,
+  color:
+    status === 'CURRENT'
+      ? '#3b82f6'
+      : status === 'SUBTASK'
+        ? '#8b5cf6'
+        : '#64748b',
+  textTransform: 'uppercase',
+  backgroundColor:
+    status === 'SUBTASK' ? 'rgba(139, 92, 246, 0.1)' : 'transparent',
+  padding: status === 'SUBTASK' ? '2px 8px' : '0',
+  borderRadius: status === 'SUBTASK' ? '4px' : '0',
+}));
 
 export const QueueItemTime = styled(Typography)(({ theme }) => ({
   fontSize: '11px',
@@ -497,7 +544,10 @@ export const CancelButton = styled(Button)(({ theme }) => ({
   fontSize: '16px',
   fontWeight: 600,
   '&:hover': {
-    backgroundColor: theme.palette.mode === 'dark' ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)',
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255,255,255,0.05)'
+        : 'rgba(0,0,0,0.05)',
   },
 }));
 
@@ -565,7 +615,9 @@ export const StatsContainer = styled(Box)(({ theme }) => ({
 
 export const StatCard = styled(Box)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.03)' : 'rgba(226, 232, 240, 0.4)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(255, 255, 255, 0.03)'
+      : 'rgba(226, 232, 240, 0.4)',
   borderRadius: '20px',
   padding: theme.spacing(3),
   minWidth: 200,
@@ -623,7 +675,9 @@ export const NextTaskButton = styled(Button)(({ theme }) => ({
 
 export const BreakButton = styled(Button)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(51, 65, 85, 0.5)' : 'rgba(226, 232, 240, 0.8)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(51, 65, 85, 0.5)'
+      : 'rgba(226, 232, 240, 0.8)',
   color: theme.palette.text.primary,
   padding: `${theme.spacing(2)} ${theme.spacing(3)}`,
   borderRadius: '16px',

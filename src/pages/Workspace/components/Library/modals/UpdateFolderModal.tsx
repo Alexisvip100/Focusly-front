@@ -1,9 +1,5 @@
-import { useState } from 'react';
-import {
-  Box,
-  Typography,
-  Tooltip,
-} from '@mui/material';
+import { useState, useEffect } from 'react';
+import { Box, Typography, Tooltip } from '@mui/material';
 import { EditNote as EditNoteIcon } from '@mui/icons-material';
 import { BaseModal } from '@/components/modals';
 import { Button, TextField } from '@/components/ui';
@@ -16,9 +12,25 @@ interface UpdateFolderModalProps {
   folder: FolderTypes | null;
 }
 
-export const UpdateFolderModal = ({ open, onClose, onUpdate, folder }: UpdateFolderModalProps) => {
+export const UpdateFolderModal = ({
+  open,
+  onClose,
+  onUpdate,
+  folder,
+}: UpdateFolderModalProps) => {
   const [name, setName] = useState(folder?.name || '');
-  const [selectedColor, setSelectedColor] = useState(folder?.color || '#3b82f6');
+  const [selectedColor, setSelectedColor] = useState(
+    folder?.color || '#3b82f6',
+  );
+
+  useEffect(() => {
+    if (folder) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setName(folder.name);
+
+      setSelectedColor(folder.color || '#3b82f6');
+    }
+  }, [folder, open]);
 
   const colors = [
     { name: 'Black', value: '#18181b' },
@@ -137,8 +149,12 @@ export const UpdateFolderModal = ({ open, onClose, onUpdate, folder }: UpdateFol
                   bgcolor: color.value,
                   cursor: 'pointer',
                   border: '3px solid',
-                  borderColor: selectedColor === color.value ? 'white' : 'transparent',
-                  boxShadow: selectedColor === color.value ? `0 0 0 2px ${color.value}` : 'none',
+                  borderColor:
+                    selectedColor === color.value ? 'white' : 'transparent',
+                  boxShadow:
+                    selectedColor === color.value
+                      ? `0 0 0 2px ${color.value}`
+                      : 'none',
                   transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
                   '&:hover': {
                     transform: 'scale(1.15)',

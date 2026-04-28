@@ -1,22 +1,29 @@
 import { useState, useMemo } from 'react';
 import {
-  useCreateBlockNote,
-} from '@blocknote/react';
-import { BlockNoteEditor, type PartialBlock } from '@blocknote/core';
-import {  getDefaultReactSlashMenuItems } from '@blocknote/react';
+  BlockNoteSchema,
+  defaultBlockSpecs,
+  type PartialBlock,
+} from '@blocknote/core';
+import { useCreateBlockNote } from '@blocknote/react';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/mantine/style.css';
 
-import type { TaskSearchItems, WorkspaceEditorProps } from '../../types/workspace.types';
-import {
-  EditorContainer,
-  MainEditorArea,
-} from './WorkspaceEditor.styles';
+import type {
+  TaskSearchItems,
+  WorkspaceEditorProps,
+} from '../../types/workspace.types';
+import { EditorContainer, MainEditorArea } from './WorkspaceEditor.styles';
 
 // Sub-components
 import { EditorHeader } from './components/EditorHeader/EditorHeader';
 import { EditorContent } from './components/EditorContent/EditorContent';
 import { EditorSidebar } from './components/EditorSidebar/EditorSidebar';
+
+const schema = BlockNoteSchema.create({
+  blockSpecs: {
+    ...defaultBlockSpecs,
+  },
+});
 
 export const WorkspaceEditor = ({
   onBack,
@@ -31,11 +38,14 @@ export const WorkspaceEditor = ({
   onOpenTaskDetails,
   isRightSidebarOpen,
   setIsRightSidebarOpen,
+  getCustomSlashMenuItems,
+  getWorkspaceMentionMenuItems,
+  activeFocusTaskId,
 }: WorkspaceEditorProps) => {
   const currentTitle = watch('title');
   const currentContent = watch('content');
   const currentFolder = watch('folder');
-  
+
   const [showPalette, setShowPalette] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterTab, setFilterTab] = useState<'TASKS' | 'SUBTASKS'>('TASKS');
@@ -49,7 +59,7 @@ export const WorkspaceEditor = ({
         const taskMatches = task.title.toLowerCase().includes(lowerSearch);
         const subtasks = task.subtasks || [];
         const matchingSubtasks = subtasks.filter((st) =>
-          st.title.toLowerCase().includes(lowerSearch)
+          st.title.toLowerCase().includes(lowerSearch),
         );
 
         if (filterTab === 'TASKS') {
@@ -58,7 +68,8 @@ export const WorkspaceEditor = ({
         }
 
         if (filterTab === 'SUBTASKS') {
-          if (matchingSubtasks.length > 0) return { ...task, subtasks: matchingSubtasks };
+          if (matchingSubtasks.length > 0)
+            return { ...task, subtasks: matchingSubtasks };
           return null;
         }
 
@@ -70,7 +81,9 @@ export const WorkspaceEditor = ({
   const initialContent = useMemo(() => {
     try {
       const parsed = currentContent ? JSON.parse(currentContent) : undefined;
-      return Array.isArray(parsed) && parsed.length > 0 ? (parsed as PartialBlock[]) : undefined;
+      return Array.isArray(parsed) && parsed.length > 0
+        ? (parsed as PartialBlock[])
+        : undefined;
     } catch (e) {
       console.error('Failed to parse workspace content:', e);
       return undefined;
@@ -79,6 +92,7 @@ export const WorkspaceEditor = ({
   }, []);
 
   const editor = useCreateBlockNote({
+    schema,
     initialContent: initialContent || [
       {
         type: 'paragraph',
@@ -86,17 +100,6 @@ export const WorkspaceEditor = ({
       },
     ],
   });
-
-  const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
-    const defaultItems = getDefaultReactSlashMenuItems(editor);
-    return defaultItems.filter(
-      (item) =>
-        item.title !== 'Image' &&
-        item.title !== 'Video' &&
-        item.title !== 'Audio' &&
-        item.title !== 'File'
-    );
-  };
 
   return (
     <EditorContainer>
@@ -125,6 +128,7 @@ export const WorkspaceEditor = ({
             setValue('content', JSON.stringify(editor.document));
           }}
           getCustomSlashMenuItems={getCustomSlashMenuItems}
+          getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
         />
       </MainEditorArea>
 
@@ -136,6 +140,7 @@ export const WorkspaceEditor = ({
         handleUpdateTask={handleUpdateTask}
         onOpenTaskDetails={onOpenTaskDetails}
         onStartFocus={onStartFocus}
+        activeFocusTaskId={activeFocusTaskId}
       />
     </EditorContainer>
   );

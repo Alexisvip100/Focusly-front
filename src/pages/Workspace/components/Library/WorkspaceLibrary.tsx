@@ -26,7 +26,14 @@ import {
   MoreFoldersCapsule,
   MoreFoldersCircle,
 } from './WorkspaceLibrary.styles';
-import { Box, Typography, Skeleton, LinearProgress, IconButton, useTheme } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Skeleton,
+  LinearProgress,
+  IconButton,
+  useTheme,
+} from '@mui/material';
 import { EmptyState } from '@/utils/EmptyState';
 import {
   Search as SearchIcon,
@@ -43,13 +50,26 @@ import {
   FolderShared as FolderSharedIcon,
   FilterList as FilterListIcon,
   Edit as EditIcon,
-  Delete as DeleteIcon
+  Delete as DeleteIcon,
 } from '@mui/icons-material';
 import { formatDistanceToNow } from 'date-fns';
 import { useWorkspace } from '../../hooks/useWorkspace.hook';
-import { GET_WORKSPACES, GET_FOLDERS, CREATE_FOLDER, UPDATE_WORKSPACE, UPDATE_FOLDER, DELETE_FOLDER } from '../../workspaces.graphql';
+import {
+  GET_WORKSPACES,
+  GET_FOLDERS,
+  CREATE_FOLDER,
+  UPDATE_WORKSPACE,
+  UPDATE_FOLDER,
+  DELETE_FOLDER,
+} from '../../workspaces.graphql';
 import type { WorkspaceTypes, FolderTypes } from '../../types/workspace.types';
-import { Menu, MenuItem, Divider, ListItemIcon, ListItemText } from '@mui/material';
+import {
+  Menu,
+  MenuItem,
+  Divider,
+  ListItemIcon,
+  ListItemText,
+} from '@mui/material';
 import { CreateFolderModal } from './modals/CreateFolderModal';
 import { UpdateFolderModal } from './modals/UpdateFolderModal';
 import { AllFoldersModal } from './modals/AllFoldersModal';
@@ -60,18 +80,27 @@ interface WorkspaceLibraryProps {
   onSelect: (workspace: WorkspaceTypes) => void;
 }
 
-export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) => {
+export const WorkspaceLibrary = ({
+  onCreate,
+  onSelect,
+}: WorkspaceLibraryProps) => {
   const theme = useTheme();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFolderId, setSelectedFolderId] = useState<string | null>(null);
   const [isFolderModalOpen, setIsFolderModalOpen] = useState(false);
-  const [searchMode, setSearchMode] = useState<'workspace' | 'folder'>('workspace');
+  const [searchMode, setSearchMode] = useState<'workspace' | 'folder'>(
+    'workspace',
+  );
 
   const { data, loading, error } = useQuery(GET_WORKSPACES, {
     variables: { search: searchMode === 'workspace' ? searchTerm : '' },
   });
 
-  const { data: foldersData, loading: foldersLoading, error: foldersError } = useQuery(GET_FOLDERS);
+  const {
+    data: foldersData,
+    loading: foldersLoading,
+    error: foldersError,
+  } = useQuery(GET_FOLDERS);
   const [createFolder] = useMutation(CREATE_FOLDER, {
     refetchQueries: [{ query: GET_FOLDERS }],
   });
@@ -87,13 +116,20 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
   });
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [folderAnchorEl, setFolderAnchorEl] = useState<null | HTMLElement>(null);
-  const [selectedWorkspace, setSelectedWorkspace] = useState<WorkspaceTypes | null>(null);
-  const [selectedFolderToManage, setSelectedFolderToManage] = useState<FolderTypes | null>(null);
+  const [folderAnchorEl, setFolderAnchorEl] = useState<null | HTMLElement>(
+    null,
+  );
+  const [selectedWorkspace, setSelectedWorkspace] =
+    useState<WorkspaceTypes | null>(null);
+  const [selectedFolderToManage, setSelectedFolderToManage] =
+    useState<FolderTypes | null>(null);
   const [isUpdateFolderModalOpen, setIsUpdateFolderModalOpen] = useState(false);
   const [isAllFoldersModalOpen, setIsAllFoldersModalOpen] = useState(false);
 
-  const handleMenuOpen = (event: React.MouseEvent<HTMLElement>, workspace: WorkspaceTypes) => {
+  const handleMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    workspace: WorkspaceTypes,
+  ) => {
     event.stopPropagation();
     setAnchorEl(event.currentTarget);
     setSelectedWorkspace(workspace);
@@ -104,7 +140,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
     setSelectedWorkspace(null);
   };
 
-  const handleFolderMenuOpen = (event: React.MouseEvent<HTMLElement>, folder: FolderTypes) => {
+  const handleFolderMenuOpen = (
+    event: React.MouseEvent<HTMLElement>,
+    folder: FolderTypes,
+  ) => {
     event.stopPropagation();
     setFolderAnchorEl(event.currentTarget);
     setSelectedFolderToManage(folder);
@@ -112,7 +151,6 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
 
   const handleFolderMenuClose = () => {
     setFolderAnchorEl(null);
-    setSelectedFolderToManage(null);
   };
 
   const handleMoveToFolder = async (folderId: string | null) => {
@@ -128,7 +166,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       });
       sileo.success({
         title: 'Workspace moved',
-        description: folderId ? 'Workspace moved to folder' : 'Workspace moved to All Notes',
+        description: folderId
+          ? 'Workspace moved to folder'
+          : 'Workspace moved to All Notes',
         fill: 'var(--sileo-success-bg)',
         duration: 3000,
       });
@@ -143,9 +183,11 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
   }
 
   const folders = (foldersData?.folders || []).filter((f: FolderTypes) =>
-    searchMode === 'folder' ? f.name.toLowerCase().includes(searchTerm.toLowerCase()) : true
+    searchMode === 'folder'
+      ? f.name.toLowerCase().includes(searchTerm.toLowerCase())
+      : true,
   );
-  
+
   // Move selected folder to first position
   const sortedFolders = [...folders].sort((a, b) => {
     if (a.id === selectedFolderId) return -1;
@@ -154,12 +196,13 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
   });
 
   const visibleFolders = sortedFolders.slice(0, 5);
-  const hiddenFoldersCount = sortedFolders.length > 5 ? sortedFolders.length - 5 : 0;
+  const hiddenFoldersCount =
+    sortedFolders.length > 5 ? sortedFolders.length - 5 : 0;
 
   const allWorkspaces = data?.workspaces || [];
 
   const workspaces = allWorkspaces.filter(
-    (w: WorkspaceTypes) => !selectedFolderId || w.folderId === selectedFolderId
+    (w: WorkspaceTypes) => !selectedFolderId || w.folderId === selectedFolderId,
   );
 
   const { handleOpen } = useWorkspace();
@@ -189,7 +232,11 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
     }
   };
 
-  const handleUpdateFolder = async (id: string, name: string, color: string) => {
+  const handleUpdateFolder = async (
+    id: string,
+    name: string,
+    color: string,
+  ) => {
     try {
       await updateFolder({
         variables: {
@@ -221,7 +268,8 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
 
       sileo.success({
         title: 'Folder deleted',
-        description: 'Folder has been removed. All workspaces were moved to All Notes.',
+        description:
+          'Folder has been removed. All workspaces were moved to All Notes.',
         fill: 'var(--sileo-delete-bg)',
         duration: 4000,
       });
@@ -258,13 +306,19 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       <LibraryHeader>
         <Box>
           <HeaderTitle>Workspace Library</HeaderTitle>
-          <HeaderSubtitle>Manage your strategic documents and brain dumps.</HeaderSubtitle>
+          <HeaderSubtitle>
+            Manage your strategic documents and brain dumps.
+          </HeaderSubtitle>
         </Box>
         <Box display="flex" alignItems="center">
           <SearchBar id="joyride-workspace-search">
             <SearchIcon sx={{ color: 'text.secondary', fontSize: 20 }} />
             <input
-              placeholder={searchMode === 'workspace' ? 'Search workspaces...' : 'Search folders...'}
+              placeholder={
+                searchMode === 'workspace'
+                  ? 'Search workspaces...'
+                  : 'Search folders...'
+              }
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -319,7 +373,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
               transition={{ type: 'spring', stiffness: 400, damping: 30 }}
               sx={{ flexShrink: 0 }}
             >
-              <FolderCapsule active={!selectedFolderId} onClick={() => setSelectedFolderId(null)}>
+              <FolderCapsule
+                active={!selectedFolderId}
+                onClick={() => setSelectedFolderId(null)}
+              >
                 <FolderIconCircle color={theme.palette.primary.main}>
                   <FolderSpecialIcon sx={{ fontSize: 20 }} />
                 </FolderIconCircle>
@@ -338,7 +395,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                   >
                     All Notes
                   </Typography>
-                  <Typography variant="caption" sx={{ color: 'text.secondary', opacity: 0.7 }}>
+                  <Typography
+                    variant="caption"
+                    sx={{ color: 'text.secondary', opacity: 0.7 }}
+                  >
                     {allWorkspaces.length} items
                   </Typography>
                 </Box>
@@ -416,7 +476,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                         >
                           {folder.name}
                         </Typography>
-                        <Typography variant="caption" sx={{ color: 'text.secondary', opacity: 0.7 }}>
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'text.secondary', opacity: 0.7 }}
+                        >
                           {folder.workspaceCount || 0} items
                         </Typography>
                       </Box>
@@ -432,14 +495,20 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                 animate={{ opacity: 1, scale: 1 }}
                 sx={{ flexShrink: 0 }}
               >
-                <MoreFoldersCapsule onClick={() => setIsAllFoldersModalOpen(true)}>
+                <MoreFoldersCapsule
+                  onClick={() => setIsAllFoldersModalOpen(true)}
+                >
                   <MoreFoldersCircle className="more-count-circle">
                     +{hiddenFoldersCount}
                   </MoreFoldersCircle>
                   <Typography
                     variant="subtitle2"
                     fontWeight={800}
-                    sx={{ color: 'text.secondary', fontSize: '11px', letterSpacing: '0.5px' }}
+                    sx={{
+                      color: 'text.secondary',
+                      fontSize: '11px',
+                      letterSpacing: '0.5px',
+                    }}
                   >
                     ALL FOLDERS
                   </Typography>
@@ -467,7 +536,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
 
       {error ? (
         <Box sx={{ p: 4, textAlign: 'center' }}>
-          <Typography color="error">Error loading workspaces. Please try again.</Typography>
+          <Typography color="error">
+            Error loading workspaces. Please try again.
+          </Typography>
         </Box>
       ) : (
         <GridContainer>
@@ -506,7 +577,11 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
               >
                 <AddIcon sx={{ color: 'primary.main' }} />
               </Box>
-              <Typography variant="body2" color="text.secondary" fontWeight={500}>
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                fontWeight={500}
+              >
                 Create New Note
               </Typography>
             </CreateCard>
@@ -514,10 +589,29 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
 
           {loading && !workspaces.length
             ? [1, 2, 3, 4, 5].map((i) => (
-                <WorkspaceCard key={i} sx={{ borderStyle: 'solid', cursor: 'default' }}>
-                  <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-                    <Skeleton variant="text" width="30%" height={20} animation="wave" />
-                    <Skeleton variant="circular" width={24} height={24} animation="wave" />
+                <WorkspaceCard
+                  key={i}
+                  sx={{ borderStyle: 'solid', cursor: 'default' }}
+                >
+                  <Box
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      mb: 2,
+                    }}
+                  >
+                    <Skeleton
+                      variant="text"
+                      width="30%"
+                      height={20}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      variant="circular"
+                      width={24}
+                      height={24}
+                      animation="wave"
+                    />
                   </Box>
                   <Skeleton
                     variant="rectangular"
@@ -526,8 +620,18 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                     sx={{ mb: 1.5, borderRadius: '4px' }}
                     animation="wave"
                   />
-                  <Skeleton variant="text" width="100%" height={16} animation="wave" />
-                  <Skeleton variant="text" width="90%" height={16} animation="wave" />
+                  <Skeleton
+                    variant="text"
+                    width="100%"
+                    height={16}
+                    animation="wave"
+                  />
+                  <Skeleton
+                    variant="text"
+                    width="90%"
+                    height={16}
+                    animation="wave"
+                  />
                   <Box sx={{ mt: 'auto', width: '100%' }}>
                     <Skeleton
                       variant="text"
@@ -552,10 +656,16 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                   const contentObj = JSON.parse(workspace.content);
                   if (Array.isArray(contentObj) && contentObj.length > 0) {
                     const firstPara = contentObj.find(
-                      (block: { type: string; content?: { text?: string }[] }) =>
-                        block.type === 'paragraph'
+                      (block: {
+                        type: string;
+                        content?: { text?: string }[];
+                      }) => block.type === 'paragraph',
                     );
-                    if (firstPara && firstPara.content && firstPara.content.length > 0) {
+                    if (
+                      firstPara &&
+                      firstPara.content &&
+                      firstPara.content.length > 0
+                    ) {
                       previewText = firstPara.content[0].text || previewText;
                     }
                   }
@@ -564,7 +674,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                 }
 
                 return (
-                  <WorkspaceCard key={workspace.id} onClick={() => onSelect(workspace)}>
+                  <WorkspaceCard
+                    key={workspace.id}
+                    onClick={() => onSelect(workspace)}
+                  >
                     <Box
                       sx={{
                         display: 'flex',
@@ -572,11 +685,28 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                         alignItems: 'flex-start',
                       }}
                     >
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 0.5 }}>
-                        <FolderIcon sx={{ fontSize: 16, color: 'text.secondary', opacity: 0.7 }} />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: 1,
+                          mt: 0.5,
+                        }}
+                      >
+                        <FolderIcon
+                          sx={{
+                            fontSize: 16,
+                            color: workspace.folder?.color || 'text.secondary',
+                            opacity: 0.8,
+                          }}
+                        />
                         <Typography
                           variant="caption"
-                          sx={{ color: 'text.secondary', fontWeight: 500, opacity: 0.8 }}
+                          sx={{
+                            color: 'text.secondary',
+                            fontWeight: 500,
+                            opacity: 0.8,
+                          }}
                         >
                           {workspace.folder?.name || 'Uncategorized'}
                         </Typography>
@@ -590,7 +720,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                           }}
                           sx={{
                             color: 'text.secondary',
-                            '&:hover': { color: 'white', backgroundColor: '#ff0090ff' },
+                            '&:hover': {
+                              color: 'white',
+                              backgroundColor: '#ff0090ff',
+                            },
                           }}
                         >
                           <DeleteOutlineIcon fontSize="small" />
@@ -600,7 +733,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                           onClick={(e) => handleMenuOpen(e, workspace)}
                           sx={{
                             color: 'text.secondary',
-                            '&:hover': { color: 'white', backgroundColor: 'action.hover' },
+                            '&:hover': {
+                              color: 'white',
+                              backgroundColor: 'action.hover',
+                            },
                           }}
                         >
                           <MoreVertIcon fontSize="small" />
@@ -613,7 +749,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                           }}
                           sx={{
                             color: 'text.secondary',
-                            '&:hover': { color: 'white', backgroundColor: '#18f3ffff' },
+                            '&:hover': {
+                              color: 'white',
+                              backgroundColor: '#18f3ffff',
+                            },
                           }}
                         >
                           <PushPinIcon fontSize="small" />
@@ -662,7 +801,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                         display="block"
                         mb={workspace.task ? 1.5 : 0}
                       >
-                        {formatDistanceToNow(new Date(workspace.updatedAt), { addSuffix: true })}
+                        {formatDistanceToNow(new Date(workspace.updatedAt), {
+                          addSuffix: true,
+                        })}
                       </Typography>
 
                       {workspace.task && (
@@ -694,7 +835,8 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                                 });
                                 sileo.success({
                                   title: 'Task unlinked',
-                                  description: 'The task association has been removed.',
+                                  description:
+                                    'The task association has been removed.',
                                   fill: 'var(--sileo-update-bg)',
                                   duration: 3000,
                                 });
@@ -707,7 +849,9 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
                           </Box>
                           <Box display="flex" flexDirection="column">
                             <TaskPillLabel>ASSIGNED TASK</TaskPillLabel>
-                            <TaskPillTitle>{workspace.task.title}</TaskPillTitle>
+                            <TaskPillTitle>
+                              {workspace.task.title}
+                            </TaskPillTitle>
                           </Box>
                           <HoverArrowButton className="arrow-button">
                             <ArrowForwardIcon sx={{ fontSize: 14 }} />
@@ -766,7 +910,13 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
               onClick={() => handleMoveToFolder(folder.id)}
               sx={{ fontSize: '13px', py: 1, fontWeight: 500 }}
             >
-              <FolderIcon sx={{ fontSize: 18, mr: 1.5, color: folder.color || 'primary.main' }} />
+              <FolderIcon
+                sx={{
+                  fontSize: 18,
+                  mr: 1.5,
+                  color: folder.color || 'primary.main',
+                }}
+              />
               {folder.name}
             </MenuItem>
           ))}
@@ -781,7 +931,10 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
       <UpdateFolderModal
         key={selectedFolderToManage?.id || 'new'}
         open={isUpdateFolderModalOpen}
-        onClose={() => setIsUpdateFolderModalOpen(false)}
+        onClose={() => {
+          setIsUpdateFolderModalOpen(false);
+          setSelectedFolderToManage(null);
+        }}
         onUpdate={handleUpdateFolder}
         folder={selectedFolderToManage}
       />
@@ -821,7 +974,7 @@ export const WorkspaceLibrary = ({ onCreate, onSelect }: WorkspaceLibraryProps) 
           }}
           sx={{ fontSize: '13px', py: 1 }}
         >
-          <ListItemIcon sx={{ minWidth:32 }}>
+          <ListItemIcon sx={{ minWidth: 32 }}>
             <EditIcon fontSize="small" sx={{ color: 'primary.main' }} />
           </ListItemIcon>
           <ListItemText>Edit Folder</ListItemText>

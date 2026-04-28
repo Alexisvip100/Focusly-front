@@ -23,7 +23,7 @@ interface MiniModeProps {
   timeLeft: number;
   isActive: boolean;
   setIsActive: (active: boolean) => void;
-  activeItem: any;
+  activeItem: unknown;
   progress: number;
   handleCloseRequest: () => void;
   setViewMode: (mode: 'full' | 'mini') => void;
@@ -49,12 +49,9 @@ export const MiniMode: React.FC<MiniModeProps> = ({
       sx={{
         cursor: 'grab',
         '&:active': { cursor: 'grabbing' },
-        ...(position && {
-          left: position.x,
-          top: position.y,
-          bottom: 'auto',
-          right: 'auto',
-        }),
+        transform: `translate3d(${position?.x || 0}px, ${position?.y || 0}px, 0)`,
+        left: 0,
+        top: 0,
       }}
     >
       <RippleDot />
@@ -74,7 +71,10 @@ export const MiniMode: React.FC<MiniModeProps> = ({
           {activeItem?.title || 'Focus Session'}
         </Typography>
         <Box sx={{ display: 'flex', gap: 2 }}>
-          <Typography variant="caption" sx={{ color: theme.palette.text.secondary }}>
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.text.secondary }}
+          >
             {Math.round(progress)}% Complete
           </Typography>
         </Box>
@@ -82,10 +82,18 @@ export const MiniMode: React.FC<MiniModeProps> = ({
       <MiniControlsBox>
         <Box sx={{ display: 'flex', gap: 1 }}>
           <MiniPlayButton size="small" onClick={() => setIsActive(!isActive)}>
-            {isActive ? <PauseIcon fontSize="small" /> : <PlayArrowIcon fontSize="small" />}
+            {isActive ? (
+              <PauseIcon fontSize="small" />
+            ) : (
+              <PlayArrowIcon fontSize="small" />
+            )}
           </MiniPlayButton>
 
-          <IconButton size="small" sx={{ color: '#ef4444' }} onClick={handleCloseRequest}>
+          <IconButton
+            size="small"
+            sx={{ color: '#ef4444' }}
+            onClick={handleCloseRequest}
+          >
             <CloseIcon fontSize="small" />
           </IconButton>
         </Box>

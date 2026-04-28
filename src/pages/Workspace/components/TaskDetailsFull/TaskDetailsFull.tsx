@@ -18,7 +18,7 @@ import {
   Close as CloseIcon,
   PlayArrow as PlayArrowIcon,
   KeyboardArrowRight as KeyboardArrowRightIcon,
-  Link as LinkIcon
+  Link as LinkIcon,
 } from '@mui/icons-material';
 import {
   getPriorityFromLevel,
@@ -56,6 +56,7 @@ interface TaskDetailsFullProps {
   onMarkDone?: (task: TaskSearchItems) => void;
   onStartFocus?: (task: TaskSearchItems, subtaskIndex?: number | null) => void;
   onToggleSubtask?: (taskId: string, index: number) => void;
+  activeFocusTaskId?: string | null;
 }
 
 export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
@@ -64,14 +65,17 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
   onMarkDone,
   onStartFocus,
   onToggleSubtask,
+  activeFocusTaskId,
 }) => {
+  const isTaskInFocus = activeFocusTaskId === task.id;
   const theme = useTheme();
   const [selectedSubtaskDetails, setSelectedSubtaskDetails] = React.useState<
     NonNullable<TaskSearchItems['subtasks']>[0] | null
   >(null);
 
   const hasSubtasks = task.subtasks && task.subtasks.length > 0;
-  const completedSubtasksCount = task.subtasks?.filter((s) => s.completed).length || 0;
+  const completedSubtasksCount =
+    task.subtasks?.filter((s) => s.completed).length || 0;
   const progressPercent = hasSubtasks
     ? Math.round((completedSubtasksCount / (task.subtasks?.length || 1)) * 100)
     : 0;
@@ -91,7 +95,9 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
         <Button
           onClick={onClose}
           startIcon={
-            <KeyboardArrowRightIcon sx={{ fontSize: 20, color: theme.palette.text.primary }} />
+            <KeyboardArrowRightIcon
+              sx={{ fontSize: 20, color: theme.palette.text.primary }}
+            />
           }
           sx={{
             textTransform: 'none',
@@ -108,29 +114,60 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
         >
           Task Details
         </Button>
-        <Button
-          variant="contained"
-          startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
-          onClick={() => onStartFocus && onStartFocus(task)}
-          sx={{
-            minWidth: 'auto',
-            padding: '6px 16px',
-            fontSize: '11px',
-            height: '32px',
-            bgcolor: theme.palette.primary.main,
-            color: theme.palette.primary.contrastText,
-            fontWeight: 600,
-            textTransform: 'none',
-            '&:hover': {
-              bgcolor: theme.palette.primary.dark,
-            },
-          }}
-        >
-          Start Focus Mode
-        </Button>
+        {isTaskInFocus ? (
+          <Box
+            sx={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 1.5,
+              bgcolor: `${theme.palette.primary.main}15`,
+              color: theme.palette.primary.main,
+              px: 2,
+              borderRadius: '99px',
+              border: `1px solid ${theme.palette.primary.main}33`,
+              height: '32px',
+            }}
+          >
+            <Box
+              sx={{
+                width: 6,
+                height: 6,
+                borderRadius: '50%',
+                bgcolor: theme.palette.primary.main,
+                boxShadow: `0 0 8px ${theme.palette.primary.main}`,
+              }}
+            />
+            <Typography variant="caption" fontWeight={700} letterSpacing={1}>
+              IN PROGRESS
+            </Typography>
+          </Box>
+        ) : (
+          <Button
+            variant="contained"
+            startIcon={<FlashOnIcon sx={{ fontSize: 16 }} />}
+            onClick={() => onStartFocus && onStartFocus(task)}
+            sx={{
+              minWidth: 'auto',
+              padding: '6px 16px',
+              fontSize: '11px',
+              height: '32px',
+              bgcolor: theme.palette.primary.main,
+              color: theme.palette.primary.contrastText,
+              fontWeight: 600,
+              textTransform: 'none',
+              '&:hover': {
+                bgcolor: theme.palette.primary.dark,
+              },
+            }}
+          >
+            Start Focus Mode
+          </Button>
+        )}
       </SidebarTopNav>
 
-      <SidebarBreadcrumbs>WORKSPACE / {task.category || 'PROJECTS'}</SidebarBreadcrumbs>
+      <SidebarBreadcrumbs>
+        WORKSPACE / {task.category || 'PROJECTS'}
+      </SidebarBreadcrumbs>
       <SidebarTaskTitle>{task.title}</SidebarTaskTitle>
 
       <PropertyGrid>
@@ -207,12 +244,13 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
         <PropertyCard sx={{ bgcolor: theme.palette.background.default }}>
           <PropertyLabel>ESTIMATE</PropertyLabel>
           <PropertyValue>
-            <AccessTimeIcon sx={{ fontSize: 12, color: theme.palette.text.secondary }} />
+            <AccessTimeIcon
+              sx={{ fontSize: 12, color: theme.palette.text.secondary }}
+            />
             {task.estimate_timer ? formatDuration(task.estimate_timer) : '0h'}
           </PropertyValue>
         </PropertyCard>
       </PropertyGrid>
-
 
       {task.links && task.links.length > 0 && (
         <>
@@ -232,11 +270,17 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
                 }}
               >
                 <Box display="flex" alignItems="center" gap={1.5}>
-                  <LinkIcon sx={{ fontSize: 18, color: theme.palette.primary.main }} />
+                  <LinkIcon
+                    sx={{ fontSize: 18, color: theme.palette.primary.main }}
+                  />
                   <Box>
                     <Typography
                       variant="body2"
-                      sx={{ fontWeight: 700, color: theme.palette.text.primary, lineHeight: 1.2 }}
+                      sx={{
+                        fontWeight: 700,
+                        color: theme.palette.text.primary,
+                        lineHeight: 1.2,
+                      }}
                     >
                       {link.title}
                     </Typography>
@@ -299,13 +343,27 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
 
       {hasSubtasks && (
         <>
-          <SectionSubtitle>Subtasks ({task.subtasks?.length || 0})</SectionSubtitle>
+          <SectionSubtitle>
+            Subtasks ({task.subtasks?.length || 0})
+          </SectionSubtitle>
           <ProgressSection>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-              <Typography variant="caption" fontWeight={700} color={theme.palette.text.primary}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color={theme.palette.text.primary}
+              >
                 {completedSubtasksCount} of {task.subtasks?.length} completed
               </Typography>
-              <Typography variant="caption" fontWeight={700} color={theme.palette.primary.main}>
+              <Typography
+                variant="caption"
+                fontWeight={700}
+                color={theme.palette.primary.main}
+              >
                 {progressPercent}%
               </Typography>
             </Box>
@@ -325,7 +383,12 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
 
               return (
                 <SidebarSubtaskItem key={index} completed={subtask.completed}>
-                  <Box display="flex" alignItems="center" gap={1.5} sx={{ flex: 1 }}>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    gap={1.5}
+                    sx={{ flex: 1 }}
+                  >
                     <SubtaskCheck
                       completed={subtask.completed}
                       onClick={(e) => {
@@ -335,7 +398,9 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
                         }
                       }}
                     >
-                      {subtask.completed && <CheckIcon sx={{ fontSize: 12, color: '#fff' }} />}
+                      {subtask.completed && (
+                        <CheckIcon sx={{ fontSize: 12, color: '#fff' }} />
+                      )}
                     </SubtaskCheck>
 
                     <Box sx={{ flex: 1 }}>
@@ -347,7 +412,9 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
                             : theme.palette.text.primary,
                           fontSize: '13px',
                           fontWeight: 500,
-                          textDecoration: subtask.completed ? 'line-through' : 'none',
+                          textDecoration: subtask.completed
+                            ? 'line-through'
+                            : 'none',
                         }}
                       >
                         {subtask.title}
@@ -374,11 +441,20 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
                         </Box>
 
                         {/* Subtask Priority */}
-                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.3 }}>
+                        <Box
+                          sx={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: 0.3,
+                          }}
+                        >
                           <FlashOnIcon
                             sx={{
                               fontSize: 10,
-                              color: subPriority === 'High' ? theme.palette.error.main : '#f59e0b',
+                              color:
+                                subPriority === 'High'
+                                  ? theme.palette.error.main
+                                  : '#f59e0b',
                             }}
                           />
                           <Typography
@@ -434,7 +510,9 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
                           }}
                           sx={{
                             color: theme.palette.info.main,
-                            '&:hover': { bgcolor: `${theme.palette.info.main}15` },
+                            '&:hover': {
+                              bgcolor: `${theme.palette.info.main}15`,
+                            },
                           }}
                         >
                           <LaunchIcon sx={{ fontSize: 14 }} />
@@ -502,8 +580,16 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
               color: theme.palette.text.primary,
               fontSize: '13px',
               lineHeight: 1.6,
-              '& p': { margin: 0, marginBottom: '12px', '&:last-child': { marginBottom: 0 } },
-              '& ul, & ol': { marginTop: '4px', marginBottom: '12px', paddingLeft: '20px' },
+              '& p': {
+                margin: 0,
+                marginBottom: '12px',
+                '&:last-child': { marginBottom: 0 },
+              },
+              '& ul, & ol': {
+                marginTop: '4px',
+                marginBottom: '12px',
+                paddingLeft: '20px',
+              },
               '& a': {
                 color: theme.palette.info.main,
                 textDecoration: 'none',
@@ -511,7 +597,9 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
               },
             }}
             dangerouslySetInnerHTML={{
-              __html: selectedSubtaskDetails?.notes_encrypted || 'No information provided.',
+              __html:
+                selectedSubtaskDetails?.notes_encrypted ||
+                'No information provided.',
             }}
           />
         </DialogContent>
@@ -521,24 +609,26 @@ export const TaskDetailsFull: React.FC<TaskDetailsFullProps> = ({
         <ViewTaskButton onClick={onClose} startIcon={undefined}>
           CLOSE
         </ViewTaskButton>
-        <MarkDoneButton
-          onClick={() => onMarkDone && onMarkDone(task)}
-          sx={{
-            flex: 1,
-            padding: '12px',
-            fontSize: '11px',
-            bgcolor: theme.palette.text.primary,
-            color: theme.palette.background.default,
-            border: 'none',
-            '&:hover': {
-              bgcolor: theme.palette.text.secondary,
+        {!isTaskInFocus && (
+          <MarkDoneButton
+            onClick={() => onMarkDone && onMarkDone(task)}
+            sx={{
+              flex: 1,
+              padding: '12px',
+              fontSize: '11px',
+              bgcolor: theme.palette.text.primary,
               color: theme.palette.background.default,
-              borderColor: 'transparent',
-            },
-          }}
-        >
-          MARK AS DONE
-        </MarkDoneButton>
+              border: 'none',
+              '&:hover': {
+                bgcolor: theme.palette.text.secondary,
+                color: theme.palette.background.default,
+                borderColor: 'transparent',
+              },
+            }}
+          >
+            MARK AS DONE
+          </MarkDoneButton>
+        )}
       </SidebarFooter>
     </Box>
   );

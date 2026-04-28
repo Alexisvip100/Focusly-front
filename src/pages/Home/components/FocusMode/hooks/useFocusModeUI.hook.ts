@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { ViewMode } from '../FocusMode.types';
 
 export const useFocusModeUI = () => {
@@ -8,25 +8,40 @@ export const useFocusModeUI = () => {
   const [isSessionCompleted, setIsSessionCompleted] = useState(false);
 
   /* Drag Logic */
-  const [position, setPosition] = useState<{ x: number; y: number } | null>(null);
+  // Initial position: Bottom Right
+  const [position, setPosition] = useState<{ x: number; y: number }>(() => ({
+    x: window.innerWidth - 420, // Approx width of mini mode
+    y: window.innerHeight - 150, // Approx height of mini mode
+  }));
   const [isDragging, setIsDragging] = useState(false);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  const handleMouseDown = (e: React.MouseEvent) => {
-    setIsDragging(true);
-    const rect = (e.currentTarget as HTMLElement).getBoundingClientRect();
-    setDragOffset({
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
-    });
-  };
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      setIsDragging(true);
+      // Use the current translate position to calculate offset correctly
+      setDragOffset({
+        x: e.clientX - position.x,
+        y: e.clientY - position.y,
+      });
+    },
+    [position],
+  );
 
   useEffect(() => {
+    let animationFrameId: number;
+
     const handleMouseMove = (e: MouseEvent) => {
       if (!isDragging) return;
-      const newX = e.clientX - dragOffset.x;
-      const newY = e.clientY - dragOffset.y;
-      setPosition({ x: newX, y: newY });
+
+      const updatePosition = () => {
+        const newX = e.clientX - dragOffset.x;
+        const newY = e.clientY - dragOffset.y;
+        setPosition({ x: newX, y: newY });
+      };
+
+      // Throttle updates with requestAnimationFrame
+      animationFrameId = requestAnimationFrame(updatePosition);
     };
 
     const handleMouseUp = () => {
@@ -41,8 +56,23 @@ export const useFocusModeUI = () => {
     return () => {
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseup', handleMouseUp);
+      if (animationFrameId) {
+        cancelAnimationFrame(animationFrameId);
+      }
     };
   }, [isDragging, dragOffset]);
+
+  // Handle window resize to keep mini mode visible
+  useEffect(() => {
+    const handleResize = () => {
+      setPosition((prev) => ({
+        x: Math.min(prev.x, window.innerWidth - 400),
+        y: Math.min(prev.y, window.innerHeight - 100),
+      }));
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return {
     isSidebarOpen,

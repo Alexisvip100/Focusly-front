@@ -41,7 +41,9 @@ export const DraftingBadge = styled(Box)(({ theme }) => ({
   alignItems: 'center',
   gap: '6px',
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(34, 211, 238, 0.1)' : 'rgba(19, 127, 236, 0.1)',
+    theme.palette.mode === 'dark'
+      ? 'rgba(34, 211, 238, 0.1)'
+      : 'rgba(19, 127, 236, 0.1)',
   color: theme.palette.info.main,
   padding: '4px 10px',
   borderRadius: '6px',
@@ -134,7 +136,9 @@ export const MetaValue = styled(Box)(({ theme }) => ({
 
 export const StatusBadge = styled(Box)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(56, 189, 248, 0.15)' : 'rgba(19, 127, 236, 0.1)', // Light blue bg
+    theme.palette.mode === 'dark'
+      ? 'rgba(56, 189, 248, 0.15)'
+      : 'rgba(19, 127, 236, 0.1)', // Light blue bg
   color: theme.palette.info.main, // Light blue text
   fontSize: '10px',
   fontWeight: 700,
@@ -194,7 +198,9 @@ export const InsightHeader = styled(Box)({
 
 export const MarkDoneButton = styled(Button)(({ theme }) => ({
   backgroundColor:
-    theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 0.5)' : theme.palette.action.selected, // Transparent/Dark styling
+    theme.palette.mode === 'dark'
+      ? 'rgba(30, 41, 59, 0.5)'
+      : theme.palette.action.selected, // Transparent/Dark styling
   color: theme.palette.text.secondary,
   width: '100%',
   fontWeight: 600,
@@ -278,6 +284,74 @@ export const BlockNoteWrapper = styled(Box)(({ theme }) => ({
     color: theme.palette.text.primary,
     '&:hover': {
       backgroundColor: theme.palette.action.hover,
+    },
+  },
+  // Theme-aware Code Styles
+  '& code': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(255, 255, 255, 0.08)'
+        : 'rgba(0, 0, 0, 0.05)',
+    color: theme.palette.primary.light,
+    padding: '2px 6px',
+    borderRadius: '4px',
+    fontFamily: '"JetBrains Mono", "Fira Code", monospace',
+    fontSize: '0.9em',
+  },
+  '& pre': {
+    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4f5',
+    border: `1px solid ${theme.palette.divider}`,
+    borderRadius: '12px',
+    padding: '20px',
+    margin: '16px 0',
+    overflow: 'auto',
+    '& code': {
+      backgroundColor: 'transparent',
+      padding: 0,
+      color: theme.palette.text.primary,
+      fontSize: '14px',
+      lineHeight: 1.6,
+    },
+  },
+  '& .bn-block-content[data-content-type=codeBlock]': {
+    backgroundColor: theme.palette.mode === 'dark' ? '#0f172a' : '#f4f4f4f5',
+    padding: 0,
+  },
+  // Custom Workspace Mention styles
+  '& a[href*="workspaceId"]': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? 'rgba(56, 189, 248, 0.15)'
+        : 'rgba(19, 127, 236, 0.1)',
+    color: theme.palette.info.main,
+    padding: '2px 10px',
+    borderRadius: '8px',
+    textDecoration: 'none',
+    fontWeight: 700,
+    border: `1px solid ${theme.palette.info.main}33`,
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '2px',
+    transition: 'all 0.2s',
+    cursor: 'pointer',
+    '&::before': {
+      content: '""',
+      display: 'inline-block',
+      width: '14px',
+      height: '14px',
+      marginRight: '4px',
+      backgroundColor: 'currentColor',
+      maskImage:
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z'%3E%3C/path%3E%3C/svg%3E\")",
+      maskRepeat: 'no-repeat',
+      maskSize: 'contain',
+      verticalAlign: 'middle',
+    },
+    '&:hover': {
+      backgroundColor: theme.palette.info.main,
+      color: '#fff',
+      boxShadow: `0 0 12px ${theme.palette.info.main}66`,
+      transform: 'translateY(-1px)',
     },
   },
 }));

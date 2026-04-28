@@ -1,6 +1,5 @@
 import { WorkspaceEmptyState } from '@/utils';
 import { WorkspaceEditor } from './components/Editor/WorkspaceEditor';
-
 import { useWorkspace } from './hooks/useWorkspace.hook';
 import { WorkspaceLibrary } from './components/Library/WorkspaceLibrary';
 import { OnboardingWrapper } from '@/components/Onboarding/OnboardingWrapper';
@@ -11,6 +10,9 @@ import { useEffect, useState } from 'react';
 import type { WorkspaceProps, WorkspaceTypes } from './types/workspace.types';
 import { useSearchParams } from 'react-router-dom';
 import { Box, Typography } from '@mui/material';
+import { BlockNoteEditor } from '@blocknote/core';
+import { getDefaultReactSlashMenuItems } from '@blocknote/react';
+import { Folder as FolderIcon } from '@mui/icons-material';
 
 export const Workspace = ({
   isEditorOpen,
@@ -19,6 +21,7 @@ export const Workspace = ({
   onOpenTaskDetails,
   isSidebarOpen,
   onSidebarChange,
+  activeFocusTaskId,
 }: WorkspaceProps) => {
   const {
     register,
@@ -58,7 +61,8 @@ export const Workspace = ({
     },
     {
       target: '#joyride-workspace-folders',
-      content: 'Organize your notes into custom folders to keep everything structured.',
+      content:
+        'Organize your notes into custom folders to keep everything structured.',
     },
     {
       target: '#joyride-workspace-create-note',
@@ -70,22 +74,27 @@ export const Workspace = ({
     setRunOnboarding(false);
     localStorage.setItem('onboarding_workspace_completed', 'true');
   };
-  const { data: workspacesData, loading: workspacesLoading } = useQuery(GET_WORKSPACES, { 
-    variables: { search: '' },
-    skip: isEditorOpen 
-  });
+
+  const { data: workspacesData, loading: workspacesLoading } = useQuery(
+    GET_WORKSPACES,
+    {
+      variables: { search: '' },
+    },
+  );
+
   const [getWorkspaceById] = useLazyQuery(GET_WORKSPACE_BY_ID);
   const [searchParams, setSearchParams] = useSearchParams();
   const workspaceIdParam = searchParams.get('workspaceId');
 
   const hasWorkspaces = (workspacesData?.workspaces?.length ?? 0) > 0;
 
-  // Sync workspaceId from URL to Editor state
   useEffect(() => {
     const loadWorkspaceFromUrl = async () => {
-      if (workspaceIdParam && !isEditorOpen && watch('id') !== workspaceIdParam) {
+      if (workspaceIdParam && watch('id') !== workspaceIdParam) {
         try {
-          const { data } = await getWorkspaceById({ variables: { id: workspaceIdParam } });
+          const { data } = await getWorkspaceById({
+            variables: { id: workspaceIdParam },
+          });
           const workspace = data?.workspace;
           if (workspace) {
             setValue('id', workspace.id);
@@ -104,14 +113,10 @@ export const Workspace = ({
           }
         } catch (error) {
           console.error('Error loading workspace from URL', error);
-          // If not found, clear param
           const newParams = new URLSearchParams(searchParams);
           newParams.delete('workspaceId');
           setSearchParams(newParams);
         }
-      } else if (!workspaceIdParam && isEditorOpen && watch('id')) {
-        // This block handles the case where the user navigates away or clears the ID
-        // But we generally want the editor to handle its own close via onBack
       }
     };
     loadWorkspaceFromUrl();
@@ -128,12 +133,10 @@ export const Workspace = ({
   ]);
 
   const handleSelectWorkspace = (workspace: WorkspaceTypes) => {
-    // URL Update
     const newParams = new URLSearchParams(searchParams);
     newParams.set('workspaceId', workspace.id);
     setSearchParams(newParams);
 
-    // Load workspace data into form
     setValue('id', workspace.id);
     setValue('title', workspace.title);
     setValue('content', workspace.content);
@@ -161,10 +164,56 @@ export const Workspace = ({
     onEditorChange(true);
   };
 
+  const getCustomSlashMenuItems = (editor: BlockNoteEditor) => {
+    const defaultItems = getDefaultReactSlashMenuItems(editor);
+    return defaultItems.filter(
+      (item) =>
+        item.title !== 'Image' &&
+        item.title !== 'Video' &&
+        item.title !== 'Audio' &&
+        item.title !== 'File',
+    );
+  };
+
+  const getWorkspaceMentionMenuItems = (editor: BlockNoteEditor) => {
+    if (!workspacesData?.workspaces) return [];
+
+    const currentId = watch('id');
+    const otherWorkspaces = workspacesData.workspaces.filter(
+      (w: WorkspaceTypes) => w.id !== currentId,
+    );
+
+    return otherWorkspaces.map((w: WorkspaceTypes) => ({
+      title: w.title,
+      icon: (
+        <FolderIcon
+          sx={{ fontSize: 18, color: w.folder?.color || 'primary.main' }}
+        />
+      ),
+      onItemClick: () => {
+        editor.insertInlineContent([
+          {
+            type: 'link',
+            href: `/dashboard?tab=Workspace&workspaceId=${w.id}`,
+            content: `@${w.title}`,
+          },
+          {
+            type: 'text',
+            text: ' ',
+            styles: {},
+          },
+        ]);
+      },
+    }));
+  };
+
   if (isEditorOpen) {
     return (
       <>
-        <div id="joyride-workspace-editor" style={{ height: '100%', width: '100%' }}>
+        <div
+          id="joyride-workspace-editor"
+          style={{ height: '100%', width: '100%' }}
+        >
           <WorkspaceEditor
             onBack={() => {
               onEditorChange(false);
@@ -185,6 +234,10 @@ export const Workspace = ({
             onOpenTaskDetails={onOpenTaskDetails}
             isRightSidebarOpen={isSidebarOpen}
             setIsRightSidebarOpen={onSidebarChange}
+            workspaces={workspacesData?.workspaces}
+            getCustomSlashMenuItems={getCustomSlashMenuItems}
+            getWorkspaceMentionMenuItems={getWorkspaceMentionMenuItems}
+            activeFocusTaskId={activeFocusTaskId}
           />
         </div>
         <OnboardingWrapper
@@ -196,14 +249,19 @@ export const Workspace = ({
     );
   }
 
-  // Show a blank screen while loading to avoid flickering between states
   if (workspacesLoading) return null;
 
   if (hasWorkspaces) {
     return (
       <>
-        <div id="joyride-workspace-library" style={{ height: '100%', width: '100%' }}>
-          <WorkspaceLibrary onCreate={handleCreateNew} onSelect={handleSelectWorkspace} />
+        <div
+          id="joyride-workspace-library"
+          style={{ height: '100%', width: '100%' }}
+        >
+          <WorkspaceLibrary
+            onCreate={handleCreateNew}
+            onSelect={handleSelectWorkspace}
+          />
         </div>
         <OnboardingWrapper
           steps={onboardingSteps}
@@ -216,7 +274,10 @@ export const Workspace = ({
 
   return (
     <>
-      <div id="joyride-workspace-empty" style={{ height: '100%', width: '100%' }}>
+      <div
+        id="joyride-workspace-empty"
+        style={{ height: '100%', width: '100%' }}
+      >
         <WorkspaceEmptyState onCreate={handleCreateNew} />
       </div>
       <OnboardingWrapper

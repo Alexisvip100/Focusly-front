@@ -10,6 +10,7 @@ interface TaskDetailsFullModalProps {
   onStartFocus?: (task: TaskSearchItems, subtaskIndex?: number | null) => void;
   onMarkDone?: (task: TaskSearchItems) => void;
   onToggleSubtask?: (taskId: string, index: number) => void;
+  activeFocusTaskId?: string | null;
 }
 
 export const TaskDetailsFullModal: React.FC<TaskDetailsFullModalProps> = ({
@@ -19,6 +20,7 @@ export const TaskDetailsFullModal: React.FC<TaskDetailsFullModalProps> = ({
   onStartFocus,
   onMarkDone,
   onToggleSubtask,
+  activeFocusTaskId,
 }) => {
   if (!task) return null;
 
@@ -37,13 +39,21 @@ export const TaskDetailsFullModal: React.FC<TaskDetailsFullModalProps> = ({
         },
       }}
     >
-      <Box sx={{ position: 'relative', height: '100%', display: 'flex', flexDirection: 'column' }}>
+      <Box
+        sx={{
+          position: 'relative',
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
         <TaskDetailsFull
           task={task}
           onClose={onClose}
           onStartFocus={onStartFocus}
           onMarkDone={onMarkDone}
           onToggleSubtask={onToggleSubtask}
+          activeFocusTaskId={activeFocusTaskId}
         />
       </Box>
     </Drawer>

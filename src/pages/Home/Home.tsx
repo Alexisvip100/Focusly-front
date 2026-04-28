@@ -75,6 +75,7 @@ export const Home = () => {
               onOpenTaskDetails={handleOpenTaskDetails}
               isSidebarOpen={isWorkspaceSidebarOpen}
               onSidebarChange={setIsWorkspaceSidebarOpen}
+              activeFocusTaskId={activeFocusTask?.id}
             />
           )}
           {activeTab === TaskBar.Insights && <Insights />}
@@ -115,12 +116,16 @@ export const Home = () => {
         onClose={() => setIsFocusModeOpen(false)}
         task={activeFocusTask}
         subtaskIndex={activeFocusSubtaskIndex}
-        onActiveChange={() => { }}
+        onActiveChange={() => {}}
       />
 
       {isEditModalOpen && (
         <TaskDetailModal
-          key={taskDetailsTask?.google_event_id || taskDetailsTask?.id || 'create-task-modal'}
+          key={
+            taskDetailsTask?.google_event_id ||
+            taskDetailsTask?.id ||
+            'create-task-modal'
+          }
           open={isEditModalOpen}
           onClose={closeTaskDetails}
           onSave={handleSaveTask}
@@ -138,6 +143,7 @@ export const Home = () => {
           task={taskDetailsTask as unknown as TaskSearchItems}
           onStartFocus={handleStartFocus}
           onToggleSubtask={handleToggleSubtask}
+          activeFocusTaskId={activeFocusTask?.id}
         />
       )}
 
@@ -145,6 +151,5 @@ export const Home = () => {
     </>
   );
 };
-
 
 export default Home;
