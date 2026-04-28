@@ -1,16 +1,28 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useAppSelector, useAppDispatch } from '@/redux/hooks';
 import { useMutation } from '@apollo/client';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
-import { GET_TASKS, DELETE_TASK, UPDATE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
-import { removeTask, upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
+import {
+  GET_TASKS,
+  DELETE_TASK,
+  UPDATE_TASK,
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import {
+  removeTask,
+  upsertTask as upsertTaskRedux,
+} from '@/redux/tasks/task.slice';
 import { removeEvent } from '@/redux/calendar/calendar.slice';
 import { TaskBar } from '../components/Sidebar/types/Sidebar.types';
 import type { Task } from '@/redux/tasks/task.types';
 import type { TaskSearchItems } from '../../Workspace/types/workspace.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
-import { mapGoogleEventToTask, normalizeGoogleId, mapResponseToTask, getBaseGoogleId } from '@/api/Tasks/taskMapper';
+import {
+  mapGoogleEventToTask,
+  normalizeGoogleId,
+  mapResponseToTask,
+  getBaseGoogleId,
+} from '@/api/Tasks/taskMapper';
 import { deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
 
 export const useHome = () => {
@@ -28,9 +40,36 @@ export const useHome = () => {
   const [isRightPanelOpen, setIsRightPanelOpen] = useState(true);
 
   // Focus Mode State
-  const [isFocusModeOpen, setIsFocusModeOpen] = useState(false);
-  const [activeFocusTask, setActiveFocusTask] = useState<Task | null>(null);
-  const [activeFocusSubtaskIndex, setActiveFocusSubtaskIndex] = useState<number | null>(null);
+  const [isFocusModeOpen, setIsFocusModeOpen] = useState(() => {
+    return localStorage.getItem('focus_mode_open') === 'true';
+  });
+  const [activeFocusTask, setActiveFocusTask] = useState<Task | null>(() => {
+    const saved = localStorage.getItem('focus_mode_task');
+    return saved ? JSON.parse(saved) : null;
+  });
+  const [activeFocusSubtaskIndex, setActiveFocusSubtaskIndex] = useState<
+    number | null
+  >(() => {
+    const saved = localStorage.getItem('focus_mode_subtask_index');
+    return saved ? JSON.parse(saved) : null;
+  });
+
+  useEffect(() => {
+    localStorage.setItem('focus_mode_open', String(isFocusModeOpen));
+    if (activeFocusTask) {
+      localStorage.setItem('focus_mode_task', JSON.stringify(activeFocusTask));
+    } else {
+      localStorage.removeItem('focus_mode_task');
+    }
+    if (activeFocusSubtaskIndex !== null) {
+      localStorage.setItem(
+        'focus_mode_subtask_index',
+        JSON.stringify(activeFocusSubtaskIndex),
+      );
+    } else {
+      localStorage.removeItem('focus_mode_subtask_index');
+    }
+  }, [isFocusModeOpen, activeFocusTask, activeFocusSubtaskIndex]);
 
   // Task Details Management via URL
   const taskIdParam = searchParams.get('taskId');
@@ -42,7 +81,7 @@ export const useHome = () => {
   const taskDetailsTask = useMemo(() => {
     if (!taskIdParam) return null;
     if (tempTask && tempTask.id === taskIdParam) return tempTask;
-    
+
     // Check in native Focusly tasks
     const nativeTask = tasks.find((t) => t.id === taskIdParam);
     if (nativeTask) return nativeTask;
@@ -56,11 +95,12 @@ export const useHome = () => {
 
   const isTaskDetailsOpen = !!taskIdParam && !!taskDetailsTask;
   const isViewFull = searchParams.get('view') === 'full';
-  
+
   // New Case: "New Task" via URL (e.g. from calendar slot)
   const isCreatingNewTask = searchParams.get('action') === 'create';
-  
-  const isEditModalOpen = (isTaskDetailsOpen && !isViewFull) || isCreatingNewTask;
+
+  const isEditModalOpen =
+    (isTaskDetailsOpen && !isViewFull) || isCreatingNewTask;
   const isFullViewOpen = isTaskDetailsOpen && isViewFull;
 
   const initialStart = useMemo(() => {
@@ -77,15 +117,30 @@ export const useHome = () => {
     return isNaN(date.getTime()) ? null : date;
   }, [searchParams]);
 
-  const handleStartFocus = (task?: Task | TaskSearchItems | null, subtaskIndex?: number | null) => {
+  const handleStartFocus = (
+    task?: Task | TaskSearchItems | null,
+    subtaskIndex?: number | null,
+  ) => {
+    if (
+      task?.id !== activeFocusTask?.id ||
+      subtaskIndex !== activeFocusSubtaskIndex
+    ) {
+      localStorage.removeItem('focus_mode_time_left');
+      localStorage.removeItem('focus_mode_is_active');
+    }
     if (task) {
       setActiveFocusTask(task as Task);
     }
-    setActiveFocusSubtaskIndex(typeof subtaskIndex === 'number' ? subtaskIndex : null);
+    setActiveFocusSubtaskIndex(
+      typeof subtaskIndex === 'number' ? subtaskIndex : null,
+    );
     setIsFocusModeOpen(true);
   };
 
-  const handleOpenTaskDetails = (task: Task | TaskSearchItems, mode: 'view' | 'edit' = 'edit') => {
+  const handleOpenTaskDetails = (
+    task: Task | TaskSearchItems,
+    mode: 'view' | 'edit' = 'edit',
+  ) => {
     setTempTask(task);
     const params: Record<string, string> = { tab: activeTab, taskId: task.id };
     if (mode === 'view') params.view = 'full';
@@ -107,9 +162,12 @@ export const useHome = () => {
     if (!taskDetailsTask || !taskDetailsTask.subtasks) return;
 
     const updatedSubtasks = [...taskDetailsTask.subtasks].map((s) =>
-      typeof s === 'string' ? { title: s, completed: false, timer: 0 } : { ...s }
+      typeof s === 'string'
+        ? { title: s, completed: false, timer: 0 }
+        : { ...s },
     );
-    updatedSubtasks[subtaskIndex].completed = !updatedSubtasks[subtaskIndex].completed;
+    updatedSubtasks[subtaskIndex].completed =
+      !updatedSubtasks[subtaskIndex].completed;
 
     try {
       const { data } = await updateTaskMutation({
@@ -128,12 +186,16 @@ export const useHome = () => {
               category: s.category,
             })),
             google_event_id: (taskDetailsTask as Task).google_event_id,
-            estimated_start_date: (taskDetailsTask as Task).estimated_start_date,
+            estimated_start_date: (taskDetailsTask as Task)
+              .estimated_start_date,
             estimated_end_date: (taskDetailsTask as Task).estimated_end_date,
           },
         },
         refetchQueries: [
-          { query: GET_TASKS, variables: { userId: (taskDetailsTask as Task).user_id || '' } },
+          {
+            query: GET_TASKS,
+            variables: { userId: (taskDetailsTask as Task).user_id || '' },
+          },
           { query: GET_WORKSPACES, variables: { search: '' } },
         ],
       });
@@ -147,7 +209,10 @@ export const useHome = () => {
           deadline: data.updateTask.deadline || new Date().toISOString(),
           estimated_start_date: data.updateTask.estimated_start_date,
           estimated_end_date: data.updateTask.estimated_end_date,
-          tags: data.updateTask.tags?.map((t: { name: string } | string) => (typeof t === 'string' ? t : t.name)) || [],
+          tags:
+            data.updateTask.tags?.map((t: { name: string } | string) =>
+              typeof t === 'string' ? t : t.name,
+            ) || [],
         };
         dispatch(upsertTaskRedux(mappedTask));
       }
@@ -183,7 +248,10 @@ export const useHome = () => {
     dispatch(upsertTaskRedux(mappedTask));
 
     // 3. Cleanup virtual Google state to prevent duplication
-    if (mappedTask.google_event_id || ('task_type' in updatedTask && updatedTask.task_type === 'GoogleTask')) {
+    if (
+      mappedTask.google_event_id ||
+      ('task_type' in updatedTask && updatedTask.task_type === 'GoogleTask')
+    ) {
       // Remove the specific ID we just converted
       if (prevTaskId) {
         dispatch(removeEvent({ id: prevTaskId }));
@@ -192,13 +260,18 @@ export const useHome = () => {
       // Secondary cleanup for any other virtual instances of the same event
       const normalizedId = normalizeGoogleId(mappedTask.google_event_id);
       const baseId = getBaseGoogleId(mappedTask.google_event_id);
-      
+
       const matchingEvents = reduxEvents.filter((e) => {
         const eventId = normalizeGoogleId(e.id);
         const eventBaseId = getBaseGoogleId(e.id);
-        return eventId === normalizedId || eventBaseId === baseId || eventId === baseId || eventBaseId === normalizedId;
+        return (
+          eventId === normalizedId ||
+          eventBaseId === baseId ||
+          eventId === baseId ||
+          eventBaseId === normalizedId
+        );
       });
-      
+
       matchingEvents.forEach((e) => {
         if (e.id !== prevTaskId) {
           dispatch(removeEvent({ id: e.id }));
@@ -215,7 +288,8 @@ export const useHome = () => {
   const deleteTask = async () => {
     if (taskDetailsTask?.id) {
       try {
-        const isGoogleTask = (taskDetailsTask as Task).task_type === 'GoogleTask';
+        const isGoogleTask =
+          (taskDetailsTask as Task).task_type === 'GoogleTask';
 
         if (!isGoogleTask) {
           // Point 2: Platform Task — Delete from BOTH Google (if synced) and Platform
@@ -225,7 +299,10 @@ export const useHome = () => {
               // Also remove from virtual state
               dispatch(removeEvent({ id: taskDetailsTask.google_event_id }));
             } catch (err) {
-              console.warn('Failed to delete synced Google event, proceeding with platform delete', err);
+              console.warn(
+                'Failed to delete synced Google event, proceeding with platform delete',
+                err,
+              );
             }
           }
 

@@ -56,7 +56,7 @@ export const EditorContent = ({
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <BlockNoteWrapper>
+      <BlockNoteWrapper id="joyride-editor-area">
         <BlockNoteView
           editor={editor}
           theme={isThemeDark ? 'dark' : 'light'}

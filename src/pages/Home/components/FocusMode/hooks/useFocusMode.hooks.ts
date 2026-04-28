@@ -20,7 +20,13 @@ export const useFocusMode = ({
   subtaskIndex,
 }: UseFocusModeProps) => {
   const { user } = useAppSelector((state) => state.auth);
-  const [isActive, setIsActive] = useState(false);
+  const [isActive, setIsActive] = useState(() => {
+    return localStorage.getItem('focus_mode_is_active') === 'true';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('focus_mode_is_active', String(isActive));
+  }, [isActive]);
 
   // 1. Task Logic
   const tasks = useFocusModeTasks({
@@ -81,12 +87,20 @@ export const useFocusMode = ({
     const timeSpentSeconds = initialMinutes * 60 - timer.timeLeft;
     const timeSpentMinutes = Math.max(1, Math.round(timeSpentSeconds / 60));
 
-    await actions.handleCompleteTask(tasks.activeTask, tasks.activeSubtaskIndex, timeSpentMinutes);
+    await actions.handleCompleteTask(
+      tasks.activeTask,
+      tasks.activeSubtaskIndex,
+      timeSpentMinutes,
+    );
   };
 
   const handleUpdateStatus = (newStatus: TaskStatus) => {
     if (!tasks.activeTask) return;
-    actions.handleUpdateStatus(tasks.activeTask, tasks.activeSubtaskIndex, newStatus);
+    actions.handleUpdateStatus(
+      tasks.activeTask,
+      tasks.activeSubtaskIndex,
+      newStatus,
+    );
     tasks.setActiveTask((prev) => {
       if (!prev) return null;
       if (tasks.activeSubtaskIndex !== null && prev.subtasks) {
@@ -108,7 +122,11 @@ export const useFocusMode = ({
 
   const handleUpdatePriority = (newPriority: number) => {
     if (!tasks.activeTask) return;
-    actions.handleUpdatePriority(tasks.activeTask, tasks.activeSubtaskIndex, newPriority);
+    actions.handleUpdatePriority(
+      tasks.activeTask,
+      tasks.activeSubtaskIndex,
+      newPriority,
+    );
     tasks.setActiveTask((prev) => {
       if (!prev) return null;
       if (tasks.activeSubtaskIndex !== null && prev.subtasks) {

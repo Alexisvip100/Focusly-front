@@ -55,7 +55,10 @@ export const EditorHeader = ({
         </BackButton>
       </HeaderLeft>
 
-      <HeaderCenter sx={{ position: 'relative', zIndex: 50, mx: 2 }}>
+      <HeaderCenter
+        id="joyride-editor-search"
+        sx={{ position: 'relative', zIndex: 50, mx: 2 }}
+      >
         <SearchPalette
           showPalette={showPalette}
           setShowPalette={setShowPalette}
