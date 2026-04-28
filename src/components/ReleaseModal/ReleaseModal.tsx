@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Dialog, Box, Typography, Button, styled } from '@mui/material';
 import {
   AutoAwesome as SparklesIcon,
