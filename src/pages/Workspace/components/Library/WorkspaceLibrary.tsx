@@ -734,7 +734,6 @@ export const WorkspaceLibrary = ({
                           sx={{
                             color: 'text.secondary',
                             '&:hover': {
-                              color: 'white',
                               backgroundColor: 'action.hover',
                             },
                           }}
