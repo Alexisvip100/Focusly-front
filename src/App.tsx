@@ -11,14 +11,18 @@ import Dashboard from '@/pages/Dashboard/Dashboard';
 import { useSession } from '@/hooks/useSession';
 import { useAppSelector } from '@/redux/hooks';
 import { SessionExpiredBanner } from '@/components/SessionExpiredBanner';
+import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 
 function App() {
   const { isLogged } = useSession();
-  const sessionExpiredNotice = useAppSelector((state) => state.auth.sessionExpiredNotice);
+  const sessionExpiredNotice = useAppSelector(
+    (state) => state.auth.sessionExpiredNotice,
+  );
 
   return (
     <>
       <SessionExpiredBanner />
+      <ReleaseModal />
       <Box
         sx={{
           pt: sessionExpiredNotice ? { xs: '92px', sm: '102px' } : 0,
@@ -26,8 +30,14 @@ function App() {
         }}
       >
         <Routes>
-          <Route path="/dashboard" element={isLogged ? <Dashboard /> : <Navigate to="/login" />} />
-          <Route path="/" element={isLogged ? <Navigate to="/dashboard" /> : <LandingPage />} />
+          <Route
+            path="/dashboard"
+            element={isLogged ? <Dashboard /> : <Navigate to="/login" />}
+          />
+          <Route
+            path="/"
+            element={isLogged ? <Navigate to="/dashboard" /> : <LandingPage />}
+          />
           <Route
             path="/tasks"
             element={
@@ -43,8 +53,14 @@ function App() {
           <Route path="/how-it-works" element={<HowItWorksPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/about" element={<AboutPage />} />
-          <Route path="/login" element={isLogged ? <Navigate to="/dashboard" /> : <Login />} />
-          <Route path="/profile" element={isLogged ? <Profile /> : <Navigate to="/login" />} />
+          <Route
+            path="/login"
+            element={isLogged ? <Navigate to="/dashboard" /> : <Login />}
+          />
+          <Route
+            path="/profile"
+            element={isLogged ? <Profile /> : <Navigate to="/login" />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Box>
