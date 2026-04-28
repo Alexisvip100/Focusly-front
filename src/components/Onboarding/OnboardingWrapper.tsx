@@ -7,12 +7,16 @@ interface OnboardingWrapperProps {
   onFinish?: () => void;
 }
 
-export const OnboardingWrapper = ({ steps, run, onFinish }: OnboardingWrapperProps) => {
+export const OnboardingWrapper = ({
+  steps,
+  run,
+  onFinish,
+}: OnboardingWrapperProps) => {
   const theme = useTheme();
 
   const handleJoyrideCallback = (data: CallBackProps) => {
     const { status } = data;
-    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as any)) {
+    if ([STATUS.FINISHED, STATUS.SKIPPED].includes(status as string)) {
       if (onFinish) onFinish();
     }
   };

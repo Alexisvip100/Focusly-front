@@ -13,11 +13,14 @@ import {
   CurrentTaskBadge,
   TaskMetadataContainer,
 } from '../FocusMode.styles';
-import { getPriorityFromLevel, formatDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import {
+  getPriorityFromLevel,
+  formatDuration,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 
 interface FocusMetadataProps {
-  activeItem: any;
+  activeItem: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   handleUpdateStatus: (status: TaskStatus) => void;
   handleUpdatePriority: (level: number) => void;
 }
@@ -30,7 +33,9 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
   const theme = useTheme();
   const isDark = theme.palette.mode === 'dark';
   const [statusAnchor, setStatusAnchor] = useState<null | HTMLElement>(null);
-  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(null);
+  const [priorityAnchor, setPriorityAnchor] = useState<null | HTMLElement>(
+    null,
+  );
 
   return (
     <TaskTitleContainer>
@@ -78,8 +83,19 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
                 bgcolor: 'rgba(255,255,255,0.05)',
               }}
             >
-              <FolderIcon sx={{ fontSize: 16, color: activeItem.workspace.folder.color || 'primary.main' }} />
-              <Typography variant="body2" sx={{ fontWeight: 600, color: activeItem.workspace.folder.color || 'primary.main' }}>
+              <FolderIcon
+                sx={{
+                  fontSize: 16,
+                  color: activeItem.workspace.folder.color || 'primary.main',
+                }}
+              />
+              <Typography
+                variant="body2"
+                sx={{
+                  fontWeight: 600,
+                  color: activeItem.workspace.folder.color || 'primary.main',
+                }}
+              >
                 {activeItem.workspace.folder.name}
               </Typography>
             </Box>
@@ -110,13 +126,27 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             const status = activeItem?.status || 'Todo';
             switch (status) {
               case 'Done':
-                return <CheckCircleIcon sx={{ fontSize: 16, color: 'success.main' }} />;
+                return (
+                  <CheckCircleIcon
+                    sx={{ fontSize: 16, color: 'success.main' }}
+                  />
+                );
               case 'Pending':
-                return <PauseCircleIcon sx={{ fontSize: 16, color: 'warning.main' }} />;
+                return (
+                  <PauseCircleIcon
+                    sx={{ fontSize: 16, color: 'warning.main' }}
+                  />
+                );
               case 'Backlog':
-                return <HistoryIcon sx={{ fontSize: 16, color: 'secondary.main' }} />;
+                return (
+                  <HistoryIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
+                );
               default:
-                return <RadioButtonUncheckedIcon sx={{ fontSize: 16, color: 'info.main' }} />;
+                return (
+                  <RadioButtonUncheckedIcon
+                    sx={{ fontSize: 16, color: 'info.main' }}
+                  />
+                );
             }
           })()}
           <Typography variant="body2" sx={{ fontWeight: 500 }}>
@@ -158,7 +188,10 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
         </Typography>
 
         <Box sx={{ px: 1, py: 0.5 }}>
-          <Typography variant="body2" sx={{ color: theme.palette.text.secondary }}>
+          <Typography
+            variant="body2"
+            sx={{ color: theme.palette.text.secondary }}
+          >
             {formatDuration(activeItem?.estimate_timer || 25)} estimated
           </Typography>
         </Box>
@@ -182,20 +215,28 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
           {
             label: 'Todo',
             icon: (
-              <RadioButtonUncheckedIcon sx={{ fontSize: 18, color: 'info.main' }} />
+              <RadioButtonUncheckedIcon
+                sx={{ fontSize: 18, color: 'info.main' }}
+              />
             ),
           },
           {
             label: 'Pending',
-            icon: <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />,
+            icon: (
+              <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+            ),
           },
           {
             label: 'Backlog',
-            icon: <HistoryIcon sx={{ fontSize: 18, color: 'secondary.main' }} />,
+            icon: (
+              <HistoryIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
+            ),
           },
           {
             label: 'Done',
-            icon: <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />,
+            icon: (
+              <CheckCircleIcon sx={{ fontSize: 18, color: 'success.main' }} />
+            ),
           },
         ].map((option) => (
           <MenuItem
@@ -245,7 +286,7 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
           </MenuItem>
         ))}
       </Menu>
-      
+
       {activeItem?.isSubtask && (
         <Box sx={{ mt: 1, display: 'inline-flex' }}>
           <Typography

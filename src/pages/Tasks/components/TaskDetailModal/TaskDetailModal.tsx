@@ -1,11 +1,5 @@
 import { useState } from 'react';
-import {
-  Dialog,
-  DialogContent,
-  Box,
-  TextField,
-  Slide,
-} from '@mui/material';
+import { Dialog, DialogContent, Box, TextField, Slide } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 import React from 'react';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -32,7 +26,7 @@ import { TaskWorkspaces } from './components/TaskWorkspaces/TaskWorkspaces';
 
 const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
-    children: React.ReactElement<any, any>;
+    children: React.ReactElement;
   },
   ref: React.Ref<unknown>,
 ) {
@@ -50,27 +44,48 @@ export const TaskDetailModal = ({
   subtaskIndex,
 }: TaskDetailModalProps) => {
   const {
-    title, setTitle,
-    description, setDescription,
-    priority, setPriority,
-    category, setCategory,
-    status, setStatus,
-    tags, setTags,
-    newTag, setNewTag,
-    isAddingTag, setIsAddingTag,
-    handleSave, handleAddTag, handleUpdate, handleDelete,
-    realTime, setRealTime,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    priority,
+    setPriority,
+    category,
+    setCategory,
+    status,
+    setStatus,
+    tags,
+    setTags,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    handleSave,
+    handleAddTag,
+    handleUpdate,
+    handleDelete,
+    realTime,
+    setRealTime,
     timeSlotDisplay,
     errors,
-    duration, setDuration,
-    color, setColor,
-    currentDate, setCurrentDate,
+    duration,
+    setDuration,
+    color,
+    setColor,
+    currentDate,
+    setCurrentDate,
     loadingSave,
-    links, handleAddLink, handleRemoveLink,
-    newLinkTitle, setNewLinkTitle,
-    newLinkUrl, setNewLinkUrl,
-    isAddingLink, setIsAddingLink,
-    collaborators, handleAddCollaborator,
+    links,
+    handleAddLink,
+    handleRemoveLink,
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
+    isAddingLink,
+    setIsAddingLink,
+    collaborators,
+    handleAddCollaborator,
     isGeneratingMeet,
     handleGenerateMeet,
     handleTimerChange,
@@ -89,7 +104,7 @@ export const TaskDetailModal = ({
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [isLinksExpanded, setIsLinksExpanded] = useState(true);
   const [colorAnchor, setColorAnchor] = useState<HTMLElement | null>(null);
-  
+
   const isPureGoogleTask = initialTask?.task_type === 'GoogleTask';
 
   return (
@@ -139,18 +154,29 @@ export const TaskDetailModal = ({
           </Box>
 
           <TaskProperties
-            status={status} setStatus={setStatus}
-            priority={priority} setPriority={setPriority}
-            category={category} setCategory={setCategory}
-            color={color} setColor={setColor}
-            colorAnchor={colorAnchor} setColorAnchor={setColorAnchor}
-            currentDate={currentDate} setCurrentDate={setCurrentDate}
-            tags={tags} setTags={setTags}
-            newTag={newTag} setNewTag={setNewTag}
-            isAddingTag={isAddingTag} setIsAddingTag={setIsAddingTag}
+            status={status}
+            setStatus={setStatus}
+            priority={priority}
+            setPriority={setPriority}
+            category={category}
+            setCategory={setCategory}
+            color={color}
+            setColor={setColor}
+            colorAnchor={colorAnchor}
+            setColorAnchor={setColorAnchor}
+            currentDate={currentDate}
+            setCurrentDate={setCurrentDate}
+            tags={tags}
+            setTags={setTags}
+            newTag={newTag}
+            setNewTag={setNewTag}
+            isAddingTag={isAddingTag}
+            setIsAddingTag={setIsAddingTag}
             handleAddTag={handleAddTag}
-            duration={duration} setDuration={setDuration}
-            realTime={realTime} setRealTime={setRealTime}
+            duration={duration}
+            setDuration={setDuration}
+            realTime={realTime}
+            setRealTime={setRealTime}
             isPureGoogleTask={isPureGoogleTask}
             timeSlotDisplay={timeSlotDisplay}
             handleTimerChange={handleTimerChange}
@@ -178,7 +204,7 @@ export const TaskDetailModal = ({
             handleAddCollaborator={handleAddCollaborator}
           />
 
-          <TaskWorkspaces 
+          <TaskWorkspaces
             workspaces={initialTask?.workspaces}
             onNavigate={createURLWorkSpace}
           />

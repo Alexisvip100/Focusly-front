@@ -28,15 +28,22 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     links: event.links || [],
     task_type: 'GoogleTask',
     google_event_id: normalizeGoogleId(event.id),
-    subtasks: (event.subtasks || []) as any,
+    subtasks: event.subtasks || [],
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    collaborators: (event.collaborators || (event as any).attendees || (event as any).participants || []).map((c: any) => ({
+    collaborators: (
+      event.collaborators ||
+      (event as any).attendees ||
+      (event as any).participants ||
+      []
+    ).map((c: any) => ({
       ...c,
       name: c.name || '',
-      avatar: c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`
+      avatar:
+        c.avatar ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`,
     })),
   };
 };
@@ -91,12 +98,17 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     google_event_id: normalizeGoogleId(t.google_event_id),
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     source: (t as any).source || 'platform',
-    collaborators: (t.collaborators || []).map(c => ({
+    collaborators: (t.collaborators || []).map((c) => ({
       ...c,
       name: c.name || '',
-      avatar: c.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`
+      avatar:
+        c.avatar ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`,
     })),
-    tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
+    tags:
+      t.tags?.map((tag: string | { name: string }) =>
+        typeof tag === 'string' ? tag : tag.name,
+      ) || [],
     estimated_start_date: safeISO(t.estimated_start_date),
     estimated_end_date: safeISO(t.estimated_end_date),
   };

@@ -19,14 +19,18 @@ import {
   ListItemText,
   Divider,
   Stack,
-  Typography
+  Typography,
 } from '@mui/material';
 import { Add as AddIcon } from '@mui/icons-material';
 
 // Styles & Hooks
 import { CalendarContainer } from './CalendarView.styles';
 import { useCalendarView } from './hooks/useCalendarView.hook';
-import { contextMenuSx, priorityCircleSx, PRIORITY_COLORS } from '../CalendarEvent/CalendarEvent.styles';
+import {
+  contextMenuSx,
+  priorityCircleSx,
+  PRIORITY_COLORS,
+} from '../CalendarEvent/CalendarEvent.styles';
 
 // Types
 import type { ICalendarEvent } from '../CalendarEvent/CalendarEvent';
@@ -60,29 +64,40 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     if (slotContextMenu) {
       const start = slotContextMenu.date;
       const end = new Date(start.getTime() + 30 * 60000); // Default 30 mins
-      
-      const params: { action: string; start: string; end: string; priority?: number } = { 
-        action: 'create', 
-        start: start.toISOString(), 
-        end: end.toISOString() 
+
+      const params: {
+        action: string;
+        start: string;
+        end: string;
+        priority?: number;
+      } = {
+        action: 'create',
+        start: start.toISOString(),
+        end: end.toISOString(),
       };
-      
+
       if (priority) {
         params.priority = priority;
       }
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       handleSelectSlot(params as any);
       closeSlotContextMenu();
     }
   };
 
-
   return (
-    <CalendarContainer 
-      isDayView={currentView === Views.DAY}
-    >
-      <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', height: '100%', position: 'relative', overflow: 'hidden' }}>
+    <CalendarContainer isDayView={currentView === Views.DAY}>
+      <Box
+        sx={{
+          flexGrow: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          height: '100%',
+          position: 'relative',
+          overflow: 'hidden',
+        }}
+      >
         <Calendar
           localizer={localizer}
           events={events}
@@ -106,17 +121,23 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               />
             ),
             header: CalendarHeader,
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             event: (props: any) => (
-              <CalendarEvent
+              <CalendarEvent {...props} onStartFocus={onStartFocus} />
+            ),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            timeSlotWrapper: (props: any) => (
+              <CalendarSlotWrapper
                 {...props}
-                onStartFocus={onStartFocus}
+                onContextMenu={handleSlotContextMenu}
               />
             ),
-            timeSlotWrapper: (props: any) => (
-              <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
-            ),
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             dateCellWrapper: (props: any) => (
-              <CalendarSlotWrapper {...props} onContextMenu={handleSlotContextMenu} />
+              <CalendarSlotWrapper
+                {...props}
+                onContextMenu={handleSlotContextMenu}
+              />
             ),
           }}
           step={30}
@@ -141,10 +162,24 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
         sx={contextMenuSx}
       >
         <Box sx={{ px: 2, py: 1.5 }}>
-          <Typography variant="overline" sx={{ fontWeight: 700, color: 'text.secondary', display: 'block', mb: 1, lineHeight: 1 }}>
+          <Typography
+            variant="overline"
+            sx={{
+              fontWeight: 700,
+              color: 'text.secondary',
+              display: 'block',
+              mb: 1,
+              lineHeight: 1,
+            }}
+          >
             Quick Create
           </Typography>
-          <Stack direction="row" spacing={1.5} justifyContent="center" sx={{ mt: 1 }}>
+          <Stack
+            direction="row"
+            spacing={1.5}
+            justifyContent="center"
+            sx={{ mt: 1 }}
+          >
             {[1, 2, 3, 4].map((level) => (
               <Box
                 key={level}
@@ -154,9 +189,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
             ))}
           </Stack>
         </Box>
-        
+
         <Divider />
-        
+
         <MenuItem onClick={() => handleCreateTaskAtSlot()}>
           <ListItemIcon>
             <AddIcon fontSize="small" />

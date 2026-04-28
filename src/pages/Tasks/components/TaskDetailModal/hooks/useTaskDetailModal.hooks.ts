@@ -19,16 +19,26 @@ export const useTaskDetailModal = ({
   const [searchParams, setSearchParams] = useSearchParams();
 
   const {
-    title, setTitle,
-    description, setDescription,
-    priority, setPriority,
-    status, setStatus,
-    category, setCategory,
-    currentDate, setCurrentDate,
-    duration, setDuration,
-    realTime, setRealTime,
-    color, setColor,
-    errors, setErrors,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    priority,
+    setPriority,
+    status,
+    setStatus,
+    category,
+    setCategory,
+    currentDate,
+    setCurrentDate,
+    duration,
+    setDuration,
+    realTime,
+    setRealTime,
+    color,
+    setColor,
+    errors,
+    setErrors,
     handleTitleChange,
     validateForm,
     initialState,
@@ -48,23 +58,34 @@ export const useTaskDetailModal = ({
   });
 
   const {
-    tags, setTags,
-    subtasks, setSubtasks,
-    links, setLinks,
-    newTag, setNewTag,
-    isAddingTag, setIsAddingTag,
-    newSubtask, setNewSubtask,
-    newSubtaskDuration, setNewSubtaskDuration,
-    newLinkTitle, setNewLinkTitle,
-    newLinkUrl, setNewLinkUrl,
-    isAddingLink, setIsAddingLink,
+    tags,
+    setTags,
+    subtasks,
+    setSubtasks,
+    links,
+    setLinks,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    newSubtask,
+    setNewSubtask,
+    newSubtaskDuration,
+    setNewSubtaskDuration,
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
+    isAddingLink,
+    setIsAddingLink,
     handleAddTag,
     handleAddSubtask,
     handleToggleSubtask,
     handleAddLink,
     handleRemoveLink,
     handleUpdateLink,
-    collaborators, setCollaborators,
+    collaborators,
+    setCollaborators,
     handleAddCollaborator,
     handleRemoveCollaborator,
     initialCollections,
@@ -72,38 +93,44 @@ export const useTaskDetailModal = ({
     initialTask,
     onAddLink: (updatedLinks: { title: string; url: string }[]) => {
       if (initialTask?.id) {
-        mutations.handleUpdate({
-          title,
-          description,
-          priority,
-          status,
-          category,
-          deadline: currentDate,
-          duration,
-          realTime,
-          tags,
-          subtasks,
-          links: updatedLinks,
-          color,
-        }, false);
+        mutations.handleUpdate(
+          {
+            title,
+            description,
+            priority,
+            status,
+            category,
+            deadline: currentDate,
+            duration,
+            realTime,
+            tags,
+            subtasks,
+            links: updatedLinks,
+            color,
+          },
+          false,
+        );
       }
     },
     onRemoveLink: (updatedLinks: { title: string; url: string }[]) => {
       if (initialTask?.id) {
-        mutations.handleUpdate({
-          title,
-          description,
-          priority,
-          status,
-          category,
-          deadline: currentDate,
-          duration,
-          realTime,
-          tags,
-          subtasks,
-          links: updatedLinks,
-          color,
-        }, false);
+        mutations.handleUpdate(
+          {
+            title,
+            description,
+            priority,
+            status,
+            category,
+            deadline: currentDate,
+            duration,
+            realTime,
+            tags,
+            subtasks,
+            links: updatedLinks,
+            color,
+          },
+          false,
+        );
       }
     },
   });
@@ -118,7 +145,7 @@ export const useTaskDetailModal = ({
     setColor(initialState.color);
     setRealTime(initialState.realTime);
     setStatus(initialState.status);
-    
+
     setTags(initialCollections.tags);
     setSubtasks(initialCollections.subtasks);
     setLinks(initialCollections.links);
@@ -128,7 +155,28 @@ export const useTaskDetailModal = ({
     setNewTag('');
     setIsAddingTag(false);
     setIsAddingLink(false);
-  }, [initialState, initialCollections, setTitle, setDescription, setPriority, setCategory, setCurrentDate, setDuration, setColor, setRealTime, setStatus, setTags, setSubtasks, setLinks, setNewSubtask, setNewSubtaskDuration, setNewTag, setIsAddingTag, setIsAddingLink]);
+  }, [
+    initialState,
+    initialCollections,
+    setTitle,
+    setDescription,
+    setPriority,
+    setCategory,
+    setCurrentDate,
+    setDuration,
+    setColor,
+    setRealTime,
+    setStatus,
+    setTags,
+    setSubtasks,
+    setLinks,
+    setCollaborators,
+    setNewSubtask,
+    setNewSubtaskDuration,
+    setNewTag,
+    setIsAddingTag,
+    setIsAddingLink,
+  ]);
 
   // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
   const mutationsWithReset = { ...mutations, resetForm };
@@ -224,7 +272,7 @@ export const useTaskDetailModal = ({
     setter: (v: string) => void,
     setSuggestions: (s: string[]) => void,
     setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement
+    target: HTMLDivElement,
   ) => {
     setter(value);
     const suggestions = getTimerSuggestions(value);
@@ -232,36 +280,59 @@ export const useTaskDetailModal = ({
     setAnchor(suggestions.length > 0 ? target : null);
   };
 
-  const hasMeetLink = shouldGenerateMeet || links.some(l => 
-    l.url.includes('meet.google.com') || 
-    l.title.toLowerCase().includes('google meet') || 
-    l.url.includes('hangouts')
-  );
+  const hasMeetLink =
+    shouldGenerateMeet ||
+    links.some(
+      (l) =>
+        l.url.includes('meet.google.com') ||
+        l.title.toLowerCase().includes('google meet') ||
+        l.url.includes('hangouts'),
+    );
 
   return {
-    title, setTitle,
-    description, setDescription,
-    priority, setPriority,
-    status, setStatus,
-    category, setCategory,
-    currentDate, setCurrentDate,
-    duration, setDuration,
-    realTime, setRealTime,
-    color, setColor,
-    errors, setErrors,
+    title,
+    setTitle,
+    description,
+    setDescription,
+    priority,
+    setPriority,
+    status,
+    setStatus,
+    category,
+    setCategory,
+    currentDate,
+    setCurrentDate,
+    duration,
+    setDuration,
+    realTime,
+    setRealTime,
+    color,
+    setColor,
+    errors,
+    setErrors,
     handleTitleChange,
     validateForm,
     timeSlotDisplay,
-    tags, setTags,
-    subtasks, setSubtasks,
-    links, setLinks,
-    newTag, setNewTag,
-    isAddingTag, setIsAddingTag,
-    newSubtask, setNewSubtask,
-    newSubtaskDuration, setNewSubtaskDuration,
-    newLinkTitle, setNewLinkTitle,
-    newLinkUrl, setNewLinkUrl,
-    isAddingLink, setIsAddingLink,
+    tags,
+    setTags,
+    subtasks,
+    setSubtasks,
+    links,
+    setLinks,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    newSubtask,
+    setNewSubtask,
+    newSubtaskDuration,
+    setNewSubtaskDuration,
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
+    isAddingLink,
+    setIsAddingLink,
     handleAddTag,
     handleAddSubtask,
     handleToggleSubtask,
