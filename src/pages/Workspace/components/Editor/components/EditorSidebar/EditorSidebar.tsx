@@ -391,7 +391,26 @@ export const EditorSidebar = ({
           <Box sx={{ flexGrow: 1 }} />
 
           <Box sx={{ display: 'flex', gap: 2, flexDirection: 'column' }}>
-            {activeFocusTaskId === selectTask?.id ? (
+            {currentStatus === 'Done' ? (
+              <Box
+                sx={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: 1.5,
+                  bgcolor: `${theme.palette.success.main}15`,
+                  color: theme.palette.success.main,
+                  p: 2,
+                  borderRadius: '12px',
+                  border: `1px solid ${theme.palette.success.main}33`,
+                }}
+              >
+                <CheckCircleIcon sx={{ fontSize: 20 }} />
+                <Typography variant="body2" fontWeight={700} letterSpacing={1}>
+                  COMPLETED
+                </Typography>
+              </Box>
+            ) : activeFocusTaskId === selectTask?.id ? (
               <Box
                 sx={{
                   display: 'flex',
@@ -431,11 +450,8 @@ export const EditorSidebar = ({
                 >
                   Focus Mode
                 </StartFocusButton>
-                <MarkDoneButton
-                  disabled={!selectTask || currentStatus === 'Done'}
-                  onClick={handleMarkDone}
-                >
-                  {currentStatus === 'Done' ? 'Completed' : 'Mark Done'}
+                <MarkDoneButton disabled={!selectTask} onClick={handleMarkDone}>
+                  Mark Done
                 </MarkDoneButton>
               </>
             )}

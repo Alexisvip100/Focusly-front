@@ -41,6 +41,7 @@ export const MiniModeContainer = styled(Box)(({ theme }) => ({
   border: `1px solid ${theme.palette.divider}`,
   minWidth: 380,
   userSelect: 'none',
+  overflow: 'hidden',
   // Optimize for dragging: avoid 'all' transitions
   transition: 'opacity 0.3s ease, box-shadow 0.3s ease, transform 0.05s linear',
   willChange: 'transform',
@@ -310,7 +311,7 @@ export const MiniTimerBox = styled(Box)(({ theme }) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'center',
-  width: '70px',
+  width: '100px',
   border:
     theme.palette.mode === 'light'
       ? `1px solid ${theme.palette.divider}`

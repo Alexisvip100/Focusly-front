@@ -55,17 +55,26 @@ export const MiniMode: React.FC<MiniModeProps> = ({
       }}
     >
       <RippleDot />
-      <MiniTimerBox>
-        <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
-          {formatTime(timeLeft)}
-        </Typography>
-        <Typography
-          variant="caption"
-          sx={{ color: theme.palette.text.secondary, fontSize: '10px' }}
-        >
-          LEFT
-        </Typography>
-      </MiniTimerBox>
+      <Box
+        sx={{
+          borderRadius: '14px',
+          padding: '2px',
+          background: `conic-gradient(${theme.palette.primary.main} ${progress}%, transparent ${progress}%)`,
+          display: 'flex',
+        }}
+      >
+        <MiniTimerBox sx={{ border: 'none', width: '96px', m: 0 }}>
+          <Typography variant="h6" sx={{ fontWeight: 'bold', lineHeight: 1 }}>
+            {formatTime(timeLeft)}
+          </Typography>
+          <Typography
+            variant="caption"
+            sx={{ color: theme.palette.text.secondary, fontSize: '10px' }}
+          >
+            LEFT
+          </Typography>
+        </MiniTimerBox>
+      </Box>
       <MiniInfoBox>
         <Typography variant="subtitle2" sx={{ fontWeight: 600, mb: 0.5 }}>
           {activeItem?.title || 'Focus Session'}
