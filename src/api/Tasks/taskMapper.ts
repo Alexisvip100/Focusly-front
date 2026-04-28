@@ -1,6 +1,7 @@
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
+import { Task } from '@mui/icons-material';
 
 export const normalizeGoogleId = (id: string | null | undefined): string => {
   if (!id) return '';
@@ -28,7 +29,7 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     links: event.links || [],
     task_type: 'GoogleTask',
     google_event_id: normalizeGoogleId(event.id),
-    subtasks: event.subtasks || [],
+    subtasks: [],
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
@@ -89,13 +90,9 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
       };
     }),
     links: t.links || [],
-    task_type:
-      ((t as unknown as Record<string, unknown>).task_type as string) ||
-      'PlatformTask',
+    task_type: (t.task_type || 'PlatformTask') as 'GoogleTask' | 'PlatformTask',
     google_event_id: normalizeGoogleId(t.google_event_id),
-    source:
-      ((t as unknown as Record<string, unknown>).source as string) ||
-      'platform',
+    source: 'platform',
     collaborators: (t.collaborators || []).map((c) => ({
       ...c,
       name: c.name || '',
