@@ -23,7 +23,7 @@ interface MiniModeProps {
   timeLeft: number;
   isActive: boolean;
   setIsActive: (active: boolean) => void;
-  activeItem: unknown;
+  activeItem: { title?: string } | null;
   progress: number;
   handleCloseRequest: () => void;
   setViewMode: (mode: 'full' | 'mini') => void;
