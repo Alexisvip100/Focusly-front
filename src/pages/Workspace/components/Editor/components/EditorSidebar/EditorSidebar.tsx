@@ -204,7 +204,7 @@ export const EditorSidebar = ({
             </SectionTitle>
           </SidebarHeader>
 
-          <MetadataSection>
+          <MetadataSection id="joyride-editor-metadata">
             {selectTask ? (
               <>
                 <Box
@@ -375,6 +375,7 @@ export const EditorSidebar = ({
             <>
               <Divider sx={{ borderColor: 'divider', mb: 2, mt: 2 }} />
               <ViewTaskButton
+                id="joyride-editor-full-detail"
                 startIcon={<OpenInNewIcon />}
                 disabled={!selectTask}
                 onClick={() => {

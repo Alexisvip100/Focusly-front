@@ -4,7 +4,13 @@ import type { ViewMode } from '../FocusMode.types';
 export const useFocusModeUI = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [showExitConfirmation, setShowExitConfirmation] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('full');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    return (localStorage.getItem('focus_mode_view') as ViewMode) || 'full';
+  });
+
+  useEffect(() => {
+    localStorage.setItem('focus_mode_view', viewMode);
+  }, [viewMode]);
   const [isSessionCompleted, setIsSessionCompleted] = useState(false);
 
   /* Drag Logic */
