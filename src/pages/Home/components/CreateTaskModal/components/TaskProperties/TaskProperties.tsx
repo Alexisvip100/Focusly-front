@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import {
-  Box, Typography, Chip, TextField, Popover, MenuItem, List, ListItemText,
+  Box,
+  Typography,
+  Chip,
+  TextField,
+  Popover,
+  MenuItem,
+  List,
+  ListItemText,
 } from '@mui/material';
 import {
   AccessTime as AccessTimeIcon,
@@ -37,7 +44,7 @@ import {
   getCategoryIcon,
   getCategoryColor,
   getPriorityIconColor,
-} from '../TaskIcons/TaskIcons';
+} from '../TaskIcons';
 import type { TaskStatus } from '@/redux/tasks/task.types';
 
 interface TaskPropertiesProps {
@@ -66,7 +73,7 @@ interface TaskPropertiesProps {
     setter: (v: string) => void,
     setSuggestions: (s: string[]) => void,
     setAnchor: (el: HTMLDivElement | null) => void,
-    target: HTMLDivElement
+    target: HTMLDivElement,
   ) => void;
   durationSuggestions: string[];
   setDurationSuggestions: (s: string[]) => void;
@@ -80,14 +87,35 @@ interface TaskPropertiesProps {
 
 export const TaskProperties = (props: TaskPropertiesProps) => {
   const {
-    status, setStatusAnchor,
-    priority, setPriorityAnchor,
-    category, setCategoryAnchor,
-    currentDate, setCurrentDate, timeSlotDisplay,
-    tags, setTags, newTag, setNewTag, isAddingTag, setIsAddingTag, handleAddTag,
-    duration, setDuration, realTime, setRealTime, handleTimerChange,
-    durationSuggestions, setDurationSuggestions, durationAnchor, setDurationAnchor,
-    realTimeSuggestions, setRealTimeSuggestions, realTimeAnchor, setRealTimeAnchor,
+    status,
+    setStatusAnchor,
+    priority,
+    setPriorityAnchor,
+    category,
+    setCategoryAnchor,
+    currentDate,
+    setCurrentDate,
+    timeSlotDisplay,
+    tags,
+    setTags,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    handleAddTag,
+    duration,
+    setDuration,
+    realTime,
+    setRealTime,
+    handleTimerChange,
+    durationSuggestions,
+    setDurationSuggestions,
+    durationAnchor,
+    setDurationAnchor,
+    realTimeSuggestions,
+    setRealTimeSuggestions,
+    realTimeAnchor,
+    setRealTimeAnchor,
   } = props;
 
   const [datePickerOpen, setDatePickerOpen] = useState(false);
@@ -109,7 +137,12 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <TodoIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Status</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Status
+          </Typography>
         </Box>
         <Box sx={propertyValueSx}>
           <Chip
@@ -119,7 +152,9 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             sx={{
               ...chipBase,
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(30, 41, 59, 1)'
+                  : 'rgba(0, 0, 0, 0.04)',
               border: '1px solid',
               borderColor: 'divider',
               color: getStatusColor(status),
@@ -133,26 +168,48 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <AttachFileIcon sx={{ fontSize: 18, transform: 'rotate(45deg)' }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Priority</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Priority
+          </Typography>
         </Box>
         <Box sx={propertyValueSx}>
           <Chip
-            icon={<FlagIcon sx={{ fontSize: 16, color: getPriorityIconColor(priority) }} />}
+            icon={
+              <FlagIcon
+                sx={{ fontSize: 16, color: getPriorityIconColor(priority) }}
+              />
+            }
             label={priority || 'No priority'}
             onClick={(e) => setPriorityAnchor(e.currentTarget)}
             sx={{
               ...chipBase,
               bgcolor:
-                priority === 'High' ? 'rgba(239, 68, 68, 0.1)' :
-                priority === 'Med' ? 'rgba(245, 158, 11, 0.1)' :
-                priority === 'Low' ? 'rgba(16, 185, 129, 0.1)' :
-                (theme) => theme.palette.mode === 'dark' ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.04)',
+                priority === 'High'
+                  ? 'rgba(239, 68, 68, 0.1)'
+                  : priority === 'Med'
+                    ? 'rgba(245, 158, 11, 0.1)'
+                    : priority === 'Low'
+                      ? 'rgba(16, 185, 129, 0.1)'
+                      : (theme) =>
+                          theme.palette.mode === 'dark'
+                            ? 'rgba(255, 255, 255, 0.05)'
+                            : 'rgba(0, 0, 0, 0.04)',
               border: '1px solid',
               borderColor:
-                priority === 'High' ? 'error.main' :
-                priority === 'Med' ? 'warning.main' :
-                priority === 'Low' ? 'success.main' : 'divider',
-              color: getPriorityIconColor(priority) === 'inherit' ? 'text.secondary' : getPriorityIconColor(priority),
+                priority === 'High'
+                  ? 'error.main'
+                  : priority === 'Med'
+                    ? 'warning.main'
+                    : priority === 'Low'
+                      ? 'success.main'
+                      : 'divider',
+              color:
+                getPriorityIconColor(priority) === 'inherit'
+                  ? 'text.secondary'
+                  : getPriorityIconColor(priority),
               '&:hover': { opacity: 0.8 },
               '& .MuiChip-icon': { marginRight: '-4px', color: 'inherit' },
             }}
@@ -164,7 +221,12 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <AutoFixHighIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Category</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Category
+          </Typography>
         </Box>
         <Box sx={propertyValueSx}>
           <Chip
@@ -174,7 +236,9 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             sx={{
               ...chipBase,
               bgcolor: (theme) =>
-                theme.palette.mode === 'dark' ? 'rgba(30, 41, 59, 1)' : 'rgba(0, 0, 0, 0.04)',
+                theme.palette.mode === 'dark'
+                  ? 'rgba(30, 41, 59, 1)'
+                  : 'rgba(0, 0, 0, 0.04)',
               border: '1px solid',
               borderColor: 'divider',
               color: getCategoryColor(category),
@@ -188,22 +252,47 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <PlannedIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Date</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Date
+          </Typography>
         </Box>
         <Box sx={{ ...propertyValueSx, position: 'relative' }}>
           <Chip
             label={currentDate ? format(currentDate, 'PPP') : 'Pick a date'}
             onClick={() => setDatePickerOpen(true)}
             variant="outlined"
-            sx={{ borderRadius: '8px', height: '32px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            sx={{
+              borderRadius: '8px',
+              height: '32px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
           />
           <DatePicker
             open={datePickerOpen}
             onClose={() => setDatePickerOpen(false)}
             value={currentDate}
-            onChange={(newValue) => { setCurrentDate(newValue); setDatePickerOpen(false); }}
+            onChange={(newValue) => {
+              setCurrentDate(newValue);
+              setDatePickerOpen(false);
+            }}
             slotProps={{
-              textField: { sx: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, pointerEvents: 'none' } },
+              textField: {
+                sx: {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  pointerEvents: 'none',
+                },
+              },
               popper: { sx: datePickerPopperSx, placement: 'bottom-start' },
               desktopPaper: { sx: datePickerPaperSx },
             }}
@@ -215,28 +304,56 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <AccessTimeIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Time</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Time
+          </Typography>
         </Box>
         <Box sx={{ ...propertyValueSx, position: 'relative' }}>
           <Chip
             label={currentDate ? format(currentDate, 'hh:mm a') : 'Pick a time'}
             onClick={() => setTimePickerOpen(true)}
             variant="outlined"
-            sx={{ borderRadius: '8px', height: '32px', fontSize: '14px', fontWeight: 500, cursor: 'pointer', '&:hover': { bgcolor: 'action.hover' } }}
+            sx={{
+              borderRadius: '8px',
+              height: '32px',
+              fontSize: '14px',
+              fontWeight: 500,
+              cursor: 'pointer',
+              '&:hover': { bgcolor: 'action.hover' },
+            }}
           />
           <TimePicker
             open={timePickerOpen}
             onClose={() => setTimePickerOpen(false)}
             value={currentDate}
-            onChange={(newValue) => { setCurrentDate(newValue); setTimePickerOpen(false); }}
+            onChange={(newValue) => {
+              setCurrentDate(newValue);
+              setTimePickerOpen(false);
+            }}
             slotProps={{
-              textField: { sx: { position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', opacity: 0, pointerEvents: 'none' } },
+              textField: {
+                sx: {
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  height: '100%',
+                  opacity: 0,
+                  pointerEvents: 'none',
+                },
+              },
               popper: { sx: timePickerPopperSx, placement: 'bottom-start' },
               desktopPaper: { sx: timePickerPaperSx },
               layout: { sx: timePickerLayoutSx },
             }}
           />
-          <Typography variant="caption" sx={{ color: 'text.secondary', ml: 1.5, fontStyle: 'italic' }}>
+          <Typography
+            variant="caption"
+            sx={{ color: 'text.secondary', ml: 1.5, fontStyle: 'italic' }}
+          >
             ({timeSlotDisplay})
           </Typography>
         </Box>
@@ -246,7 +363,12 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={propertyRowSx}>
         <Box sx={propertyLabelSx}>
           <DescriptionIcon sx={{ fontSize: 18, transform: 'rotate(180deg)' }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Tags</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Tags
+          </Typography>
         </Box>
         <Box sx={propertyValueSx}>
           {tags.map((tag, index) => {
@@ -265,7 +387,12 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                   borderRadius: '12px',
                   fontSize: '12px',
                   height: '24px',
-                  '& .MuiChip-deleteIcon': { color: colors.color, fontSize: '14px', opacity: 0.7, '&:hover': { opacity: 1 } },
+                  '& .MuiChip-deleteIcon': {
+                    color: colors.color,
+                    fontSize: '14px',
+                    opacity: 0.7,
+                    '&:hover': { opacity: 1 },
+                  },
                 }}
               />
             );
@@ -290,8 +417,13 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
               label="Add Tag"
               onClick={() => setIsAddingTag(true)}
               sx={{
-                height: 28, fontSize: 12, bgcolor: 'transparent', color: 'text.secondary',
-                border: '1px dashed', borderColor: 'divider', '&:hover': { bgcolor: 'action.hover' },
+                height: 28,
+                fontSize: 12,
+                bgcolor: 'transparent',
+                color: 'text.secondary',
+                border: '1px dashed',
+                borderColor: 'divider',
+                '&:hover': { bgcolor: 'action.hover' },
               }}
             />
           )}
@@ -302,7 +434,12 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
       <Box sx={{ ...propertyRowSx, alignItems: 'center' }}>
         <Box sx={propertyLabelSx}>
           <AccessTimeIcon sx={{ fontSize: 18 }} />
-          <Typography variant="caption" sx={{ fontSize: '14px', fontWeight: 500 }}>Time Tracking</Typography>
+          <Typography
+            variant="caption"
+            sx={{ fontSize: '14px', fontWeight: 500 }}
+          >
+            Time Tracking
+          </Typography>
         </Box>
         <Box sx={{ ...propertyValueSx, gap: 6 }}>
           {/* Estimated */}
@@ -310,7 +447,15 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             <Box sx={{ textAlign: 'center' }}>
               <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
                 <TimerIcon sx={{ fontSize: 14, color: 'text.secondary' }} />
-                <Typography variant="caption" sx={{ color: 'text.secondary', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'text.secondary',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                  }}
+                >
                   ESTIMATED
                 </Typography>
               </Box>
@@ -318,12 +463,30 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 variant="standard"
                 value={duration}
                 onChange={(e) =>
-                  handleTimerChange(e.target.value, setDuration, setDurationSuggestions, setDurationAnchor, e.currentTarget.parentElement as HTMLDivElement)
+                  handleTimerChange(
+                    e.target.value,
+                    setDuration,
+                    setDurationSuggestions,
+                    setDurationAnchor,
+                    e.currentTarget.parentElement as HTMLDivElement,
+                  )
                 }
                 onBlur={() => setTimeout(() => setDurationAnchor(null), 200)}
                 placeholder="2h 00m"
-                InputProps={{ disableUnderline: true, sx: { fontSize: '15px', fontWeight: 700, color: 'text.primary' } }}
-                sx={{ width: '80px', bgcolor: 'background.default', borderRadius: '10px', px: 1 }}
+                InputProps={{
+                  disableUnderline: true,
+                  sx: {
+                    fontSize: '15px',
+                    fontWeight: 700,
+                    color: 'text.primary',
+                  },
+                }}
+                sx={{
+                  width: '80px',
+                  bgcolor: 'background.default',
+                  borderRadius: '10px',
+                  px: 1,
+                }}
               />
               <Popover
                 open={Boolean(durationAnchor)}
@@ -333,12 +496,32 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                 disableAutoFocus
                 disableEnforceFocus
-                slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      minWidth: 80,
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                    },
+                  },
+                }}
               >
                 <List dense sx={{ py: 0 }}>
                   {durationSuggestions.map((s) => (
-                    <MenuItem key={s} onClick={() => { setDuration(s); setDurationAnchor(null); }}>
-                      <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600 }} />
+                    <MenuItem
+                      key={s}
+                      onClick={() => {
+                        setDuration(s);
+                        setDurationAnchor(null);
+                      }}
+                    >
+                      <ListItemText
+                        primary={s}
+                        primaryTypographyProps={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                        }}
+                      />
                     </MenuItem>
                   ))}
                 </List>
@@ -350,7 +533,15 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
             <Box sx={{ textAlign: 'center' }}>
               <Box display="flex" alignItems="center" gap={0.5} mb={0.5}>
                 <HistoryIcon sx={{ fontSize: 14, color: 'info.main' }} />
-                <Typography variant="caption" sx={{ color: 'info.main', fontSize: '10px', fontWeight: 600, letterSpacing: '0.5px' }}>
+                <Typography
+                  variant="caption"
+                  sx={{
+                    color: 'info.main',
+                    fontSize: '10px',
+                    fontWeight: 600,
+                    letterSpacing: '0.5px',
+                  }}
+                >
                   REAL
                 </Typography>
               </Box>
@@ -358,12 +549,26 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 variant="standard"
                 value={realTime}
                 onChange={(e) =>
-                  handleTimerChange(e.target.value, setRealTime, setRealTimeSuggestions, setRealTimeAnchor, e.currentTarget.parentElement as HTMLDivElement)
+                  handleTimerChange(
+                    e.target.value,
+                    setRealTime,
+                    setRealTimeSuggestions,
+                    setRealTimeAnchor,
+                    e.currentTarget.parentElement as HTMLDivElement,
+                  )
                 }
                 onBlur={() => setTimeout(() => setRealTimeAnchor(null), 200)}
                 placeholder="1h 30m"
-                InputProps={{ disableUnderline: true, sx: { fontSize: '15px', color: 'info.main', fontWeight: 700 } }}
-                sx={{ width: '80px', bgcolor: 'background.default', borderRadius: '10px', px: 1 }}
+                InputProps={{
+                  disableUnderline: true,
+                  sx: { fontSize: '15px', color: 'info.main', fontWeight: 700 },
+                }}
+                sx={{
+                  width: '80px',
+                  bgcolor: 'background.default',
+                  borderRadius: '10px',
+                  px: 1,
+                }}
               />
               <Popover
                 open={Boolean(realTimeAnchor)}
@@ -373,12 +578,33 @@ export const TaskProperties = (props: TaskPropertiesProps) => {
                 transformOrigin={{ vertical: 'top', horizontal: 'left' }}
                 disableAutoFocus
                 disableEnforceFocus
-                slotProps={{ paper: { sx: { minWidth: 80, borderRadius: '12px', boxShadow: '0 8px 32px rgba(0,0,0,0.3)' } } }}
+                slotProps={{
+                  paper: {
+                    sx: {
+                      minWidth: 80,
+                      borderRadius: '12px',
+                      boxShadow: '0 8px 32px rgba(0,0,0,0.3)',
+                    },
+                  },
+                }}
               >
                 <List dense sx={{ py: 0 }}>
                   {realTimeSuggestions.map((s) => (
-                    <MenuItem key={s} onClick={() => { setRealTime(s); setRealTimeAnchor(null); }}>
-                      <ListItemText primary={s} primaryTypographyProps={{ fontSize: '13px', fontWeight: 600, color: 'info.main' }} />
+                    <MenuItem
+                      key={s}
+                      onClick={() => {
+                        setRealTime(s);
+                        setRealTimeAnchor(null);
+                      }}
+                    >
+                      <ListItemText
+                        primary={s}
+                        primaryTypographyProps={{
+                          fontSize: '13px',
+                          fontWeight: 600,
+                          color: 'info.main',
+                        }}
+                      />
                     </MenuItem>
                   ))}
                 </List>

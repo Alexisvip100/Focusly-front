@@ -7,19 +7,25 @@ export const CalendarContainer = styled(Box, {
   height: '100%',
   flex: 1,
   // Override React Big Calendar styles for Dark Mode
+  // Make the calendar fill all available height
   '& .rbc-calendar': {
     fontFamily: theme.typography.fontFamily,
     color: theme.palette.text.primary,
+    display: 'flex',
+    flexDirection: 'column',
+    height: '100%',
+    flex: 1,
   },
-  
+
   '& .rbc-month-row .rbc-row-bg > div': {
     borderLeft: `1px solid ${theme.palette.divider} !important`,
     borderRight: `1px solid ${theme.palette.divider} !important`,
   },
   // Force all react-big-calendar borders to use theme divider
-  '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view, & .rbc-month-row, & .rbc-day-bg, & .rbc-time-content, & .rbc-timeslot-group, & .rbc-time-slot, & .rbc-header, & .rbc-time-header-content, & .rbc-time-header, & .rbc-time-gutter': {
-    borderColor: `${theme.palette.divider} !important`,
-  },
+  '& .rbc-month-view, & .rbc-time-view, & .rbc-agenda-view, & .rbc-month-row, & .rbc-day-bg, & .rbc-time-content, & .rbc-timeslot-group, & .rbc-time-slot, & .rbc-header, & .rbc-time-header-content, & .rbc-time-header, & .rbc-time-gutter':
+    {
+      borderColor: `${theme.palette.divider} !important`,
+    },
 
   '& .rbc-event-label': {
     display: 'none',
@@ -28,8 +34,20 @@ export const CalendarContainer = styled(Box, {
     border: `1px solid ${theme.palette.divider}`,
     backgroundColor: theme.palette.background.default,
   },
+
+  // Month view: fill all available height
+  '& .rbc-month-view': {
+    display: 'flex',
+    flexDirection: 'column',
+    flex: 1,
+    height: '100%',
+  },
+
   '& .rbc-off-range-bg': {
-    backgroundColor: theme.palette.mode === 'dark' ? alpha(theme.palette.background.default, 0.5) : theme.palette.grey[100],
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? alpha(theme.palette.background.default, 0.5)
+        : theme.palette.grey[100],
   },
 
   '& .rbc-month-row + .rbc-month-row': {
@@ -108,7 +126,7 @@ export const CalendarContainer = styled(Box, {
     fontWeight: 600,
     padding: '8px 0',
     height: 'auto',
-    display: 'flex', 
+    display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     borderTop: `1px solid ${theme.palette.divider}`, // Ensure top border for consistency
@@ -161,18 +179,25 @@ export const CalendarContainer = styled(Box, {
     },
   },
 
+  // Month rows: flex to fill available height instead of fixed 104px
   '& .rbc-month-view .rbc-month-row': {
-    height: '104px',
-    minHeight: '104px',
-    maxHeight: '104px',
+    flex: 1,
+    minHeight: 0,
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
+  },
+
+  '& .rbc-month-view .rbc-row-bg': {
+    flex: 1,
   },
 
   '& .rbc-month-view .rbc-row-content': {
-    height: '104px',
-    minHeight: '104px',
-    maxHeight: '104px',
+    flex: 1,
+    minHeight: 0,
     overflow: 'hidden',
+    display: 'flex',
+    flexDirection: 'column',
   },
 
   '& .rbc-month-view .rbc-row-content .rbc-row': {
@@ -193,6 +218,15 @@ export const CalendarContainer = styled(Box, {
     background: 'none',
   },
 
+  '& .rbc-month-view .rbc-date-cell': {
+    padding: '4px 8px 2px 0',
+    textAlign: 'right',
+    '& button': {
+      fontSize: '12px',
+      fontWeight: 500,
+    },
+  },
+
   '& .rbc-month-view .rbc-date-cell.rbc-now': {
     '& button': {
       backgroundColor: theme.palette.primary.main,
@@ -203,23 +237,26 @@ export const CalendarContainer = styled(Box, {
       display: 'inline-flex',
       alignItems: 'center',
       justifyContent: 'center',
-      margin: '6px 8px 0 auto',
+      margin: '0',
       padding: '0',
       minWidth: '24px',
       fontWeight: 600,
       fontSize: '12px',
-    }
+    },
   },
 
   '& .rbc-month-view .rbc-event': {
-    height: '20px !important',
-    minHeight: '20px !important',
-    maxHeight: '20px !important',
+    height: '22px !important',
+    minHeight: '22px !important',
+    maxHeight: '22px !important',
     margin: '1px 0 !important',
     padding: '0 !important',
     backgroundColor: 'transparent !important',
     '& .event-icon-container': { display: 'none' },
-    '& .event-card-inner': { padding: '2px 6px !important', gap: '0 !important' },
+    '& .event-card-inner': {
+      padding: '2px 6px !important',
+      gap: '0 !important',
+    },
     '& .event-info': { flexDirection: 'row', alignItems: 'center', gap: '4px' },
     '& .event-info span:last-child': { display: 'none' },
   },
