@@ -33,10 +33,10 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
     collaborators: (
-      (event as unknown as Record<string, unknown>).collaborators ||
-      (event as unknown as Record<string, unknown>).attendees ||
-      (event as unknown as Record<string, unknown>).participants ||
-      ([] as Record<string, unknown>[])
+      ((event as unknown as Record<string, unknown>).collaborators ||
+        (event as unknown as Record<string, unknown>).attendees ||
+        (event as unknown as Record<string, unknown>).participants ||
+        []) as Record<string, unknown>[]
     ).map((c: Record<string, unknown>) => ({
       ...c,
       name: (c.name as string) || '',
