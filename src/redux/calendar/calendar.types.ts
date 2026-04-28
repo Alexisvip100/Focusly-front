@@ -1,4 +1,3 @@
-
 export interface GoogleCalendarEvent {
   id: string;
   google_event_id: string;
@@ -6,10 +5,23 @@ export interface GoogleCalendarEvent {
   notes_encrypted: string;
   deadline: string;
   estimated_start_date: string;
-  status: 'Pending' | 'In Progress' | 'Completed' | 'Scheduled' | 'Canceled' | 'Todo' | 'Planning' | 'OnHold' | 'Review' | 'Done' | 'Backlog' | 'Scheduled' | 'Archived';
+  status:
+    | 'Pending'
+    | 'In Progress'
+    | 'Completed'
+    | 'Scheduled'
+    | 'Canceled'
+    | 'Todo'
+    | 'Planning'
+    | 'OnHold'
+    | 'Review'
+    | 'Done'
+    | 'Backlog'
+    | 'Scheduled'
+    | 'Archived';
   priority_level: number;
-  subtasks: any[];
-  tags: any[];
+  subtasks: unknown[];
+  tags: string[];
   links: { title: string; url: string }[];
   estimate_timer?: number;
   collaborators?: { email: string; responseStatus?: string; avatar?: string }[];

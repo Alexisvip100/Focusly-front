@@ -1,8 +1,15 @@
 import { ArrowBack as ArrowBackIcon } from '@mui/icons-material';
 import { SearchPalette } from '../SearchPalette/SearchPalette';
 import type { TaskSearchItems } from '../../../../types/workspace.types';
-import { HeaderCenter, HeaderLeft, HeaderRight } from '@/pages/Workspace/Workspace.styles';
-import { BackButton, EditorHeader as StyledEditorHeader } from './EditorHeader.styles';
+import {
+  HeaderCenter,
+  HeaderLeft,
+  HeaderRight,
+} from '@/pages/Workspace/Workspace.styles';
+import {
+  BackButton,
+  EditorHeader as StyledEditorHeader,
+} from './EditorHeader.styles';
 
 interface EditorHeaderProps {
   onBack: () => void;
@@ -15,8 +22,11 @@ interface EditorHeaderProps {
   setFilterTab: (t: 'TASKS' | 'SUBTASKS') => void;
   selectTask: TaskSearchItems | null;
   selectedSubtaskIndex: number | null;
-  handleSelectTask: (task: TaskSearchItems | null, index: number | null) => void;
-  setValue: (field: any, value: any) => void;
+  handleSelectTask: (
+    task: TaskSearchItems | null,
+    index: number | null,
+  ) => void;
+  setValue: (field: string, value: unknown) => void;
 }
 
 export const EditorHeader = ({
@@ -36,7 +46,10 @@ export const EditorHeader = ({
   return (
     <StyledEditorHeader>
       <HeaderLeft>
-        <BackButton startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />} onClick={onBack}>
+        <BackButton
+          startIcon={<ArrowBackIcon sx={{ fontSize: 14 }} />}
+          onClick={onBack}
+        >
           BACK TO WORKSPACES
         </BackButton>
       </HeaderLeft>

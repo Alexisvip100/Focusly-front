@@ -27,11 +27,9 @@ import {
   PaletteFooter,
   AddTaskButton,
   CollapsedSearchContainer,
-  ItemText
+  ItemText,
 } from './SearchPalette.styles';
 import type { TaskSearchItems } from '../../../../types/workspace.types';
-
-
 
 interface SearchPaletteProps {
   showPalette: boolean;
@@ -43,8 +41,11 @@ interface SearchPaletteProps {
   setFilterTab: (t: 'TASKS' | 'SUBTASKS') => void;
   selectTask: TaskSearchItems | null;
   selectedSubtaskIndex: number | null;
-  handleSelectTask: (task: TaskSearchItems | null, index: number | null) => void;
-  setValue: (field: string, value: any) => void;
+  handleSelectTask: (
+    task: TaskSearchItems | null,
+    index: number | null,
+  ) => void;
+  setValue: (field: string, value: unknown) => void;
 }
 
 export const SearchPalette = ({
@@ -73,7 +74,11 @@ export const SearchPalette = ({
   return (
     <Box sx={{ width: '100%', maxWidth: '600px', position: 'relative' }}>
       {showPalette ? (
-        <CommandPaletteContainer ref={containerRef} onBlur={handleBlur} tabIndex={-1}>
+        <CommandPaletteContainer
+          ref={containerRef}
+          onBlur={handleBlur}
+          tabIndex={-1}
+        >
           <CommandInputWrapper>
             <SearchIcon sx={{ color: 'info.main', fontSize: 20 }} />
             <CommandInput
@@ -173,7 +178,10 @@ export const SearchPalette = ({
                             )}
                           </Box>
                         </Box>
-                        <RadioCircle selected={isSelected} color={statusColor} />
+                        <RadioCircle
+                          selected={isSelected}
+                          color={statusColor}
+                        />
                       </Box>
                     </TaskItemContainer>
                   )}
@@ -215,7 +223,9 @@ export const SearchPalette = ({
                           >
                             <SubdirectoryArrowRightIcon
                               sx={{
-                                color: isSubtaskSelected ? 'info.main' : 'text.disabled',
+                                color: isSubtaskSelected
+                                  ? 'info.main'
+                                  : 'text.disabled',
                                 fontSize: 16,
                               }}
                             />
@@ -258,7 +268,9 @@ export const SearchPalette = ({
 
                           <CheckSquare selected={isSubtaskSelected}>
                             {isSubtaskSelected && (
-                              <CheckIcon sx={{ fontSize: 12, color: '#0f172a' }} />
+                              <CheckIcon
+                                sx={{ fontSize: 12, color: '#0f172a' }}
+                              />
                             )}
                           </CheckSquare>
                         </SubTaskItemContainer>
