@@ -26,7 +26,8 @@ interface EditorHeaderProps {
     task: TaskSearchItems | null,
     index: number | null,
   ) => void;
-  setValue: (field: string, value: unknown) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setValue: (field: any, value: any) => void;
 }
 
 export const EditorHeader = ({
