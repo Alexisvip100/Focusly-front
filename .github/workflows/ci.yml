@@ -21,7 +21,7 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
-        cache: 'yarn'
+        # Eliminamos 'cache: yarn' de aquí porque choca con Yarn 4/Corepack en GitHub
 
     - name: Enable Corepack
       run: corepack enable
