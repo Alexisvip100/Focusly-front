@@ -32,18 +32,17 @@ export const mapGoogleEventToTask = (event: GoogleCalendarEvent): Task => {
     tags: event.tags || [],
     estimated_start_date: event.estimated_start_date,
     estimated_end_date: event.deadline,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     collaborators: (
-      event.collaborators ||
-      (event as any).attendees ||
-      (event as any).participants ||
-      []
-    ).map((c: any) => ({
+      (event as unknown as Record<string, unknown>).collaborators ||
+      (event as unknown as Record<string, unknown>).attendees ||
+      (event as unknown as Record<string, unknown>).participants ||
+      ([] as Record<string, unknown>[])
+    ).map((c: Record<string, unknown>) => ({
       ...c,
-      name: c.name || '',
+      name: (c.name as string) || '',
       avatar:
-        c.avatar ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(c.email?.split('@')[0] || 'user')}&background=random&color=fff&size=128`,
+        (c.avatar as string) ||
+        `https://ui-avatars.com/api/?name=${encodeURIComponent((c.email as string)?.split('@')[0] || 'user')}&background=random&color=fff&size=128`,
     })),
   };
 };
