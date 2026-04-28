@@ -1,7 +1,6 @@
 import type { Task, TaskStatus } from '@/redux/tasks/task.types';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { GoogleCalendarEvent } from '@/redux/calendar/calendar.types';
-import { Task } from '@mui/icons-material';
 
 export const normalizeGoogleId = (id: string | null | undefined): string => {
   if (!id) return '';
