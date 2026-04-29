@@ -1,4 +1,15 @@
-import { Box, Switch, alpha, Typography, useTheme, type Theme } from '@mui/material';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import type { RootState } from '@/redux/store';
+import { updateUser } from '@/redux/auth/auth.slice';
+import {
+  Box,
+  Switch,
+  alpha,
+  Typography,
+  useTheme,
+  type Theme,
+} from '@mui/material';
 import {
   Campaign as CampaignIcon,
   Timer as TimerIcon,
@@ -6,7 +17,7 @@ import {
   Coffee as CoffeeIcon,
   Check as CheckIcon,
   WarningAmber as WarningAmberIcon,
-  KeyboardArrowDown as KeyboardArrowDownIcon
+  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from '@mui/icons-material';
 import {
   SectionCard,
@@ -26,6 +37,41 @@ import {
 export const NotificationSettings = () => {
   const theme = useTheme();
   const themeSwitchStyles = switchStyles(theme);
+  const dispatch = useDispatch();
+  const { user } = useSelector((state: RootState) => state.auth);
+
+  // La preferencia guardada en el perfil del usuario (o true por defecto)
+  const savedPreference = user?.pushEnabled !== false;
+
+  const [pushEnabled, setPushEnabled] = useState(
+    Notification.permission === 'granted' && savedPreference,
+  );
+  const [permissionStatus, setPermissionStatus] =
+    useState<NotificationPermission>(Notification.permission);
+
+  const handlePushToggle = async () => {
+    if (permissionStatus === 'denied') {
+      alert(
+        'Las notificaciones están bloqueadas en tu navegador. Por favor, actívalas en la configuración del sitio (icono del candado).',
+      );
+      return;
+    }
+
+    if (!pushEnabled) {
+      // Intentar activar
+      const permission = await Notification.requestPermission();
+      setPermissionStatus(permission);
+
+      if (permission === 'granted') {
+        setPushEnabled(true);
+        dispatch(updateUser({ pushEnabled: true }));
+      }
+    } else {
+      // Desactivar manualmente en la app
+      setPushEnabled(false);
+      dispatch(updateUser({ pushEnabled: false }));
+    }
+  };
 
   return (
     <Box>
@@ -44,7 +90,9 @@ export const NotificationSettings = () => {
         <SettingItem>
           <SettingInfo>
             <SettingLabel>In-App Notifications</SettingLabel>
-            <SettingSublabel>Receive alerts directly within the browser while you work.</SettingSublabel>
+            <SettingSublabel>
+              Receive alerts directly within the browser while you work.
+            </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles} />
         </SettingItem>
@@ -52,7 +100,10 @@ export const NotificationSettings = () => {
         <SettingItem>
           <SettingInfo>
             <SettingLabel>Email Summaries</SettingLabel>
-            <SettingSublabel>Get daily and weekly productivity reports sent to alex.morgan@example.com.</SettingSublabel>
+            <SettingSublabel>
+              Get daily and weekly productivity reports sent to
+              user@example.com.
+            </SettingSublabel>
           </SettingInfo>
           <Switch defaultChecked sx={themeSwitchStyles} />
         </SettingItem>
@@ -60,9 +111,24 @@ export const NotificationSettings = () => {
         <SettingItem>
           <SettingInfo>
             <SettingLabel>Desktop Push Notifications</SettingLabel>
-            <SettingSublabel>Native OS notifications even when the browser is minimized.</SettingSublabel>
+            <SettingSublabel>
+              Native OS notifications even when the browser is minimized.
+              {permissionStatus === 'denied' && (
+                <Typography
+                  variant="caption"
+                  color="error"
+                  sx={{ display: 'block', mt: 0.5, fontWeight: 600 }}
+                >
+                  ⚠️ Notifications are blocked in your browser.
+                </Typography>
+              )}
+            </SettingSublabel>
           </SettingInfo>
-          <Switch sx={themeSwitchStyles} />
+          <Switch
+            checked={pushEnabled}
+            onChange={handlePushToggle}
+            sx={themeSwitchStyles}
+          />
         </SettingItem>
       </SectionCard>
 
@@ -70,7 +136,10 @@ export const NotificationSettings = () => {
       <SectionCard>
         <SectionHeader>
           <SectionTitle>
-            <Box className="icon-wrapper" sx={{ color: theme.palette.primary.main }}>
+            <Box
+              className="icon-wrapper"
+              sx={{ color: theme.palette.primary.main }}
+            >
               <TimerIcon />
             </Box>
             <Typography>Session & Break Alerts</Typography>
@@ -83,11 +152,30 @@ export const NotificationSettings = () => {
               <PlayArrowIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>Session Start</Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
-                    Get notified 5 minutes before a scheduled deep work session begins.
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+                  >
+                    Session Start
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      display: 'block',
+                      mt: 0.5,
+                    }}
+                  >
+                    Get notified 5 minutes before a scheduled deep work session
+                    begins.
                   </Typography>
                 </Box>
                 <Switch defaultChecked size="small" sx={themeSwitchStyles} />
@@ -104,11 +192,30 @@ export const NotificationSettings = () => {
               <CoffeeIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>Break Reminders</Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
-                    Reminders to take a break when energy levels drop or session ends.
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+                  >
+                    Break Reminders
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      display: 'block',
+                      mt: 0.5,
+                    }}
+                  >
+                    Reminders to take a break when energy levels drop or session
+                    ends.
                   </Typography>
                 </Box>
                 <Switch defaultChecked size="small" sx={themeSwitchStyles} />
@@ -125,10 +232,28 @@ export const NotificationSettings = () => {
               <CheckIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>Session End</Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+                  >
+                    Session End
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      display: 'block',
+                      mt: 0.5,
+                    }}
+                  >
                     Notification when your focus timer hits zero.
                   </Typography>
                 </Box>
@@ -146,10 +271,28 @@ export const NotificationSettings = () => {
               <WarningAmberIcon />
             </AlertIconBox>
             <Box sx={{ flex: 1 }}>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'flex-start',
+                }}
+              >
                 <Box>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 700, color: theme.palette.text.primary }}>Overtime Alert</Typography>
-                  <Typography variant="caption" sx={{ color: theme.palette.text.secondary, display: 'block', mt: 0.5 }}>
+                  <Typography
+                    variant="subtitle1"
+                    sx={{ fontWeight: 700, color: theme.palette.text.primary }}
+                  >
+                    Overtime Alert
+                  </Typography>
+                  <Typography
+                    variant="caption"
+                    sx={{
+                      color: theme.palette.text.secondary,
+                      display: 'block',
+                      mt: 0.5,
+                    }}
+                  >
                     Warn when you've been working too long without a break.
                   </Typography>
                 </Box>
@@ -178,4 +321,3 @@ const switchStyles = (theme: Theme) => ({
     backgroundColor: theme.palette.primary.main,
   },
 });
-

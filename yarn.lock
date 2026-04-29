@@ -2966,6 +2966,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"animate.css@npm:^4.1.1":
+  version: 4.1.1
+  resolution: "animate.css@npm:4.1.1"
+  checksum: 10c0/28fcf5a5f502e4c12186846d22aa1cd63b835955160a97116930c78bff8a89135aa5c57f94010252a29456ada7cfc8ed8791cac02521ec6402befaf883937159
+  languageName: node
+  linkType: hard
+
 "ansi-escapes@npm:^7.0.0":
   version: 7.2.0
   resolution: "ansi-escapes@npm:7.2.0"
@@ -4139,6 +4146,7 @@ __metadata:
     "@types/react-dom": "npm:^19.2.3"
     "@types/uuid": "npm:^11.0.0"
     "@vitejs/plugin-react": "npm:^5.1.1"
+    animate.css: "npm:^4.1.1"
     axios: "npm:^1.13.2"
     canvas-confetti: "npm:^1.9.4"
     date-fns: "npm:^4.1.0"
@@ -4168,6 +4176,7 @@ __metadata:
     recharts: "npm:^3.7.0"
     rxjs: "npm:^7.8.2"
     sileo: "npm:^0.1.5"
+    sweetalert2: "npm:^11.26.24"
     temporal-polyfill: "npm:^0.3.0"
     typescript: "npm:~5.9.3"
     typescript-eslint: "npm:^8.46.4"
@@ -7401,6 +7410,13 @@ __metadata:
   version: 1.0.0
   resolution: "supports-preserve-symlinks-flag@npm:1.0.0"
   checksum: 10c0/6c4032340701a9950865f7ae8ef38578d8d7053f5e10518076e6554a9381fa91bd9c6850193695c141f32b21f979c985db07265a758867bac95de05f7d8aeb39
+  languageName: node
+  linkType: hard
+
+"sweetalert2@npm:^11.26.24":
+  version: 11.26.24
+  resolution: "sweetalert2@npm:11.26.24"
+  checksum: 10c0/f002ff982f2cfe48ff24e2faefd990776d7ad38e6d13024fdbdd178f464154061d665682102ddfcb9a65c15019011c6ddae67a93416d4b07716fce77fe9a8484
   languageName: node
   linkType: hard
 
