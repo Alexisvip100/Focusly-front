@@ -1,5 +1,6 @@
 import React from 'react';
-import { Box, Typography, useTheme } from '@mui/material';
+import { Box, Typography, useTheme, Tooltip } from '@mui/material';
+import { InfoOutlined as InfoIcon } from '@mui/icons-material';
 import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
 import { ChartCard } from '../../Insights.styles';
 import type {
@@ -44,9 +45,19 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
 
   return (
     <ChartCard>
-      <Typography variant="h6" fontWeight="bold">
-        Distribución de Tiempo
-      </Typography>
+      <Box display="flex" alignItems="center" gap={0.5}>
+        <Typography variant="h6" fontWeight="bold">
+          Time Distribution
+        </Typography>
+        <Tooltip
+          title="Shows which types of activities you spend the most time on, classifying your tasks into categories like Deep Work, Meetings, or Admin."
+          arrow
+        >
+          <InfoIcon
+            sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }}
+          />
+        </Tooltip>
+      </Box>
 
       <Box
         position="relative"
@@ -101,7 +112,7 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               color="text.secondary"
               sx={{ ml: 2.5 }}
             >
-              Tiempo:{' '}
+              Time:{' '}
               <b style={{ color: 'var(--mui-palette-text-primary)' }}>
                 {formatMinutes(hoveredData.value)}
               </b>
@@ -162,9 +173,9 @@ export const TimeDistributionChart: React.FC<TimeDistributionChartProps> = ({
               lineHeight: 1.2,
             }}
           >
-            ACTIVIDAD DE
+            FOCUS
             <br />
-            ENFOQUE
+            ACTIVITY
           </Typography>
         </Box>
       </Box>
