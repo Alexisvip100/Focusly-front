@@ -79,6 +79,15 @@ export const useFocusMode = ({
   const confirmExit = () => {
     ui.setShowExitConfirmation(false);
     setIsActive(false);
+
+    // Clear all persisted focus mode state
+    localStorage.removeItem('focus_mode_open');
+    localStorage.removeItem('focus_mode_task');
+    localStorage.removeItem('focus_mode_subtask_index');
+    localStorage.removeItem('focus_mode_time_left');
+    localStorage.removeItem('focus_mode_is_active');
+    localStorage.removeItem('focus_mode_view');
+
     onClose();
   };
 

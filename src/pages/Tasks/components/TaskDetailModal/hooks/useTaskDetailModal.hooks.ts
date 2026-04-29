@@ -181,7 +181,7 @@ export const useTaskDetailModal = ({
   // Inject real resetForm into mutations (assuming useTaskMutations doesn't store it in a way that breaks this)
   const mutationsWithReset = { ...mutations, resetForm };
 
-  const handleSaveWrapper = async () => {
+  const handleSaveWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
     await mutationsWithReset.handleSave({
       title,
@@ -199,26 +199,30 @@ export const useTaskDetailModal = ({
       color,
       shouldGenerateMeet,
     });
+    if (shouldClose) onClose();
   };
 
-  const handleUpdateWrapper = async () => {
+  const handleUpdateWrapper = async (shouldClose = true) => {
     if (!validateForm()) return;
-    await mutationsWithReset.handleUpdate({
-      title,
-      description,
-      priority,
-      status,
-      category,
-      deadline: currentDate,
-      duration,
-      realTime,
-      tags,
-      subtasks,
-      links,
-      collaborators,
-      color,
-      shouldGenerateMeet,
-    });
+    await mutationsWithReset.handleUpdate(
+      {
+        title,
+        description,
+        priority,
+        status,
+        category,
+        deadline: currentDate,
+        duration,
+        realTime,
+        tags,
+        subtasks,
+        links,
+        collaborators,
+        color,
+        shouldGenerateMeet,
+      },
+      shouldClose,
+    );
   };
 
   const createURLWorkSpace = (workspaceId: string): void => {

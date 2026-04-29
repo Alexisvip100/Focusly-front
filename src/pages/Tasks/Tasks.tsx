@@ -185,6 +185,7 @@ export const Tasks = () => {
       handleSubtaskToggle={handleSubtaskToggle}
       handleOpenSubtaskModal={handleOpenSubtaskModal}
       onTaskClick={handleTaskClick}
+      updateTask={updateTask}
     />
   );
 

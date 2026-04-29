@@ -1,9 +1,5 @@
 import React, { useEffect } from 'react';
-import {
-  Dialog,
-  Slide,
-  useTheme,
-} from '@mui/material';
+import { Dialog, Slide, useTheme } from '@mui/material';
 import type { TransitionProps } from '@mui/material/transitions';
 
 import type { FocusModeProps } from './FocusMode.types';
@@ -28,7 +24,7 @@ const Transition = React.forwardRef(function Transition(
   props: TransitionProps & {
     children: React.ReactElement;
   },
-  ref: React.Ref<unknown>
+  ref: React.Ref<unknown>,
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -63,10 +59,16 @@ export const FocusMode: React.FC<FocusModeProps> = ({
     confirmExit,
   } = ui;
 
-  const { timeLeft, setTimeLeft, progress, formatTime, isActive, setIsActive } = timer;
+  const { timeLeft, setTimeLeft, progress, formatTime, isActive, setIsActive } =
+    timer;
 
-  const { activeItem, todaysTasks, handleCompleteTask, handleUpdateStatus, handleUpdatePriority } =
-    tasks;
+  const {
+    activeItem,
+    todaysTasks,
+    handleCompleteTask,
+    handleUpdateStatus,
+    handleUpdatePriority,
+  } = tasks;
 
   const theme = useTheme();
 
@@ -96,7 +98,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({
       >
         <FocusModeLayout>
           <MainArea>
-            <FocusHeader 
+            <FocusHeader
               isSidebarOpen={isSidebarOpen}
               setIsSidebarOpen={setIsSidebarOpen}
               setViewMode={setViewMode}
@@ -112,19 +114,19 @@ export const FocusMode: React.FC<FocusModeProps> = ({
                 />
               ) : (
                 <>
-                  <FocusMetadata 
+                  <FocusMetadata
                     activeItem={activeItem}
                     handleUpdateStatus={handleUpdateStatus}
                     handleUpdatePriority={handleUpdatePriority}
                   />
 
-                  <FocusTimerDisplay 
+                  <FocusTimerDisplay
                     timeLeft={timeLeft}
                     formatTime={formatTime}
                     progress={progress}
                   />
 
-                  <FocusFooter 
+                  <FocusFooter
                     isActive={isActive}
                     setIsActive={setIsActive}
                     setTimeLeft={setTimeLeft}
@@ -135,16 +137,16 @@ export const FocusMode: React.FC<FocusModeProps> = ({
             </MainContentContainer>
           </MainArea>
         </FocusModeLayout>
-
-        <EndSessionModal
-          open={showExitConfirmation}
-          onClose={() => setShowExitConfirmation(false)}
-          onConfirm={confirmExit}
-        />
       </Dialog>
 
+      <EndSessionModal
+        open={showExitConfirmation}
+        onClose={() => setShowExitConfirmation(false)}
+        onConfirm={confirmExit}
+      />
+
       {viewMode === 'mini' && open && (
-        <MiniMode 
+        <MiniMode
           position={position}
           handleMouseDown={handleMouseDown}
           formatTime={formatTime}

@@ -181,6 +181,7 @@ export const useTaskMutations = ({
           ],
         });
         if (data?.addSubtask) {
+          dispatch(upsertTaskRedux(mapResponseToTask(data.addSubtask)));
           sileo.success({
             title: 'Subtask added',
             fill: 'var(--sileo-success-bg)',
