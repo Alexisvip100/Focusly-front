@@ -25,6 +25,8 @@ export interface TaskResponse {
   notes_encrypted: string;
   estimate_timer: number;
   estimate_minutes: number;
+  real_timer?: number;
+  duration?: string;
   priority_level: number;
   category: string;
   deadline: string; // GraphQL usually sends ISO string for Dates

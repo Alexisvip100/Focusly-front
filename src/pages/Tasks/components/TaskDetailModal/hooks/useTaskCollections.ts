@@ -1,14 +1,21 @@
 import { useState, useCallback, useMemo } from 'react';
-import { deduplicateLinks, normalizeUrl, parseDuration } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
+import {
+  deduplicateLinks,
+  normalizeUrl,
+  parseDuration,
+} from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import type { UseTaskCollectionsProps } from '../types/TaskDetailModal.types';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
-
-
-export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: UseTaskCollectionsProps) => {
+export const useTaskCollections = ({
+  initialTask,
+  onAddLink,
+  onRemoveLink,
+}: UseTaskCollectionsProps) => {
   const getInitialCollectionState = useCallback(() => {
     const defaults = {
       tags: [] as string[],
-      subtasks: [] as { title: string; completed: boolean; timer: number }[],
+      subtasks: [] as TaskResponse['subtasks'],
       links: [] as { title: string; url: string }[],
       collaborators: [] as { name: string; email: string; avatar?: string }[],
     };
@@ -28,12 +35,20 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
 
     const parsedSubtasks = Array.isArray(subtasks)
       ? subtasks.map((s) => {
-          if (typeof s === 'string') return { title: s, completed: false, timer: 0 };
-          const obj = s as { title?: string; name?: string; completed?: boolean; timer?: number };
+          if (typeof s === 'string')
+            return { title: s, completed: false, timer: 0 };
+          const obj = s as TaskResponse['subtasks'][number];
           return {
-            title: obj.title || obj.name || '',
+            title: obj.title,
             completed: !!obj.completed,
-            timer: obj.timer || 0,
+            timer: obj.timer,
+            estimate_timer: obj.estimate_timer,
+            notes_encrypted: obj.notes_encrypted,
+            priority_level: obj.priority_level,
+            status: obj.status,
+            deadline: obj.deadline,
+            category: obj.category,
+            links: obj.links,
           };
         })
       : [];
@@ -54,16 +69,21 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
     };
   }, [initialTask]);
 
-  const initialCollections = useMemo(() => getInitialCollectionState(), [getInitialCollectionState]);
+  const initialCollections = useMemo(
+    () => getInitialCollectionState(),
+    [getInitialCollectionState],
+  );
 
   const [tags, setTags] = useState<string[]>(initialCollections.tags);
-  const [subtasks, setSubtasks] = useState<{ title: string; completed: boolean; timer: number }[]>(
-    initialCollections.subtasks
+  const [subtasks, setSubtasks] = useState<TaskResponse['subtasks']>(
+    initialCollections.subtasks,
   );
-  const [links, setLinks] = useState<{ title: string; url: string }[]>(initialCollections.links);
-  const [collaborators, setCollaborators] = useState<{ name: string; email: string; avatar?: string }[]>(
-    initialCollections.collaborators
+  const [links, setLinks] = useState<{ title: string; url: string }[]>(
+    initialCollections.links,
   );
+  const [collaborators, setCollaborators] = useState<
+    { name: string; email: string; avatar?: string }[]
+  >(initialCollections.collaborators);
   const [newTag, setNewTag] = useState('');
   const [isAddingTag, setIsAddingTag] = useState(false);
   const [newSubtask, setNewSubtask] = useState('');
@@ -71,7 +91,6 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
   const [newLinkTitle, setNewLinkTitle] = useState('');
   const [newLinkUrl, setNewLinkUrl] = useState('');
   const [isAddingLink, setIsAddingLink] = useState(false);
-
 
   const handleAddTag = (keepOpen = false) => {
     if (newTag.trim()) {
@@ -97,7 +116,11 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
   };
 
   const handleToggleSubtask = (index: number) => {
-    setSubtasks(subtasks.map((st, i) => (i === index ? { ...st, completed: !st.completed } : st)));
+    setSubtasks(
+      subtasks.map((st, i) =>
+        i === index ? { ...st, completed: !st.completed } : st,
+      ),
+    );
   };
 
   const handleAddLink = (title: string, url: string) => {
@@ -105,8 +128,12 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
       const updatedLinks = [
         ...links,
         {
-          title: title.trim() || (url.includes('meet.google.com') ? 'Google Meet' : 'Link'),
-          url: url.trim().startsWith('http') ? url.trim() : `https://${url.trim()}`,
+          title:
+            title.trim() ||
+            (url.includes('meet.google.com') ? 'Google Meet' : 'Link'),
+          url: url.trim().startsWith('http')
+            ? url.trim()
+            : `https://${url.trim()}`,
         },
       ];
       const normNew = normalizeUrl(url.trim());
@@ -134,7 +161,9 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
   const handleAddCollaborator = (name: string, email: string) => {
     if (email.trim()) {
       setCollaborators((prev) => {
-        const exists = prev.some((c) => c.email.toLowerCase() === email.toLowerCase());
+        const exists = prev.some(
+          (c) => c.email.toLowerCase() === email.toLowerCase(),
+        );
         if (exists) return prev;
         return [...prev, { name: name.trim(), email: email.trim() }];
       });
@@ -146,17 +175,28 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
   };
 
   return {
-    tags, setTags,
-    subtasks, setSubtasks,
-    links, setLinks,
-    collaborators, setCollaborators,
-    newTag, setNewTag,
-    isAddingTag, setIsAddingTag,
-    newSubtask, setNewSubtask,
-    newSubtaskDuration, setNewSubtaskDuration,
-    newLinkTitle, setNewLinkTitle,
-    newLinkUrl, setNewLinkUrl,
-    isAddingLink, setIsAddingLink,
+    tags,
+    setTags,
+    subtasks,
+    setSubtasks,
+    links,
+    setLinks,
+    collaborators,
+    setCollaborators,
+    newTag,
+    setNewTag,
+    isAddingTag,
+    setIsAddingTag,
+    newSubtask,
+    setNewSubtask,
+    newSubtaskDuration,
+    setNewSubtaskDuration,
+    newLinkTitle,
+    setNewLinkTitle,
+    newLinkUrl,
+    setNewLinkUrl,
+    isAddingLink,
+    setIsAddingLink,
     handleAddTag,
     handleAddSubtask,
     handleToggleSubtask,
@@ -167,5 +207,4 @@ export const useTaskCollections = ({ initialTask, onAddLink, onRemoveLink }: Use
     handleAddCollaborator,
     initialCollections,
   };
-}
-;
+};

@@ -1,5 +1,9 @@
 import { useMutation } from '@apollo/client';
-import { UPDATE_TASK, GET_TASKS, GET_TASKS_TITLES } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import {
+  UPDATE_TASK,
+  GET_TASKS,
+  GET_TASKS_TITLES,
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import { useAppDispatch } from '@/redux/hooks';
 import { upsertTask as upsertTaskRedux } from '@/redux/tasks/task.slice';
@@ -11,10 +15,14 @@ interface UseTasksMutationsProps {
   onSuccess?: (message: string, subMessage: string) => void;
 }
 
-export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutationsProps) => {
+export const useTasksMutations = ({
+  userId,
+  tasks,
+  onSuccess,
+}: UseTasksMutationsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
   const dispatch = useAppDispatch();
-  
+
   const mapResponseToTask = (t: TaskResponse): Task => ({
     id: t.id,
     user_id: t.user_id || userId || '',
@@ -31,10 +39,14 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
     deleted_at: null,
     subtasks: t.subtasks || [],
     links: t.links || [],
+    real_timer: t.real_timer,
     google_event_id: t.google_event_id,
     estimated_start_date: t.estimated_start_date,
     estimated_end_date: t.estimated_end_date,
-    tags: t.tags?.map((tag: string | { name: string }) => (typeof tag === 'string' ? tag : tag.name)) || [],
+    tags:
+      t.tags?.map((tag: string | { name: string }) =>
+        typeof tag === 'string' ? tag : tag.name,
+      ) || [],
   });
 
   const updateTask = async (id: string, task: TaskResponse) => {
@@ -52,6 +64,7 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
         google_event_id,
         estimated_start_date,
         estimated_end_date,
+        real_timer,
       } = task;
 
       const { data } = await updateTaskMutation({
@@ -62,6 +75,7 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
             notes_encrypted,
             status,
             estimate_timer: estimate_minutes,
+            real_timer,
             duration: null,
             priority_level,
             deadline,
@@ -71,8 +85,9 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
             estimated_start_date,
             estimated_end_date,
             tags:
-              tags?.map((t: string | { name: string }) => (typeof t === 'string' ? t : t.name)) ||
-              [],
+              tags?.map((t: string | { name: string }) =>
+                typeof t === 'string' ? t : t.name,
+              ) || [],
           },
         },
         refetchQueries: [
@@ -80,12 +95,15 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
           { query: GET_TASKS_TITLES, variables: { userId } },
         ],
       });
-      
+
       if (data?.updateTask) {
         dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
       }
-      
-      onSuccess?.('Task updated successfully!', 'Your changes have been saved.');
+
+      onSuccess?.(
+        'Task updated successfully!',
+        'Your changes have been saved.',
+      );
     } catch (error) {
       console.error('Error updating task:', error);
     }
@@ -93,7 +111,7 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
 
   const handleAddSubtask = async (
     parentTaskId: string,
-    subtask: { title: string; timer: number }
+    subtask: { title: string; timer: number },
   ) => {
     const parentTask = tasks.find((t) => t.id === parentTaskId);
     if (!parentTask) return;
@@ -130,7 +148,7 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
             estimated_end_date: parentTask.estimated_end_date,
             tags:
               parentTask.tags?.map((t: string | { name: string }) =>
-                typeof t === 'string' ? t : t.name
+                typeof t === 'string' ? t : t.name,
               ) || [],
           },
         },
@@ -139,14 +157,14 @@ export const useTasksMutations = ({ userId, tasks, onSuccess }: UseTasksMutation
           { query: GET_TASKS_TITLES, variables: { userId } },
         ],
       });
-      
+
       if (data?.updateTask) {
         dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
       }
-      
+
       onSuccess?.(
         'Subtask added successfully!',
-        'The subtask has been attached to the parent task.'
+        'The subtask has been attached to the parent task.',
       );
     } catch (error) {
       console.error('Error adding subtask:', error);

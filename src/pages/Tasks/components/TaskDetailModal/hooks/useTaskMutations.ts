@@ -18,7 +18,11 @@ import {
   updateGoogleEvent,
   deleteGoogleEvent,
 } from '@/api/GoogleCalendar/googleCalendarApi';
-import { removeTask } from '@/redux/tasks/task.slice';
+import {
+  removeTask,
+  upsertTask as upsertTaskRedux,
+} from '@/redux/tasks/task.slice';
+import { mapResponseToTask } from '@/api/Tasks/taskMapper';
 import {
   deduplicateLinks,
   parseDuration,
@@ -156,7 +160,7 @@ export const useTaskMutations = ({
           title: state.title,
           notes_encrypted: `${cleanDesc} [COLOR:${state.color}]`,
           completed: state.status === 'Done',
-          timer: estimateTimer || 0,
+          timer: realTimer || 0,
           estimate_timer: estimateTimer,
           priority_level: priorityLevel,
           status: state.status || 'Backlog',
@@ -262,7 +266,7 @@ export const useTaskMutations = ({
           '#3b82f6';
         return {
           title: state.title || initialTask.title,
-          timer: estimateTimer || 0,
+          timer: realTimer || 0,
           completed: (state.status || initialTask.status) === 'Done',
           notes_encrypted: `${state.description || initialTask.notes_encrypted || ''} [COLOR:${subtaskColor}]`,
           estimate_timer: estimateTimer,
@@ -287,6 +291,7 @@ export const useTaskMutations = ({
           ],
         });
         if (data?.updateTask) {
+          dispatch(upsertTaskRedux(mapResponseToTask(data.updateTask)));
           onSave(data.updateTask);
           resetForm();
           if (shouldClose) onClose();
