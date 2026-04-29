@@ -90,6 +90,7 @@ export interface TaskSearchItems {
   title: string;
   status: string;
   estimate_timer: number;
+  real_timer?: number;
   duration?: number;
   priority_level: number;
   category?: string;

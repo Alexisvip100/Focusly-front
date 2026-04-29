@@ -31,8 +31,6 @@ import {
 import type { PriorityType } from '@/pages/Tasks/components/TaskDetailModal/TaskDetailModal.utils';
 import {
   RightSidebar,
-  SidebarHeader,
-  SectionTitle,
   MetadataSection,
   MetaLabel,
   MetaValue,
@@ -87,6 +85,8 @@ export const EditorSidebar = ({
     if (status === 'Pending') return theme.palette.warning.main;
     if (status === 'Backlog') return theme.palette.secondary.main;
     if (status === 'Planning') return theme.palette.info.main;
+    if (status === 'OnHold') return theme.palette.error.main;
+    if (status === 'Review') return theme.palette.secondary.main;
     return theme.palette.info.main;
   };
 
@@ -196,14 +196,6 @@ export const EditorSidebar = ({
 
       {isRightSidebarOpen && (
         <>
-          <SidebarHeader sx={{ mb: 0 }}>
-            <SectionTitle sx={{ mt: 0 }}>
-              {selectedSubtaskIndex !== null
-                ? 'SUBTASK METADATA'
-                : 'TASK METADATA'}
-            </SectionTitle>
-          </SidebarHeader>
-
           <MetadataSection id="joyride-editor-metadata">
             {selectTask ? (
               <>
@@ -297,6 +289,14 @@ export const EditorSidebar = ({
                       <HistoryIcon
                         sx={{ fontSize: 16, color: 'secondary.main' }}
                       />
+                    ) : currentStatus === 'OnHold' ? (
+                      <RadioButtonUncheckedIcon
+                        sx={{ fontSize: 16, color: 'error.main' }}
+                      />
+                    ) : currentStatus === 'Review' ? (
+                      <VisibilityIcon
+                        sx={{ fontSize: 16, color: 'secondary.main' }}
+                      />
                     ) : (
                       <RadioButtonUncheckedIcon
                         sx={{ fontSize: 16, color: 'info.main' }}
@@ -318,19 +318,42 @@ export const EditorSidebar = ({
                 <Box
                   display="flex"
                   justifyContent="space-between"
-                  mb={3}
+                  mb={1}
                   alignItems="center"
                 >
                   <MetaLabel>Estimated Time</MetaLabel>
                   <MetaValue sx={{ fontWeight: 600, color: 'text.primary' }}>
+                    {selectedSubtaskIndex !== null
+                      ? selectTask?.subtasks?.[selectedSubtaskIndex]
+                          ?.estimate_timer ||
+                        selectTask?.subtasks?.[selectedSubtaskIndex]?.timer
+                        ? formatDuration(
+                            selectTask.subtasks[selectedSubtaskIndex]
+                              .estimate_timer ||
+                              selectTask.subtasks[selectedSubtaskIndex].timer,
+                          )
+                        : '0h'
+                      : selectTask?.estimate_timer
+                        ? formatDuration(selectTask.estimate_timer)
+                        : '0h'}
+                  </MetaValue>
+                </Box>
+                <Box
+                  display="flex"
+                  justifyContent="space-between"
+                  mb={3}
+                  alignItems="center"
+                >
+                  <MetaLabel>Real Time</MetaLabel>
+                  <MetaValue sx={{ fontWeight: 600, color: 'info.main' }}>
                     {selectedSubtaskIndex !== null
                       ? selectTask?.subtasks?.[selectedSubtaskIndex]?.timer
                         ? formatDuration(
                             selectTask.subtasks[selectedSubtaskIndex].timer,
                           )
                         : '0h'
-                      : selectTask?.estimate_timer
-                        ? formatDuration(selectTask.estimate_timer)
+                      : selectTask?.real_timer
+                        ? formatDuration(selectTask.real_timer)
                         : '0h'}
                   </MetaValue>
                 </Box>

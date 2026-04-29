@@ -185,6 +185,7 @@ export const useHome = () => {
               deadline: s.deadline,
               category: s.category,
             })),
+            real_timer: (taskDetailsTask as Task).real_timer,
             google_event_id: (taskDetailsTask as Task).google_event_id,
             estimated_start_date: (taskDetailsTask as Task)
               .estimated_start_date,

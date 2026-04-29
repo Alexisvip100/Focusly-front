@@ -61,6 +61,8 @@ export const mapResponseToTask = (t: TaskResponse): Task => {
     title: t.title,
     notes_encrypted: t.notes_encrypted || '',
     estimate_timer: t.estimate_timer || 0,
+    real_timer: t.real_timer,
+    duration: t.duration,
     priority_level: t.priority_level,
     deadline: safeISO(t.deadline) || new Date().toISOString(),
     status: t.status as TaskStatus,

@@ -90,10 +90,16 @@ export const Tasks = () => {
     setSearchParams({ tab: 'Tasks', taskId: task.id });
   };
 
-  const [viewMode, setViewMode] = useState<'list' | 'grid' | 'board' | 'workload'>('list');
-  const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(null);
+  const [viewMode, setViewMode] = useState<
+    'list' | 'grid' | 'board' | 'workload'
+  >('list');
+  const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(
+    null,
+  );
   const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
-  const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(null);
+  const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(
+    null,
+  );
 
   const [runOnboarding, setRunOnboarding] = useState(() => {
     return localStorage.getItem('onboarding_tasks_completed') !== 'true';
@@ -109,7 +115,8 @@ export const Tasks = () => {
             Welcome to Your Tasks! 🚀
           </Typography>
           <Typography variant="body2">
-            This is where you manage and prioritize your work. Let's take a quick tour!
+            This is where you manage and prioritize your work. Let's take a
+            quick tour!
           </Typography>
         </Box>
       ),
@@ -117,19 +124,23 @@ export const Tasks = () => {
     },
     {
       target: '#joyride-tasks-view-toggle',
-      content: 'Switch between List, Grid, Board, and Workload views to find what works best for you.',
+      content:
+        'Switch between List, Grid, Board, and Workload views to find what works best for you.',
     },
     {
       target: '#joyride-tasks-search',
-      content: 'Quickly find any task by searching for its title, tags, or projects.',
+      content:
+        'Quickly find any task by searching for its title, tags, or projects.',
     },
     {
       target: '#joyride-tasks-filters',
-      content: 'Use filters and sorting to stay focused on what matters most right now.',
+      content:
+        'Use filters and sorting to stay focused on what matters most right now.',
     },
     {
       target: '#joyride-tasks-completed',
-      content: 'Toggle completed tasks to review your progress or clear your workspace.',
+      content:
+        'Toggle completed tasks to review your progress or clear your workspace.',
     },
   ];
 
@@ -174,15 +185,12 @@ export const Tasks = () => {
       handleSubtaskToggle={handleSubtaskToggle}
       handleOpenSubtaskModal={handleOpenSubtaskModal}
       onTaskClick={handleTaskClick}
+      updateTask={updateTask}
     />
   );
 
   const renderGridTask = (task: TaskResponse) => (
-    <GridViewTask
-      key={task.id}
-      task={task}
-      onTaskClick={handleTaskClick}
-    />
+    <GridViewTask key={task.id} task={task} onTaskClick={handleTaskClick} />
   );
 
   return (
@@ -227,13 +235,15 @@ export const Tasks = () => {
               }}
             >
               <Typography variant="body2" sx={{ color: 'text.primary' }}>
-                {filteredTasks.filter((t) => t.status !== 'Done').length} Pending
+                {filteredTasks.filter((t) => t.status !== 'Done').length}{' '}
+                Pending
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
                 •
               </Typography>
               <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-                {filteredTasks.filter((t) => t.status === 'Done').length} Completed
+                {filteredTasks.filter((t) => t.status === 'Done').length}{' '}
+                Completed
               </Typography>
             </Box>
 
@@ -258,13 +268,22 @@ export const Tasks = () => {
             </Select>
 
             <ViewToggleGroup id="joyride-tasks-view-toggle">
-              <ViewToggleButton active={viewMode === 'list'} onClick={() => setViewMode('list')}>
+              <ViewToggleButton
+                active={viewMode === 'list'}
+                onClick={() => setViewMode('list')}
+              >
                 <ViewListIcon fontSize="small" />
               </ViewToggleButton>
-              <ViewToggleButton active={viewMode === 'grid'} onClick={() => setViewMode('grid')}>
+              <ViewToggleButton
+                active={viewMode === 'grid'}
+                onClick={() => setViewMode('grid')}
+              >
                 <GridViewIcon fontSize="small" />
               </ViewToggleButton>
-              <ViewToggleButton active={viewMode === 'board'} onClick={() => setViewMode('board')}>
+              <ViewToggleButton
+                active={viewMode === 'board'}
+                onClick={() => setViewMode('board')}
+              >
                 <ViewColumnIcon fontSize="small" />
               </ViewToggleButton>
               <ViewToggleButton
@@ -284,17 +303,26 @@ export const Tasks = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             InputProps={{
-              startAdornment: <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />,
+              startAdornment: (
+                <SearchIcon sx={{ color: 'text.secondary', mr: 1 }} />
+              ),
             }}
             size="small"
           />
           <Box sx={{ display: 'flex', gap: 1 }}>
             <FilterButton
               onClick={(e) => handleFilterClick(e, 'filter')}
-              sx={{ backgroundColor: filterAnchorEl ? '#257df0' : 'background.paper' }}
+              sx={{
+                backgroundColor: filterAnchorEl
+                  ? '#257df0'
+                  : 'background.paper',
+              }}
             >
               <FilterListIcon sx={{ color: 'text.primary', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.primary', fontWeight: 600 }}
+              >
                 Filter
               </Typography>
             </FilterButton>
@@ -308,10 +336,15 @@ export const Tasks = () => {
             />
             <SortButton
               onClick={(e) => handleFilterClick(e, 'sort')}
-              sx={{ backgroundColor: sortAnchorEl ? '#257df0' : 'background.paper' }}
+              sx={{
+                backgroundColor: sortAnchorEl ? '#257df0' : 'background.paper',
+              }}
             >
               <SortIcon sx={{ color: 'text.primary', fontSize: 20 }} />
-              <Typography variant="body2" sx={{ color: 'text.primary', fontWeight: 600 }}>
+              <Typography
+                variant="body2"
+                sx={{ color: 'text.primary', fontWeight: 600 }}
+              >
                 Sort
               </Typography>
             </SortButton>
@@ -326,15 +359,22 @@ export const Tasks = () => {
               id="joyride-tasks-completed"
               onClick={(e) => handleFilterClick(e, 'completed')}
               sx={{
-                backgroundColor: isCompletedFilterActive ? '#14913e' : 'background.paper',
+                backgroundColor: isCompletedFilterActive
+                  ? '#14913e'
+                  : 'background.paper',
                 color: isCompletedFilterActive ? '#ffffff' : 'text.primary',
                 '&:hover': {
-                  backgroundColor: isCompletedFilterActive ? '#117a34' : 'action.hover',
+                  backgroundColor: isCompletedFilterActive
+                    ? '#117a34'
+                    : 'action.hover',
                 },
               }}
             >
               <CheckCircleIcon
-                sx={{ color: isCompletedFilterActive ? '#ffffff' : 'text.primary', fontSize: 20 }}
+                sx={{
+                  color: isCompletedFilterActive ? '#ffffff' : 'text.primary',
+                  fontSize: 20,
+                }}
               />
               <Typography
                 variant="body2"
@@ -355,8 +395,17 @@ export const Tasks = () => {
             viewMode === 'grid' ? (
               <GridTaskContainer>
                 {[1, 2, 3, 4, 5, 6].map((i) => (
-                  <GridTaskCard key={i} sx={{ borderStyle: 'solid', cursor: 'default' }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+                  <GridTaskCard
+                    key={i}
+                    sx={{ borderStyle: 'solid', cursor: 'default' }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        mb: 2,
+                      }}
+                    >
                       <Skeleton
                         variant="rectangular"
                         width="40%"
@@ -364,7 +413,12 @@ export const Tasks = () => {
                         sx={{ borderRadius: '12px' }}
                         animation="wave"
                       />
-                      <Skeleton variant="circular" width={24} height={24} animation="wave" />
+                      <Skeleton
+                        variant="circular"
+                        width={24}
+                        height={24}
+                        animation="wave"
+                      />
                     </Box>
                     <Skeleton
                       variant="text"
@@ -373,16 +427,52 @@ export const Tasks = () => {
                       sx={{ mb: 1 }}
                       animation="wave"
                     />
-                    <Skeleton variant="text" width="100%" height={20} animation="wave" />
-                    <Skeleton variant="text" width="90%" height={20} animation="wave" />
+                    <Skeleton
+                      variant="text"
+                      width="100%"
+                      height={20}
+                      animation="wave"
+                    />
+                    <Skeleton
+                      variant="text"
+                      width="90%"
+                      height={20}
+                      animation="wave"
+                    />
                     <Box sx={{ mt: 2, display: 'flex', gap: 2 }}>
-                      <Skeleton variant="text" width="20%" height={20} animation="wave" />
-                      <Skeleton variant="text" width="30%" height={20} animation="wave" />
+                      <Skeleton
+                        variant="text"
+                        width="20%"
+                        height={20}
+                        animation="wave"
+                      />
+                      <Skeleton
+                        variant="text"
+                        width="30%"
+                        height={20}
+                        animation="wave"
+                      />
                     </Box>
                     <Box sx={{ mt: 'auto', width: '100%' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-                        <Skeleton variant="text" width="30%" height={14} animation="wave" />
-                        <Skeleton variant="text" width="10%" height={14} animation="wave" />
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          mb: 1,
+                        }}
+                      >
+                        <Skeleton
+                          variant="text"
+                          width="30%"
+                          height={14}
+                          animation="wave"
+                        />
+                        <Skeleton
+                          variant="text"
+                          width="10%"
+                          height={14}
+                          animation="wave"
+                        />
                       </Box>
                       <Skeleton
                         variant="rectangular"
@@ -398,12 +488,32 @@ export const Tasks = () => {
             ) : (
               <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                 {[1, 2, 3, 4, 5].map((i) => (
-                  <TaskCard key={i} sx={{ cursor: 'default', borderLeft: '5px solid #30363d' }}>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 1.5, width: '100%' }}>
-                      <Skeleton variant="circular" width={24} height={24} animation="wave" />
+                  <TaskCard
+                    key={i}
+                    sx={{ cursor: 'default', borderLeft: '5px solid #30363d' }}
+                  >
+                    <Box
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 1.5,
+                        width: '100%',
+                      }}
+                    >
+                      <Skeleton
+                        variant="circular"
+                        width={24}
+                        height={24}
+                        animation="wave"
+                      />
                       <Box sx={{ flex: 1 }}>
                         <Box sx={{ display: 'flex', gap: 1, mb: 1 }}>
-                          <Skeleton variant="text" width="40%" height={24} animation="wave" />
+                          <Skeleton
+                            variant="text"
+                            width="40%"
+                            height={24}
+                            animation="wave"
+                          />
                           <Skeleton
                             variant="rectangular"
                             width="60px"
@@ -413,9 +523,24 @@ export const Tasks = () => {
                           />
                         </Box>
                         <Box sx={{ display: 'flex', gap: 2 }}>
-                          <Skeleton variant="text" width="20%" height={16} animation="wave" />
-                          <Skeleton variant="text" width="25%" height={16} animation="wave" />
-                          <Skeleton variant="text" width="15%" height={16} animation="wave" />
+                          <Skeleton
+                            variant="text"
+                            width="20%"
+                            height={16}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            variant="text"
+                            width="25%"
+                            height={16}
+                            animation="wave"
+                          />
+                          <Skeleton
+                            variant="text"
+                            width="15%"
+                            height={16}
+                            animation="wave"
+                          />
                         </Box>
                       </Box>
                     </Box>
@@ -448,7 +573,9 @@ export const Tasks = () => {
               />
             </>
           ) : viewMode === 'grid' ? (
-            <GridTaskContainer>{filteredTasks.map(renderGridTask)}</GridTaskContainer>
+            <GridTaskContainer>
+              {filteredTasks.map(renderGridTask)}
+            </GridTaskContainer>
           ) : (
             <>
               {[
@@ -474,7 +601,8 @@ export const Tasks = () => {
                   id: 'none',
                   label: 'Other Tasks',
                   color: '#94a3b8',
-                  filter: (t: TaskResponse) => !t.priority_level || t.priority_level === 0,
+                  filter: (t: TaskResponse) =>
+                    !t.priority_level || t.priority_level === 0,
                 },
               ].map((section) => {
                 const sectionTasks = filteredTasks.filter(section.filter);
@@ -519,7 +647,11 @@ export const Tasks = () => {
 
       {isSubtaskModalOpen && (
         <TaskDetailModal
-          key={activeParentTask?.id ? `subtask-${activeParentTask.id}-${activeSubtaskIndex}` : 'new-subtask'}
+          key={
+            activeParentTask?.id
+              ? `subtask-${activeParentTask.id}-${activeSubtaskIndex}`
+              : 'new-subtask'
+          }
           open={isSubtaskModalOpen}
           onClose={() => setIsSubtaskModalOpen(false)}
           onSave={handleSaveSubtask}
@@ -534,7 +666,9 @@ export const Tasks = () => {
                 }
               : undefined
           }
-          subtaskIndex={activeSubtaskIndex === null ? undefined : activeSubtaskIndex}
+          subtaskIndex={
+            activeSubtaskIndex === null ? undefined : activeSubtaskIndex
+          }
           initialTask={
             activeParentTask &&
             activeSubtaskIndex !== null &&
@@ -545,15 +679,23 @@ export const Tasks = () => {
                   title: activeParentTask.subtasks[activeSubtaskIndex].title,
                   status:
                     activeParentTask.subtasks[activeSubtaskIndex].status ||
-                    (activeParentTask.subtasks[activeSubtaskIndex].completed ? 'Done' : 'Todo'),
-                  estimate_timer: activeParentTask.subtasks[activeSubtaskIndex].timer,
+                    (activeParentTask.subtasks[activeSubtaskIndex].completed
+                      ? 'Done'
+                      : 'Todo'),
+                  estimate_timer:
+                    activeParentTask.subtasks[activeSubtaskIndex]
+                      .estimate_timer ||
+                    activeParentTask.subtasks[activeSubtaskIndex].timer,
+                  real_timer:
+                    activeParentTask.subtasks[activeSubtaskIndex].timer,
                   priority_level: activeParentTask.priority_level,
                   category: activeParentTask.category,
                   deadline: activeParentTask.deadline,
                   notes_encrypted: '',
                   subtasks: [],
                   tags: [],
-                  links: activeParentTask.subtasks[activeSubtaskIndex].links || [],
+                  links:
+                    activeParentTask.subtasks[activeSubtaskIndex].links || [],
                   user_id: activeParentTask.user_id,
                   created_at: new Date().toISOString(),
                   updated_at: new Date().toISOString(),
