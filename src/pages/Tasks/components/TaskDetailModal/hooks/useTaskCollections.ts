@@ -37,17 +37,12 @@ export const useTaskCollections = ({
       ? subtasks.map((s) => {
           if (typeof s === 'string')
             return { title: s, completed: false, timer: 0 };
-          const obj = s as {
-            title?: string;
-            name?: string;
-            completed?: boolean;
-            timer?: number;
-          };
+          const obj = s as TaskResponse['subtasks'][number];
           return {
-            title: obj.title || obj.name || '',
+            title: obj.title,
             completed: !!obj.completed,
-            timer: obj.timer || 0,
-            estimate_timer: obj?.estimate_timer,
+            timer: obj.timer,
+            estimate_timer: obj.estimate_timer,
             notes_encrypted: obj.notes_encrypted,
             priority_level: obj.priority_level,
             status: obj.status,
