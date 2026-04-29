@@ -1,5 +1,7 @@
 import React from 'react';
 import { Calendar, momentLocalizer, Views } from 'react-big-calendar';
+import withDragAndDrop from 'react-big-calendar/lib/addons/dragAndDrop';
+import 'react-big-calendar/lib/addons/dragAndDrop/styles.css';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
@@ -39,6 +41,8 @@ import type { ToolbarProps } from 'react-big-calendar';
 // Setup the localizer
 const localizer = momentLocalizer(moment);
 
+const DnDCalendar = withDragAndDrop<ICalendarEvent, object>(Calendar);
+
 interface CalendarViewProps {
   onStartFocus?: () => void;
 }
@@ -52,6 +56,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
     handleOnNavigate,
     handleSelectSlot,
     handleSelectEvent,
+    handleEventDrop,
+    handleEventResize,
     isFocusSessionActive,
     handleShowMore,
     slotContextMenu,
@@ -98,7 +104,7 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           overflow: 'hidden',
         }}
       >
-        <Calendar
+        <DnDCalendar
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -109,6 +115,9 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
           onNavigate={(newDate) => handleOnNavigate(newDate as Date)}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={handleSelectEvent}
+          onEventDrop={handleEventDrop}
+          onEventResize={handleEventResize}
+          resizable
           selectable
           showAllEvents={false}
           doShowMoreDrillDown={false}
@@ -140,8 +149,8 @@ export const CalendarView: React.FC<CalendarViewProps> = ({ onStartFocus }) => {
               />
             ),
           }}
-          step={30}
-          timeslots={2}
+          step={5}
+          timeslots={12}
           onShowMore={handleShowMore}
           popup={false}
           messages={{

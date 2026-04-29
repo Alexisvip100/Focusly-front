@@ -2,9 +2,19 @@ import { useState, useMemo, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Views, type View } from 'react-big-calendar';
-import { 
-  addDays, addMonths, addWeeks, subDays, subMonths, subWeeks,
-  startOfMonth, endOfMonth, startOfWeek, endOfWeek, startOfDay, endOfDay,
+import {
+  addDays,
+  addMonths,
+  addWeeks,
+  subDays,
+  subMonths,
+  subWeeks,
+  startOfMonth,
+  endOfMonth,
+  startOfWeek,
+  endOfWeek,
+  startOfDay,
+  endOfDay,
   format,
 } from 'date-fns';
 import { sileo } from 'sileo';
@@ -12,19 +22,31 @@ import type { RootState } from '@/redux/store';
 import type { Task } from '@/redux/tasks/task.types';
 import { setTasks, removeTask } from '@/redux/tasks/task.slice';
 import { removeEvent, setEvents } from '@/redux/calendar/calendar.slice';
-import { fetchGoogleEvents, deleteGoogleEvent } from '@/api/GoogleCalendar/googleCalendarApi';
+import {
+  fetchGoogleEvents,
+  deleteGoogleEvent,
+} from '@/api/GoogleCalendar/googleCalendarApi';
 import { GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import type { ICalendarEvent } from '../../CalendarEvent';
-import { GET_TASKS, DELETE_TASK } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
+import {
+  GET_TASKS,
+  DELETE_TASK,
+  UPDATE_TASK,
+} from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { useQuery, useMutation } from '@apollo/client';
 import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 import type { CalendarNavigateAction } from '../calendarView.types';
-import { mapResponseToTask, normalizeGoogleId, getBaseGoogleId } from '@/api/Tasks/taskMapper';
+import {
+  mapResponseToTask,
+  normalizeGoogleId,
+  getBaseGoogleId,
+} from '@/api/Tasks/taskMapper';
 
 export const useCalendarView = () => {
   const dispatch = useDispatch();
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const reduxEvents = useSelector((state: RootState) => state.calendar?.reduxEvents) || [];
+  const reduxEvents =
+    useSelector((state: RootState) => state.calendar?.reduxEvents) || [];
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const tasks = useSelector((state: RootState) => state.task?.tasks) || [];
   const [searchParams, setSearchParams] = useSearchParams();
@@ -53,10 +75,10 @@ export const useCalendarView = () => {
     const newParams = new URLSearchParams(searchParams.toString());
     const currentV = newParams.get('v');
     const currentD = newParams.get('d');
-    
+
     // Use local time date string for the URL to avoid timezone confusion in the calendar view
     const dateStr = format(currentDate, 'yyyy-MM-dd');
-    
+
     if (currentV !== currentView || currentD !== dateStr) {
       newParams.set('v', currentView as string);
       newParams.set('d', dateStr);
@@ -64,10 +86,13 @@ export const useCalendarView = () => {
     }
   }, [currentView, currentDate, setSearchParams, searchParams]);
 
-  const [slotContextMenu, setSlotContextMenu] = useState<{ mouseX: number; mouseY: number; date: Date } | null>(null);
-  const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] = useState<string | null>(null);
-  
-
+  const [slotContextMenu, setSlotContextMenu] = useState<{
+    mouseX: number;
+    mouseY: number;
+    date: Date;
+  } | null>(null);
+  const [resolvedGoogleCalendarUserId, setResolvedGoogleCalendarUserId] =
+    useState<string | null>(null);
 
   // New Task Modal State moved to URL parameters
   const [deleteTaskMutation] = useMutation(DELETE_TASK);
@@ -96,21 +121,26 @@ export const useCalendarView = () => {
     };
   }, [currentDate, currentView]);
 
-  const { data: tasksData, loading: isTasksQueryLoading } = useQuery(GET_TASKS, {
-    skip: !user?.id,
-    variables: { 
-      userId: user?.id,
-      filters: {
-        startDate: dateRange.start,
-        endDate: dateRange.end,
-      }
+  const { data: tasksData, loading: isTasksQueryLoading } = useQuery(
+    GET_TASKS,
+    {
+      skip: !user?.id,
+      variables: {
+        userId: user?.id,
+        filters: {
+          startDate: dateRange.start,
+          endDate: dateRange.end,
+        },
+      },
+      fetchPolicy: 'cache-and-network',
     },
-    fetchPolicy: 'cache-and-network',
-  });
+  );
 
   useEffect(() => {
     if (tasksData?.tasks) {
-      const validTasks: Task[] = tasksData.tasks.map((t: TaskResponse) => mapResponseToTask(t));
+      const validTasks: Task[] = tasksData.tasks.map((t: TaskResponse) =>
+        mapResponseToTask(t),
+      );
       dispatch(setTasks(validTasks));
     }
   }, [tasksData, dispatch]);
@@ -158,12 +188,13 @@ export const useCalendarView = () => {
     (tasksData?.tasks?.length ?? 0) > 0;
 
   const isCalendarLoading =
-    !hasRenderableCalendarData && (isTasksQueryLoading || isGoogleEventsLoading);
+    !hasRenderableCalendarData &&
+    (isTasksQueryLoading || isGoogleEventsLoading);
   const events = useMemo(() => {
     // 1. Prepare a set of all synced Google Event IDs for efficient deduplication
     // We store both exact normalized IDs and base IDs to catch series imports.
     const syncedGoogleIds = new Set<string>();
-    tasks.forEach(t => {
+    tasks.forEach((t) => {
       if (t.google_event_id) {
         const norm = normalizeGoogleId(t.google_event_id);
         const base = getBaseGoogleId(t.google_event_id);
@@ -177,10 +208,12 @@ export const useCalendarView = () => {
       .filter((ge) => {
         const normGoogleId = normalizeGoogleId(ge.id);
         const baseGoogleId = getBaseGoogleId(ge.id);
-        
+
         // Hide if there's any match in our synced IDs set
-        const isAlreadySaved = syncedGoogleIds.has(normGoogleId) || syncedGoogleIds.has(baseGoogleId);
-                               
+        const isAlreadySaved =
+          syncedGoogleIds.has(normGoogleId) ||
+          syncedGoogleIds.has(baseGoogleId);
+
         return !isAlreadySaved;
       })
       .map((ge) => {
@@ -208,10 +241,19 @@ export const useCalendarView = () => {
       const startDateMatch = desc.match(/\[START_DATE:(.*?)\]/);
 
       const deadlineDate = task.deadline ? new Date(task.deadline) : new Date();
-      const hasEstimatedStart = task.estimated_start_date && !isNaN(new Date(task.estimated_start_date).getTime());
-      
-      let start = hasEstimatedStart ? new Date(task.estimated_start_date!) : (isNaN(deadlineDate.getTime()) ? new Date() : deadlineDate);
-      let end = hasEstimatedStart && task.estimated_end_date ? new Date(task.estimated_end_date) : new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
+      const hasEstimatedStart =
+        task.estimated_start_date &&
+        !isNaN(new Date(task.estimated_start_date).getTime());
+
+      let start = hasEstimatedStart
+        ? new Date(task.estimated_start_date!)
+        : isNaN(deadlineDate.getTime())
+          ? new Date()
+          : deadlineDate;
+      let end =
+        hasEstimatedStart && task.estimated_end_date
+          ? new Date(task.estimated_end_date)
+          : new Date(start.getTime() + (task.estimate_timer || 30) * 60000);
 
       if (startDateMatch && startDateMatch[1]) {
         const parsedStart = new Date(startDateMatch[1]);
@@ -260,14 +302,14 @@ export const useCalendarView = () => {
 
     sortedEvents.forEach((event) => {
       const start = event.start?.getTime() || 0;
-      
+
       for (let i = activeWindows.length - 1; i >= 0; i--) {
         if (activeWindows[i].end <= start) {
           activeWindows.splice(i, 1);
         }
       }
 
-      const usedIndices = new Set(activeWindows.map(w => w.index));
+      const usedIndices = new Set(activeWindows.map((w) => w.index));
       let overlapIndex = 0;
       while (usedIndices.has(overlapIndex)) {
         overlapIndex++;
@@ -279,7 +321,6 @@ export const useCalendarView = () => {
 
     return result;
   }, [reduxEvents, tasks]);
-
 
   const handleOnChangeView = (selectedView: View) => {
     setCurrentView(selectedView);
@@ -296,21 +337,30 @@ export const useCalendarView = () => {
     }
 
     if (currentView === Views.MONTH) {
-      setCurrentDate((prev) => (action === 'NEXT' ? addMonths(prev, 1) : subMonths(prev, 1)));
+      setCurrentDate((prev) =>
+        action === 'NEXT' ? addMonths(prev, 1) : subMonths(prev, 1),
+      );
       return;
     }
 
     if (currentView === Views.WEEK) {
-      setCurrentDate((prev) => (action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1)));
+      setCurrentDate((prev) =>
+        action === 'NEXT' ? addWeeks(prev, 1) : subWeeks(prev, 1),
+      );
       return;
     }
 
-    setCurrentDate((prev) => (action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1)));
+    setCurrentDate((prev) =>
+      action === 'NEXT' ? addDays(prev, 1) : subDays(prev, 1),
+    );
   };
 
-
   const handleSelectSlot = ({ start, end }: { start: Date; end: Date }) => {
-    setSearchParams({ action: 'create', start: start.toISOString(), end: end.toISOString() });
+    setSearchParams({
+      action: 'create',
+      start: start.toISOString(),
+      end: end.toISOString(),
+    });
   };
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -318,7 +368,8 @@ export const useCalendarView = () => {
     const activeTab = searchParams.get('tab') || 'DailyPlan';
 
     if (event.type === 'task') {
-      const task = tasks.find((t) => t.id === event.id) || (event.resource as Task);
+      const task =
+        tasks.find((t) => t.id === event.id) || (event.resource as Task);
       if (task) {
         setSearchParams({ tab: activeTab, taskId: task.id });
       }
@@ -345,9 +396,9 @@ export const useCalendarView = () => {
   const handleDeleteTask = async (taskId: string) => {
     try {
       // 1. Identify if it's a persistent Platform Task or a virtual Google Event
-      const persistentTask = tasks.find(t => t.id === taskId);
-      const virtualEvent = reduxEvents.find(e => e.id === taskId);
-      
+      const persistentTask = tasks.find((t) => t.id === taskId);
+      const virtualEvent = reduxEvents.find((e) => e.id === taskId);
+
       const isPlatformTask = !!persistentTask;
       const isPureGoogleEvent = !!virtualEvent && !persistentTask;
 
@@ -360,7 +411,10 @@ export const useCalendarView = () => {
             // Also remove from virtual state to prevent "ghost" duplicates
             dispatch(removeEvent({ id: persistentTask.google_event_id }));
           } catch (err) {
-            console.warn('Failed to delete Google event, proceeding with platform delete', err);
+            console.warn(
+              'Failed to delete Google event, proceeding with platform delete',
+              err,
+            );
           }
         }
 
@@ -380,7 +434,7 @@ export const useCalendarView = () => {
       }
 
       handleModalClose();
-      
+
       sileo.success({
         title: 'Task deleted successfully!',
         fill: 'var(--sileo-delete-bg)',
@@ -412,6 +466,87 @@ export const useCalendarView = () => {
     setSlotContextMenu(null);
   };
 
+  const [updateTaskMutation] = useMutation(UPDATE_TASK);
+
+  interface CalendarDragEvent {
+    event: ICalendarEvent;
+    start: string | Date;
+    end: string | Date;
+  }
+
+  const handleEventDrop = async ({ event, start, end }: CalendarDragEvent) => {
+    if (event.type !== 'task') return;
+
+    const startDate = typeof start === 'string' ? new Date(start) : start;
+    const endDate = typeof end === 'string' ? new Date(end) : end;
+
+    try {
+      await updateTaskMutation({
+        variables: {
+          updateTaskInput: {
+            id: event.id,
+            deadline: endDate.toISOString(),
+            estimated_start_date: startDate.toISOString(),
+            estimated_end_date: endDate.toISOString(),
+          },
+        },
+        refetchQueries: [
+          {
+            query: GET_TASKS,
+            variables: {
+              userId: user?.id,
+              filters: { startDate: dateRange.start, endDate: dateRange.end },
+            },
+          },
+        ],
+      });
+
+      sileo.success({
+        title: 'Task rescheduled!',
+        description: `New time: ${format(startDate, 'hh:mm a')}`,
+        duration: 3000,
+      });
+    } catch (err) {
+      console.error('Error dropping event:', err);
+      sileo.error({ title: 'Error rescheduling task' });
+    }
+  };
+
+  const handleEventResize = async ({
+    event,
+    start,
+    end,
+  }: CalendarDragEvent) => {
+    if (event.type !== 'task') return;
+
+    const startDate = typeof start === 'string' ? new Date(start) : start;
+    const endDate = typeof end === 'string' ? new Date(end) : end;
+
+    try {
+      await updateTaskMutation({
+        variables: {
+          updateTaskInput: {
+            id: event.id,
+            deadline: endDate.toISOString(),
+            estimated_start_date: startDate.toISOString(),
+            estimated_end_date: endDate.toISOString(),
+          },
+        },
+        refetchQueries: [
+          {
+            query: GET_TASKS,
+            variables: {
+              userId: user?.id,
+              filters: { startDate: dateRange.start, endDate: dateRange.end },
+            },
+          },
+        ],
+      });
+    } catch (err) {
+      console.error('Error resizing event:', err);
+    }
+  };
+
   return {
     events,
     currentView,
@@ -422,6 +557,8 @@ export const useCalendarView = () => {
     handleNavigateAction,
     handleSelectSlot,
     handleSelectEvent,
+    handleEventDrop,
+    handleEventResize,
     handleDeleteTask,
     handleModalClose,
     isFocusModeOpen,
