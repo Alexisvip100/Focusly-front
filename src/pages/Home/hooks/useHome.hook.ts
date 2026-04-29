@@ -43,6 +43,7 @@ export const useHome = () => {
   const [isFocusModeOpen, setIsFocusModeOpen] = useState(() => {
     return localStorage.getItem('focus_mode_open') === 'true';
   });
+  const [isFocusModeActive, setIsFocusModeActive] = useState(false);
   const [activeFocusTask, setActiveFocusTask] = useState<Task | null>(() => {
     const saved = localStorage.getItem('focus_mode_task');
     return saved ? JSON.parse(saved) : null;
@@ -135,6 +136,7 @@ export const useHome = () => {
       typeof subtaskIndex === 'number' ? subtaskIndex : null,
     );
     setIsFocusModeOpen(true);
+    setIsFocusModeActive(true);
   };
 
   const handleOpenTaskDetails = (
@@ -339,6 +341,8 @@ export const useHome = () => {
     setIsRightPanelOpen,
     isFocusModeOpen,
     setIsFocusModeOpen,
+    isFocusModeActive,
+    setIsFocusModeActive,
     activeFocusTask,
     activeFocusSubtaskIndex,
     handleStartFocus,
