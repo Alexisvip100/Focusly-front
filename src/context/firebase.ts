@@ -58,10 +58,8 @@ export const requestNotificationPermission = async (
   return token;
 };
 
-export const listenForegroundMessages = async () => {
-  const registration = await navigator.serviceWorker.ready;
-
-  onMessage(messaging, (payload) => {
+export const listenForegroundMessages = () => {
+  return onMessage(messaging, (payload) => {
     const state = store.getState();
     const pushEnabled = state.auth.user?.pushEnabled !== false;
 
@@ -74,9 +72,9 @@ export const listenForegroundMessages = async () => {
 
     console.log('Mensaje recibido en Focusly:', payload);
 
+    // Data-only messages: title/body are in payload.data
     const data = payload.data as Record<string, string>;
-    const taskTitle =
-      data?.taskTitle || payload.notification?.title || 'Upcoming Task! 🚀';
+    const taskTitle = data?.taskTitle || data?.title || 'Upcoming Task! 🚀';
     const taskId = data?.taskId || 'new-task';
     const deadlineStr = data?.deadline;
     let timeFormatted = '';
@@ -89,15 +87,19 @@ export const listenForegroundMessages = async () => {
       });
     }
 
-    // 1. FORZAR Notificación de Sistema (aparece sobre otras pestañas)
-    void registration.showNotification(taskTitle, {
-      body: `Empieza a las ${timeFormatted}`,
-      icon: '/Focusly.png',
-      tag: taskId, // ID único por tarea para que no se agrupen/oculten
-      renotify: true,
-    } as showNotificationProps);
+    // 1. System notification (shows over other tabs)
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      navigator.serviceWorker.ready.then((registration) => {
+        void registration.showNotification(taskTitle, {
+          body: `Empieza a las ${timeFormatted}`,
+          icon: '/Focusly.png',
+          tag: taskId,
+          renotify: true,
+        } as showNotificationProps);
+      });
+    }
 
-    // 2. Mostrar diseño Premium (solo si estamos viendo la app)
+    // 2. Premium in-app toast (only when tab is visible)
     if (document.visibilityState === 'visible') {
       void Swal.fire({
         html: `

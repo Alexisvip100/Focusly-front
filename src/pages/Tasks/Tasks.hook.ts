@@ -1,50 +1,43 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useQuery } from '@apollo/client';
-
+import { useSearchParams } from 'react-router-dom';
 import { useAppSelector } from '@/redux/hooks';
 import { GET_TAGS } from '@/pages/Tasks/components/TaskDetailModal/tasks.graphql';
 import { useTasksData } from '@/pages/Tasks/hooks/useTasksData.hook';
 import { useTasksFilters } from '@/pages/Tasks/hooks/useTasksFilters.hook';
 import { useTasksMutations } from '@/pages/Tasks/hooks/useTasksMutations.hook';
 import { useTasksUI } from '@/pages/Tasks/hooks/useTasksUI.hook';
+import type { TaskResponse } from '@/api/Tasks/apiTaskTypes';
 
 export const useTasks = () => {
   const { user } = useAppSelector((state) => state.auth);
+  const [, setSearchParams] = useSearchParams();
 
-  // 1. UI Hook
+  // ── View & UI local state ──────────────────────────────────────────
+  const [viewMode, setViewMode] = useState<
+    'list' | 'grid' | 'board' | 'workload'
+  >('list');
+  const [activeParentTask, setActiveParentTask] = useState<TaskResponse | null>(
+    null,
+  );
+  const [isSubtaskModalOpen, setIsSubtaskModalOpen] = useState(false);
+  const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(
+    null,
+  );
+  const [runOnboarding, setRunOnboarding] = useState(
+    () => localStorage.getItem('onboarding_tasks_completed') !== 'true',
+  );
+
+  // ── Composed hooks ─────────────────────────────────────────────────
   const ui = useTasksUI();
+  const filterLogic = useTasksFilters([]);
 
-  // 2. Filter Logic & State
-  // This hook manages the searchTerm, activeFilters (for server), and activeSort (for server)
-  // It also performs client-side filtering on whatever tasks are passed to it.
-  // We'll use a single instance and handle the "initial empty" case.
-  const filterLogic = useTasksFilters([]); 
-
-  // 3. Data Fetching
   const data = useTasksData({
     userId: user?.id,
     filters: filterLogic.activeFilters,
     sort: filterLogic.activeSort,
   });
 
-  // Re-run filter logic on the fetched data
-  // Since useTasksFilters is a hook that manages its own state,
-  // we can't easily "inject" tasks into it after initialization without a second instance
-  // or a refactor of useTasksFilters. 
-  // Let's use the second instance approach but ENSURE they share the SAME state if needed.
-  // Actually, for now, we'll just filter the data.tasks manually for the UI part
-  // so we don't have multiple states.
-  
-  const filteredTasks = useMemo(() => {
-    let result = data.tasks;
-    if (filterLogic.searchTerm) {
-      result = result.filter(t => t.title.toLowerCase().includes(filterLogic.searchTerm.toLowerCase()));
-    }
-    // We don't need to apply activeFilters/activeSort here because the server already did it!
-    return result;
-  }, [data.tasks, filterLogic.searchTerm]);
-
-  // 4. Mutations Hook
   const mutations = useTasksMutations({
     userId: user?.id,
     tasks: data.tasks,
@@ -55,9 +48,32 @@ export const useTasks = () => {
     variables: { userId: user?.id },
     skip: !user?.id || !ui.filterAnchorEl,
   });
-  const tags: string[] = useMemo(() => tagsData?.getTagsByUser || [], [tagsData]);
 
-  const handleFilterClick = (event: React.MouseEvent<HTMLElement>, type: string) => {
+  const tags: string[] = useMemo(
+    () => tagsData?.getTagsByUser || [],
+    [tagsData],
+  );
+
+  // ── Derived data ───────────────────────────────────────────────────
+  const filteredTasks = useMemo(() => {
+    let result = data.tasks;
+    if (filterLogic.searchTerm) {
+      result = result.filter((t) =>
+        t.title.toLowerCase().includes(filterLogic.searchTerm.toLowerCase()),
+      );
+    }
+    return result;
+  }, [data.tasks, filterLogic.searchTerm]);
+
+  // ── Handlers ───────────────────────────────────────────────────────
+  const handleTaskClick = (task: TaskResponse): void => {
+    setSearchParams({ tab: 'Tasks', taskId: task.id });
+  };
+
+  const handleFilterClick = (
+    event: React.MouseEvent<HTMLElement>,
+    type: string,
+  ): void => {
     if (type === 'filter') {
       ui.setFilterAnchorEl(event.currentTarget);
     } else if (type === 'sort') {
@@ -67,45 +83,96 @@ export const useTasks = () => {
     }
   };
 
+  const handleFinishOnboarding = (): void => {
+    setRunOnboarding(false);
+    localStorage.setItem('onboarding_tasks_completed', 'true');
+  };
+
+  const handleOpenSubtaskModal = (task: TaskResponse, index?: number): void => {
+    setActiveParentTask(task);
+    setActiveSubtaskIndex(typeof index === 'number' ? index : null);
+    setIsSubtaskModalOpen(true);
+  };
+
+  const handleSaveSubtask = async (): Promise<void> => {
+    if (activeSubtaskIndex !== null) {
+      setIsSubtaskModalOpen(false);
+      setActiveParentTask(null);
+      setActiveSubtaskIndex(null);
+    }
+  };
+
+  const handleSubtaskToggle = (task: TaskResponse, index: number): void => {
+    const newSubtasks = [...(task.subtasks || [])];
+    newSubtasks[index] = {
+      ...newSubtasks[index],
+      completed: !newSubtasks[index].completed,
+    };
+    mutations.updateTask(task.id, { ...task, subtasks: newSubtasks });
+  };
+
+  // ── Return ─────────────────────────────────────────────────────────
   return {
     // Data
     tasks: data.tasks,
     isLoading: data.isLoading,
     completedTasksCount: data.completedTasksCount,
     pendingTasksCount: data.pendingTasksCount,
+    filteredTasks,
+    tags,
 
-    // UI State & Actions
+    // Filters & search
     searchTerm: filterLogic.searchTerm,
     setSearchTerm: filterLogic.setSearchTerm,
     highPriorityTasks: filterLogic.highPriorityTasks,
     todayTasks: filterLogic.todayTasks,
     upcomingTasks: filterLogic.upcomingTasks,
-    selectedTask: ui.selectedTask,
-    isModalOpen: ui.isModalOpen,
-    handleTaskClick: ui.handleTaskClick,
-    handleCloseModal: ui.handleCloseModal,
-    handleSaveModal: ui.handleCloseModal,
-    filterAnchorEl: ui.filterAnchorEl,
-    handleFilterClick,
-    handleFilterClose: () => ui.setFilterAnchorEl(null),
-    sortAnchorEl: ui.sortAnchorEl,
     isCompletedFilterActive: filterLogic.isCompletedFilterActive,
     dateRange: filterLogic.dateRange,
     setDateRange: filterLogic.setDateRange,
-    handleSortClose: () => ui.setSortAnchorEl(null),
     activeSort: filterLogic.activeSort,
+    activeFilterState: filterLogic.activeFilterState,
+    handleApplySort: filterLogic.handleApplySort,
+    handleApplyFilters: filterLogic.handleApplyFilters,
+
+    // UI state
+    selectedTask: ui.selectedTask,
+    isModalOpen: ui.isModalOpen,
+    handleCloseModal: ui.handleCloseModal,
+    handleSaveModal: ui.handleCloseModal,
+    filterAnchorEl: ui.filterAnchorEl,
+    sortAnchorEl: ui.sortAnchorEl,
     expandedTaskIds: ui.expandedTaskIds,
     toggleTaskExpansion: ui.toggleTaskExpansion,
     showSuccessToast: ui.showSuccessToast,
     setShowSuccessToast: ui.setShowSuccessToast,
     toastMessage: ui.toastMessage,
     toastSubMessage: ui.toastSubMessage,
+
+    // Mutations
     updateTask: mutations.updateTask,
     handleAddSubtask: mutations.handleAddSubtask,
-    handleApplySort: filterLogic.handleApplySort,
-    handleApplyFilters: filterLogic.handleApplyFilters,
-    activeFilterState: filterLogic.activeFilterState,
-    filteredTasks,
-    tags,
+
+    // View & modal
+    viewMode,
+    setViewMode,
+    activeParentTask,
+    setActiveParentTask,
+    isSubtaskModalOpen,
+    setIsSubtaskModalOpen,
+    activeSubtaskIndex,
+    setActiveSubtaskIndex,
+    runOnboarding,
+    setRunOnboarding,
+
+    // Actions
+    handleTaskClick,
+    handleFilterClick,
+    handleFilterClose: () => ui.setFilterAnchorEl(null),
+    handleSortClose: () => ui.setSortAnchorEl(null),
+    handleFinishOnboarding,
+    handleOpenSubtaskModal,
+    handleSaveSubtask,
+    handleSubtaskToggle,
   };
 };
