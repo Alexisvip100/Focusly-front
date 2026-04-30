@@ -11,23 +11,27 @@ export const usePushNotifications = () => {
   const { user, isLogged } = useAppSelector((state) => state.auth);
 
   useEffect(() => {
-    if (isLogged && user?.id) {
-      const setupNotifications = async () => {
-        try {
-          const registration = await registerServiceWorker();
-          const token = await requestNotificationPermission(registration);
-          if (token) {
-            console.log('FCM Token:', token);
-            await axios.patch(`/users/${user.id}`, { fcmToken: token });
-          }
-        } catch (error) {
-          console.error('Error in setupNotifications:', error);
+    if (!isLogged || !user?.id) return;
+
+    const setupNotifications = async () => {
+      try {
+        const registration = await registerServiceWorker();
+        const token = await requestNotificationPermission(registration);
+        if (token) {
+          console.log('FCM Token:', token);
+          await axios.patch(`/users/${user.id}`, { fcmToken: token });
         }
-      };
+      } catch (error) {
+        console.error('Error in setupNotifications:', error);
+      }
+    };
 
-      setupNotifications();
+    setupNotifications();
 
-      listenForegroundMessages();
-    }
+    const unsubscribe = listenForegroundMessages();
+
+    return () => {
+      if (unsubscribe) unsubscribe();
+    };
   }, [isLogged, user?.id]);
 };
