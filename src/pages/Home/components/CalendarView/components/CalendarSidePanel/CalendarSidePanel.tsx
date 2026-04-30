@@ -38,13 +38,23 @@ const SectionTitle = styled(Typography)(({ theme }) => ({
 // Mock Components
 const QuickInsights = () => (
   <Box>
-    <SectionTitle>Quick Insights</SectionTitle>
+    <SectionTitle>Quick Insightssssssssss</SectionTitle>
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
       <Card elevation={0}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'flex-start',
+          }}
+        >
           <Typography
             variant="caption"
-            sx={{ color: 'text.secondary', fontWeight: 600, letterSpacing: '0.5px' }}
+            sx={{
+              color: 'text.secondary',
+              fontWeight: 600,
+              letterSpacing: '0.5px',
+            }}
           >
             PRODUCTIVITY SCORE
           </Typography>
@@ -52,15 +62,24 @@ const QuickInsights = () => (
         </Box>
 
         <Box sx={{ display: 'flex', alignItems: 'baseline', gap: '8px' }}>
-          <Typography variant="h3" sx={{ color: 'text.primary', fontWeight: 700 }}>
+          <Typography
+            variant="h3"
+            sx={{ color: 'text.primary', fontWeight: 700 }}
+          >
             84
           </Typography>
-          <Typography variant="body2" sx={{ color: 'success.main', fontWeight: 600 }}>
+          <Typography
+            variant="body2"
+            sx={{ color: 'success.main', fontWeight: 600 }}
+          >
             +12%
           </Typography>
         </Box>
 
-        <Typography variant="caption" sx={{ color: 'text.secondary', lineHeight: 1.5 }}>
+        <Typography
+          variant="caption"
+          sx={{ color: 'text.secondary', lineHeight: 1.5 }}
+        >
           You&apos;re more productive than usual this month.
         </Typography>
       </Card>
@@ -68,7 +87,10 @@ const QuickInsights = () => (
       <Card elevation={0}>
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
           <CheckCircleOutlineIcon sx={{ color: '#3b82f6', fontSize: 20 }} />
-          <Typography variant="body1" sx={{ color: 'text.primary', fontWeight: 600 }}>
+          <Typography
+            variant="body1"
+            sx={{ color: 'text.primary', fontWeight: 600 }}
+          >
             Habit Tracker
           </Typography>
         </Box>
@@ -102,7 +124,14 @@ const QuickInsights = () => (
 
 const UpcomingTasks = () => (
   <Box>
-    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        mb: 2,
+      }}
+    >
       <SectionTitle sx={{ mb: 0 }}>Upcoming</SectionTitle>
       <Typography
         variant="caption"
@@ -119,8 +148,16 @@ const UpcomingTasks = () => (
 
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
       {[
-        { title: 'Review Q4 Marketing Plan', due: 'Due Oct 25 • Strategy', color: '#10b981' }, // Green
-        { title: 'Send Invoice to Client X', due: 'Due Oct 26 • Finance', color: '#6366f1' }, // Indigo
+        {
+          title: 'Review Q4 Marketing Plan',
+          due: 'Due Oct 25 • Strategy',
+          color: '#10b981',
+        }, // Green
+        {
+          title: 'Send Invoice to Client X',
+          due: 'Due Oct 26 • Finance',
+          color: '#6366f1',
+        }, // Indigo
         {
           title: 'Month End Review',
           due: 'Schedule a retrospective to analyze your focus patterns.',
@@ -140,12 +177,20 @@ const UpcomingTasks = () => (
               py: 3,
             }}
           >
-            <Typography variant="body2" sx={{ color: '#818cf8', fontWeight: 600, mb: 0.5 }}>
+            <Typography
+              variant="body2"
+              sx={{ color: '#818cf8', fontWeight: 600, mb: 0.5 }}
+            >
               {task.title}
             </Typography>
             <Typography
               variant="caption"
-              sx={{ color: 'text.secondary', mb: 2, display: 'block', maxWidth: '200px' }}
+              sx={{
+                color: 'text.secondary',
+                mb: 2,
+                display: 'block',
+                maxWidth: '200px',
+              }}
             >
               {task.due}
             </Typography>
@@ -198,7 +243,7 @@ const UpcomingTasks = () => (
               </Typography>
             </Box>
           </Box>
-        )
+        ),
       )}
     </Box>
   </Box>
@@ -209,7 +254,12 @@ export const CalendarSidePanel = () => {
     <PanelContainer>
       <PerfectScrollbar
         options={{ wheelPropagation: true }}
-        style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '32px' }}
+        style={{
+          padding: '24px',
+          display: 'flex',
+          flexDirection: 'column',
+          gap: '32px',
+        }}
       >
         <QuickInsights />
         <UpcomingTasks />
