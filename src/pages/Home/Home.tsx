@@ -43,8 +43,6 @@ export const Home = () => {
     setIsRightPanelOpen,
     isFocusModeOpen,
     setIsFocusModeOpen,
-    isFocusModeActive,
-    setIsFocusModeActive,
     activeFocusTask,
     activeFocusSubtaskIndex,
     handleStartFocus,
@@ -77,7 +75,7 @@ export const Home = () => {
               onOpenTaskDetails={handleOpenTaskDetails}
               isSidebarOpen={isWorkspaceSidebarOpen}
               onSidebarChange={setIsWorkspaceSidebarOpen}
-              activeFocusTaskId={isFocusModeActive ? activeFocusTask?.id : null}
+              activeFocusTaskId={activeFocusTask?.id}
             />
           )}
           {activeTab === TaskBar.Insights && <Insights />}
@@ -118,7 +116,7 @@ export const Home = () => {
         onClose={() => setIsFocusModeOpen(false)}
         task={activeFocusTask}
         subtaskIndex={activeFocusSubtaskIndex}
-        onActiveChange={setIsFocusModeActive}
+        onActiveChange={() => {}}
       />
 
       {isEditModalOpen && (

@@ -23,10 +23,9 @@ interface CompletesSessionModalProps {
 }
 
 const formatHumanDuration = (minutes?: number) => {
-  if (!minutes || minutes <= 0) return '0m';
+  if (!minutes) return '25m';
   const h = Math.floor(minutes / 60);
-  const m = Math.round(minutes % 60);
-
+  const m = minutes % 60;
   if (h > 0 && m > 0) return `${h}h ${m}m`;
   if (h > 0) return `${h}h`;
   return `${m}m`;
@@ -58,10 +57,7 @@ export const CompletesSessionModal: React.FC<CompletesSessionModalProps> = ({
       <SuccessIconContainer>
         <CheckIcon />
       </SuccessIconContainer>
-      <Typography
-        variant="h2"
-        sx={{ fontWeight: 800, fontSize: '3rem', mb: 1 }}
-      >
+      <Typography variant="h2" sx={{ fontWeight: 800, fontSize: '3rem', mb: 1 }}>
         Task Completed!
       </Typography>
       <Typography
@@ -81,18 +77,14 @@ export const CompletesSessionModal: React.FC<CompletesSessionModalProps> = ({
         <StatCard>
           <Typography className="label">Real Time</Typography>
           <Typography className="value">
-            {formatHumanDuration(
-              Number(activeTask?.real_timer?.toFixed(2)) || 0,
-            )}
+            {formatHumanDuration(Number(activeTask?.real_timer || activeTask?.duration || 0))}
           </Typography>
         </StatCard>
       </StatsContainer>
 
-      <ActionButtonsContainer
-        sx={{ display: 'flex', justifyContent: 'center' }}
-      >
-        <NextTaskButton
-          endIcon={<ArrowForwardIcon />}
+      <ActionButtonsContainer sx={{ display: 'flex', justifyContent: 'center' }}>
+        <NextTaskButton 
+          endIcon={<ArrowForwardIcon />} 
           onClick={onClose}
           sx={{ width: 'auto', px: 4 }}
         >
