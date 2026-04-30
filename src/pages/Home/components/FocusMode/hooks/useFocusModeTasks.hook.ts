@@ -15,11 +15,9 @@ export const useFocusModeTasks = ({
   initialSubtaskIndex,
   userId,
 }: UseFocusModeTasksProps) => {
-  const [activeTask, setActiveTask] = useState<Task | null>(
-    initialTask || null,
-  );
+  const [activeTask, setActiveTask] = useState<Task | null>(initialTask || null);
   const [activeSubtaskIndex, setActiveSubtaskIndex] = useState<number | null>(
-    initialSubtaskIndex ?? null,
+    initialSubtaskIndex ?? null
   );
 
   const { data: tasksData } = useQuery(GET_TASKS, {
@@ -40,7 +38,6 @@ export const useFocusModeTasks = ({
           id: `${activeTask.id}-sub-${activeSubtaskIndex}`,
           title: st.title,
           estimate_timer: st.estimate_timer || st.timer,
-          real_timer: st.timer,
           category: st.category || activeTask.category,
           status: st.status || ('Todo' as TaskStatus),
           priority_level: st.priority_level || activeTask.priority_level,
@@ -66,12 +63,7 @@ export const useFocusModeTasks = ({
     })[] = [];
 
     allTasks.forEach((t) => {
-      if (
-        !t.deadline ||
-        !moment(t.deadline).isSame(today, 'day') ||
-        t.status === 'Done'
-      )
-        return;
+      if (!t.deadline || !moment(t.deadline).isSame(today, 'day') || t.status === 'Done') return;
 
       flattened.push(t);
 

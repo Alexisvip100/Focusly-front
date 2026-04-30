@@ -1,8 +1,5 @@
 import { useMutation } from '@apollo/client';
-import {
-  GET_TOTAL_WORKSPACES,
-  GET_WORKSPACES,
-} from '@/pages/Workspace/workspaces.graphql';
+import { GET_TOTAL_WORKSPACES, GET_WORKSPACES } from '@/pages/Workspace/workspaces.graphql';
 import {
   UPDATE_TASK,
   GET_TASKS,
@@ -15,16 +12,13 @@ interface UseFocusModeActionsProps {
   onSessionComplete: () => void;
 }
 
-export const useFocusModeActions = ({
-  userId,
-  onSessionComplete,
-}: UseFocusModeActionsProps) => {
+export const useFocusModeActions = ({ userId, onSessionComplete }: UseFocusModeActionsProps) => {
   const [updateTaskMutation] = useMutation(UPDATE_TASK);
 
   const handleCompleteTask = async (
     activeTask: Task,
     activeSubtaskIndex: number | null,
-    timeSpentMinutes: number,
+    timeSpentMinutes: number
   ) => {
     try {
       if (activeSubtaskIndex !== null && activeTask.subtasks) {
@@ -36,7 +30,7 @@ export const useFocusModeActions = ({
         const subtaskInput = {
           title: subtask.title,
           completed: true,
-          timer: Math.round((subtask.timer || 0) + timeSpentMinutes),
+          timer: timeSpentMinutes,
           estimate_timer: subtask.estimate_timer,
           priority_level: subtask.priority_level,
           category: subtask.category,
@@ -44,12 +38,11 @@ export const useFocusModeActions = ({
 
         const subtasksInput = updatedSubtasks.map((st, idx) => {
           if (idx === activeSubtaskIndex) return subtaskInput;
-          if (typeof st === 'string')
-            return { title: st, completed: false, timer: 0 };
+          if (typeof st === 'string') return { title: st, completed: false, timer: 0 };
           return {
             title: st.title,
             completed: st.completed,
-            timer: Math.round(st.timer || 0),
+            timer: st.timer,
             estimate_timer: st.estimate_timer,
             priority_level: st.priority_level,
             category: st.category,
@@ -71,16 +64,13 @@ export const useFocusModeActions = ({
           ],
         });
       } else {
-        const totalRealTimer = Math.round(
-          (activeTask.real_timer || 0) + timeSpentMinutes,
-        );
         await updateTaskMutation({
           variables: {
             updateTaskInput: {
               id: activeTask.id,
               status: 'Done',
-              real_timer: totalRealTimer,
-              duration: totalRealTimer.toString(),
+              real_timer: timeSpentMinutes,
+              duration: timeSpentMinutes.toString(),
             },
           },
           refetchQueries: [
@@ -100,14 +90,13 @@ export const useFocusModeActions = ({
   const handleUpdateStatus = async (
     activeTask: Task,
     activeSubtaskIndex: number | null,
-    newStatus: TaskStatus,
+    newStatus: TaskStatus
   ) => {
     try {
       if (activeSubtaskIndex !== null && activeTask.subtasks) {
         const updatedSubtasks = [...activeTask.subtasks];
         const subtasksInput = updatedSubtasks.map((st, idx) => {
-          if (typeof st === 'string')
-            return { title: st, completed: false, timer: 0 };
+          if (typeof st === 'string') return { title: st, completed: false, timer: 0 };
           return {
             title: st.title,
             completed: st.completed,
@@ -153,21 +142,19 @@ export const useFocusModeActions = ({
   const handleUpdatePriority = async (
     activeTask: Task,
     activeSubtaskIndex: number | null,
-    newPriority: number,
+    newPriority: number
   ) => {
     try {
       if (activeSubtaskIndex !== null && activeTask.subtasks) {
         const updatedSubtasks = [...activeTask.subtasks];
         const subtasksInput = updatedSubtasks.map((st, idx) => {
-          if (typeof st === 'string')
-            return { title: st, completed: false, timer: 0 };
+          if (typeof st === 'string') return { title: st, completed: false, timer: 0 };
           return {
             title: st.title,
             completed: st.completed,
             timer: st.timer,
             estimate_timer: st.estimate_timer,
-            priority_level:
-              idx === activeSubtaskIndex ? newPriority : st.priority_level,
+            priority_level: idx === activeSubtaskIndex ? newPriority : st.priority_level,
             category: st.category,
             status: st.status,
           };

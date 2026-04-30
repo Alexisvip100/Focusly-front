@@ -1,5 +1,5 @@
-import { Box, Typography, Tooltip } from '@mui/material';
-import { WbSunny, InfoOutlined as InfoIcon } from '@mui/icons-material';
+import { Box, Typography } from '@mui/material';
+import { WbSunny } from '@mui/icons-material';
 import {
   BottomRow,
   ChartCard,
@@ -22,20 +22,10 @@ export const BottomSection = ({
     <BottomRow>
       <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography variant="h6" fontWeight="bold">
-              Golden Hours
-            </Typography>
-            <Tooltip
-              title="We identify your peak concentration moments by analyzing what time of day you usually accumulate the most real focus minutes."
-              arrow
-            >
-              <InfoIcon
-                sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }}
-              />
-            </Tooltip>
-          </Box>
-          <ActionButton>VIEW DETAILS</ActionButton>
+          <Typography variant="h6" fontWeight="bold">
+            Horas de Oro
+          </Typography>
+          <ActionButton>VER DETALLES</ActionButton>
         </Box>
         <Box
           p={2}
@@ -48,33 +38,24 @@ export const BottomSection = ({
           <WbSunny sx={{ color: 'warning.main', mt: 0.5 }} />
           <Box>
             <Typography variant="body2" color="warning.main">
-              You are most productive between <b>{goldenWindowValue}</b>
+              Eres más productivo entre las{' '}
+              <b>{goldenWindowValue}</b>
             </Typography>
           </Box>
         </Box>
         <Typography variant="caption" color="text.secondary" mt={2}>
-          PRODUCTIVITY SCORE (LAST 7 DAYS)
+          PUNTAJE DE PRODUCTIVIDAD (ÚLTIMOS 7 DÍAS)
         </Typography>
       </ChartCard>
 
       <ChartCard sx={{ height: 'auto', minHeight: '300px' }}>
         <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Box display="flex" alignItems="center" gap={0.5}>
-            <Typography variant="h6" fontWeight="bold">
-              Activity Map
-            </Typography>
-            <Tooltip
-              title="This map shows your intensity level per day. Darker squares indicate days where you had more focus sessions or dedicated more real time to your tasks."
-              arrow
-            >
-              <InfoIcon
-                sx={{ fontSize: 16, color: 'text.disabled', cursor: 'help' }}
-              />
-            </Tooltip>
-          </Box>
+          <Typography variant="h6" fontWeight="bold">
+            Mapa de Actividad
+          </Typography>
           <Box display="flex" gap={1} alignItems="center">
             <Typography variant="caption" color="text.secondary">
-              Less
+              Menos
             </Typography>
             <Box display="flex" gap={0.5}>
               {[1, 2, 3, 4].map((i) => (
@@ -91,7 +72,7 @@ export const BottomSection = ({
               ))}
             </Box>
             <Typography variant="caption" color="text.secondary">
-              More
+              Más
             </Typography>
           </Box>
         </Box>
