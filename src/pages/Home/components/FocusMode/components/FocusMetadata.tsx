@@ -7,6 +7,8 @@ import {
   History as HistoryIcon,
   RadioButtonUnchecked as RadioButtonUncheckedIcon,
   FlashOn as FlashOnIcon,
+  EventNote as PlannedIcon,
+  Visibility as VisibilityIcon,
 } from '@mui/icons-material';
 import {
   TaskTitleContainer,
@@ -141,6 +143,22 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
                 return (
                   <HistoryIcon sx={{ fontSize: 16, color: 'secondary.main' }} />
                 );
+              case 'Planning':
+                return (
+                  <PlannedIcon sx={{ fontSize: 16, color: 'info.main' }} />
+                );
+              case 'OnHold':
+                return (
+                  <RadioButtonUncheckedIcon
+                    sx={{ fontSize: 16, color: 'error.main' }}
+                  />
+                );
+              case 'Review':
+                return (
+                  <VisibilityIcon
+                    sx={{ fontSize: 16, color: 'secondary.main' }}
+                  />
+                );
               default:
                 return (
                   <RadioButtonUncheckedIcon
@@ -221,9 +239,27 @@ export const FocusMetadata: React.FC<FocusMetadataProps> = ({
             ),
           },
           {
+            label: 'Planning',
+            icon: <PlannedIcon sx={{ fontSize: 18, color: 'info.main' }} />,
+          },
+          {
             label: 'Pending',
             icon: (
               <PauseCircleIcon sx={{ fontSize: 18, color: 'warning.main' }} />
+            ),
+          },
+          {
+            label: 'OnHold',
+            icon: (
+              <RadioButtonUncheckedIcon
+                sx={{ fontSize: 18, color: 'error.main' }}
+              />
+            ),
+          },
+          {
+            label: 'Review',
+            icon: (
+              <VisibilityIcon sx={{ fontSize: 18, color: 'secondary.main' }} />
             ),
           },
           {
