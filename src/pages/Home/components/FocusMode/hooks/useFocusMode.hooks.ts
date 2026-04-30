@@ -7,6 +7,7 @@ import { useFocusModeActions } from './useFocusModeActions.hook';
 import { useFocusModeUI } from './useFocusModeUI.hook';
 
 interface UseFocusModeProps {
+  open: boolean;
   task?: Task | null;
   onClose: () => void;
   onActiveChange?: (isActive: boolean) => void;
@@ -14,6 +15,7 @@ interface UseFocusModeProps {
 }
 
 export const useFocusMode = ({
+  open,
   task,
   onClose,
   onActiveChange,
@@ -60,6 +62,17 @@ export const useFocusMode = ({
     onTick: (secondsPassed) => {
       tasks.setActiveTask((prev) => {
         if (!prev) return null;
+        if (tasks.activeSubtaskIndex !== null && prev.subtasks) {
+          const updatedSubtasks = [...prev.subtasks];
+          const st = updatedSubtasks[tasks.activeSubtaskIndex];
+          if (st && typeof st === 'object') {
+            updatedSubtasks[tasks.activeSubtaskIndex] = {
+              ...st,
+              timer: (st.timer || 0) + secondsPassed / 60,
+            };
+          }
+          return { ...prev, subtasks: updatedSubtasks as Task['subtasks'] };
+        }
         return {
           ...prev,
           real_timer: (prev.real_timer || 0) + secondsPassed / 60,
@@ -67,6 +80,17 @@ export const useFocusMode = ({
       });
     },
   });
+
+  useEffect(() => {
+    if (open) {
+      ui.setViewMode('full');
+      ui.setIsSessionCompleted(false);
+      const totalSeconds = initialMinutes * 60;
+      timer.setTimeLeft(totalSeconds);
+      localStorage.setItem('focus_mode_time_left', totalSeconds.toString());
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, initialMinutes]);
 
   useEffect(() => {
     onActiveChange?.(isActive);

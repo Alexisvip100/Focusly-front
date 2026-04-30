@@ -39,6 +39,7 @@ export const FocusMode: React.FC<FocusModeProps> = ({
   subtaskIndex,
 }) => {
   const { ui, timer, tasks } = useFocusMode({
+    open,
     task,
     onActiveChange,
     subtaskIndex,
