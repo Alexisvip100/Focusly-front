@@ -1,4 +1,10 @@
-import { Box, Typography, LinearProgress, Stack, IconButton } from '@mui/material';
+import {
+  Box,
+  Typography,
+  LinearProgress,
+  Stack,
+  IconButton,
+} from '@mui/material';
 import { TrendingUp, ChevronRight, ChevronLeft } from '@mui/icons-material';
 
 import { PanelContainer, Card } from './RightPanel.styles';
@@ -20,10 +26,14 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
       >
         {isOpen && (
           <Typography variant="h6" fontWeight="bold">
-            Quick Insights
+            Quick Insightsssssssss
           </Typography>
         )}
-        <IconButton onClick={onToggle} size="small" sx={{ color: 'text.secondary' }}>
+        <IconButton
+          onClick={onToggle}
+          size="small"
+          sx={{ color: 'text.secondary' }}
+        >
           {isOpen ? <ChevronRight /> : <ChevronLeft />}
         </IconButton>
       </Box>
@@ -32,7 +42,12 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
         <>
           <Box>
             <Card mb={3}>
-              <Stack direction="row" justifyContent="space-between" alignItems="flex-start" mb={1}>
+              <Stack
+                direction="row"
+                justifyContent="space-between"
+                alignItems="flex-start"
+                mb={1}
+              >
                 <Typography
                   variant="caption"
                   fontWeight="700"
@@ -47,7 +62,11 @@ const RightPanel = ({ isOpen, onToggle }: RightPanelProps) => {
                 <Typography variant="h3" fontWeight="800">
                   84
                 </Typography>
-                <Typography variant="body1" color="success.main" fontWeight="bold">
+                <Typography
+                  variant="body1"
+                  color="success.main"
+                  fontWeight="bold"
+                >
                   +12%
                 </Typography>
               </Stack>

@@ -29,7 +29,7 @@ export interface TaskResponse {
   duration?: string;
   priority_level: number;
   category: string;
-  deadline: string; // GraphQL usually sends ISO string for Dates
+  deadline: string;
   status:
     | 'Todo'
     | 'Planning'
