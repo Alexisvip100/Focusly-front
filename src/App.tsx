@@ -13,10 +13,12 @@ import { useAppSelector } from '@/redux/hooks';
 import { SessionExpiredBanner } from '@/components/SessionExpiredBanner';
 import { ReleaseModal } from '@/components/ReleaseModal/ReleaseModal';
 import { usePushNotifications } from '@/hooks/usePushNotifications';
+import { useAgentListener } from '@/hooks/useAgentListener';
 
 function App() {
   const { isLogged } = useSession();
   usePushNotifications();
+  useAgentListener();
   const sessionExpiredNotice = useAppSelector(
     (state) => state.auth.sessionExpiredNotice,
   );
